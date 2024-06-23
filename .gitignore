@@ -1,4 +1,4 @@
 api/migrations
 cosmtech/migrations
-api/pycache
-cosmtech/pycache
+api/__pycache__
+cosmtech/__pycache__

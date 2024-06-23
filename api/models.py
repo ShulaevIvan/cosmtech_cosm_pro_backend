@@ -31,6 +31,7 @@ class Client(models.Model):
 
 class Order(models.Model):
     order_type = models.CharField(null=True, blank=True, default='production')
+    order_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'order'
