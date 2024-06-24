@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CallbackRequests, Client, Order, ClientOrder
+from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest
 
 
 class AdminClientOrderInline(admin.TabularInline):
@@ -17,12 +17,19 @@ class AdminCallbackRequests(admin.ModelAdmin):
     list_display = ('phone', 'request_time')
     extra = 0
 
-# @admin.register(Order)
-# class AdminOrder(admin.ModelAdmin):
-#     model = Order
-#     extra = 0
-#     list_display = ['order_type', 'order_date']
-#     inlines = [AdminClientOrderInline]
+@admin.register(ConsultRequest)
+class AdminConsultRequests(admin.ModelAdmin):
+
+    model = ConsultRequest
+    list_display = ['name', 'email', 'phone', 'comment', 'city', 'pref_communication', 'request_time']
+    extra = 0
+
+@admin.register(Order)
+class AdminOrder(admin.ModelAdmin):
+    model = Order
+    extra = 0
+    list_display = ['order_type', 'order_date']
+    inlines = [AdminClientOrderInline]
 
 @admin.register(Client)
 class AdminClient(admin.ModelAdmin):

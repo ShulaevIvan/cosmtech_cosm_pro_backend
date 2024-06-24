@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from api.views import CallbackRequestView, RequestOrderView
+from api.views import CallbackRequestView, RequestOrderView, RequestConsultView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/callbackreq/', CallbackRequestView.as_view()),
-    path('api/order/', RequestOrderView.as_view())
+    path('api/order/', RequestOrderView.as_view()),
+    path('api/consultreq/', RequestConsultView.as_view()),
 ]

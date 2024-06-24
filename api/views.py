@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 
 from django.db.models import Q
-from .models import CallbackRequests, Client, Order, ClientOrder
+from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest
 
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -45,6 +45,44 @@ class CallbackRequestView(APIView):
             return Response({
                 'message': 'ok', 'description': 'Спасибо! Ваш запрос № 999 отправлен, вам перезвонят в течении 30 мин'}, status=status.HTTP_201_CREATED)
         return Response({'message': 'err phone not valid'}, status=status.HTTP_200_OK)
+    
+class RequestConsultView(APIView):
+
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        req_body = request.data
+        consult_data = {
+            'name': req_body.get('name'),
+            'phone': req_body.get('phone'),
+            'email': req_body.get('email'),
+            'city': req_body.get('city'),
+            'comment': req_body.get('comment'),
+        }
+
+        if not consult_data['email'] and not consult_data['phone']:
+            return Response({'status': 'not found', 'description': 'email or phone not valid'}, status=status.HTTP_200_OK)
+        
+        check_client = Client.objects.filter(Q(email=consult_data['email']) | Q(phone=consult_data['phone']))
+
+        if not check_client.exists():
+            Client.objects.create(
+                name=consult_data['name'], 
+                phone=consult_data['phone'], 
+                email=consult_data['email'],
+            ).save()
+
+        ConsultRequest.objects.create(
+            name=consult_data['name'], 
+            phone=consult_data['phone'], 
+            email=consult_data['email'],
+            city=consult_data['city'],
+            comment=consult_data['comment'],
+            request_time = datetime.datetime.now(tz=timezone.utc)
+        ).save()
+        
+        
+        return Response({'status': 'ok'}, status=status.HTTP_200_OK)
 
 class RequestOrderView(APIView):
     permission_classes = [IsAuthenticated, ]

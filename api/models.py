@@ -15,6 +15,23 @@ class CallbackRequests(models.Model):
 
         return self.phone
     
+class ConsultRequest(models.Model):
+    name = models.CharField(max_length=255, null=True, blank=True, default='')
+    email = models.CharField(max_length=255, null=True, blank=True, default='testmail@test.ru')
+    phone = models.CharField(max_length=255, null=True, blank=True, default='0xxxxxxxxxx')
+    city = models.CharField(max_length=255, null=True, blank=True, default='')
+    pref_communication = models.CharField(max_length=255, null=True, blank=True, default='')
+    comment = models.TextField( null=True, blank=True, default='')
+    request_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'consult_request'
+        verbose_name_plural = 'consult_requests'
+
+    def __str__(self):
+
+        return self.phone
+    
 class Client(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True, default='')
     email = models.CharField(max_length=255, null=True, blank=True, default='testmail@test.ru')
