@@ -1,17 +1,23 @@
 import datetime
-from django.utils import timezone
 import random
+import os
+import asyncio
+import base64
+
+from django.conf import settings
+from django.utils import timezone
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import authenticate, logout
 from django.core.mail import send_mail
+from django.db.models import Q
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 
-from django.db.models import Q
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest
 
 class CallbackRequestView(APIView):
@@ -82,7 +88,7 @@ class RequestConsultView(APIView):
         ).save()
         
         
-        return Response({'status': 'ok'}, status=status.HTTP_200_OK)
+        return Response({'status': 'ok', 'description': 'Ваш запрос принят!'}, status=status.HTTP_200_OK)
 
 class RequestOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -95,6 +101,7 @@ class RequestOrderView(APIView):
             "email": req_body.get('email'),
             "phone": req_body.get('phone'),
             "comment": req_body.get('comment'),
+            "options": req_body.get('options')
         }
         
         if not order_data['email'] and not order_data['phone']:
@@ -108,7 +115,7 @@ class RequestOrderView(APIView):
             elif order_data['phone'] and not order_data['email']:
                 target_client = Client.objects.filter(phone=order_data['phone'])
                 
-                
+               
             if not target_client.exists():
                 Client.objects.create(
                     name=order_data['name'], 
@@ -116,6 +123,10 @@ class RequestOrderView(APIView):
                     email=order_data['email'],
                 ).save()
                 target_client = Client.objects.filter(name=order_data['name'], phone=order_data['phone'], email=order_data['email'])
+            
+            if not order_data['options']:
+                order_data['options'] = 'none'
+
             order = generate_order_number('production', target_client[0].id)
             target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
             target_order.save()
@@ -123,7 +134,9 @@ class RequestOrderView(APIView):
                 client_id=target_client.first(), 
                 order_id=Order.objects.filter(id=target_order.id).first(),
                 order_number = order['number'], 
-                order_date = order['date']
+                order_date = order['date'],
+                oreder_description = order_data['comment'],
+                order_option = order_data['options']
             ).save()
             
             not_format_date = datetime.datetime.now(tz=timezone.utc)
@@ -144,6 +157,57 @@ class RequestOrderView(APIView):
                 'message': 'ok', 'description': f"Спасибо! Запрос отправлен, Номер запроса: №{order['number']}"}, status=status.HTTP_201_CREATED)
 
         return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+    
+class ContactsRequestView(APIView):
+
+    def post(self, request):
+        req_body = request.data
+        order_types = ['contract', 'lab', 'pack', 'cert']
+        order_cooperations = ['trade', 'cooperation']
+        contacts_data = {
+            'name': req_body.get('name'),
+            'email': req_body.get('email'),
+            'phone': req_body.get('phone'),
+            'orderType': req_body.get('orderType'),
+            'city': req_body.get('city'),
+            'comment': req_body.get('comment'),
+            'file': req_body.get('file'),
+        }
+
+        if contacts_data['file'][0] and len(contacts_data['file']) > 0:
+            files_list = contacts_data['file']
+            for file in files_list:
+                create_file(file, settings.ORDER_FILES)
+        
+        if contacts_data['orderType'] in order_types and contacts_data['orderType'] not in order_cooperations:
+            target_client = find_existing_client(contacts_data['phone'], contacts_data['email'])
+            if not target_client.exists():
+                pass
+            order = generate_order_number(contacts_data['orderType'], target_client[0].id)
+            target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
+            target_order.save()
+            ClientOrder.objects.create(
+                client_id=target_client.first(), 
+                order_id=Order.objects.filter(id=target_order.id).first(),
+                order_number = order['number'], 
+                order_date = order['date'],
+                oreder_description = contacts_data['comment'],
+                order_option = contacts_data['orderType']
+            ).save()
+            
+            not_format_date = datetime.datetime.now(tz=timezone.utc)
+            time = get_time(not_format_date)
+
+        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+    
+def find_existing_client(phone='', email=''):
+    if phone and email:
+        target_client = Client.objects.filter(email=email, phone=phone)
+    elif email and not phone:
+        target_client = Client.objects.filter(email=email)
+    elif phone and not email:
+        target_client = Client.objects.filter(phone=phone)
+    return target_client
 
 def generate_order_number(order_type, client_id):
     order_modifer = []
@@ -169,6 +233,9 @@ def generate_order_number(order_type, client_id):
         'date': datetime.datetime.now(tz=timezone.utc)
     }
 
+def create_file(file_obj, path):
+    with open(f"{path}{file_obj['name']}", "wb") as file:
+        file.write(base64.b64decode(file_obj['file']))
 
 def get_time(date):
     result_str = ''

@@ -43,7 +43,7 @@ class AdminClient(admin.ModelAdmin):
 class AdminClientOrders(admin.ModelAdmin):
     model = ClientOrder
     extra = 0
-    fields = ['order_number', 'client_id', 'order_date', 'oreder_description']
+    fields = ['order_number', 'client_id', 'order_date', 'order_option', 'oreder_description']
     list_display = ['order_number', 'client_id', 'order_date']
     readonly_fields = ['order_date']
     ordering = ['-order_date']

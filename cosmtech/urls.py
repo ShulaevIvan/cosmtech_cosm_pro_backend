@@ -14,13 +14,28 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 from django.contrib import admin
 from django.urls import path
-from api.views import CallbackRequestView, RequestOrderView, RequestConsultView
+from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView
+
+upload_files = f'{os.getcwd()}/upload_files/'
+order_files = f'{upload_files}/order_files/'
+cooperation_files = f'{upload_files}/cooperation_files/'
+
+if not os.path.exists(f'{upload_files}'):
+    os.mkdir(f'{upload_files}')
+
+if not os.path.exists(f'{order_files}'):
+    os.mkdir(f'{order_files}')
+
+if not os.path.exists(f'{cooperation_files}'):
+    os.mkdir(f'{cooperation_files}')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/callbackreq/', CallbackRequestView.as_view()),
     path('api/order/', RequestOrderView.as_view()),
     path('api/consultreq/', RequestConsultView.as_view()),
+    path('api/contactreq/', ContactsRequestView.as_view())
 ]
