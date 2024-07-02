@@ -82,21 +82,59 @@ class ClientOrder(models.Model):
     
     def file_link(self):
         if self.file:
-            return format_html("<a href='%s'>download</a>" % (self.file.url,))
+            return format_html(f"<a href='/api/admin_download/?file_path={self.file.url}' target=blank>download file</a>")
         else:
             return "No attachment"
+        
+class ClientOrderFile(models.Model):
+    file = models.FileField(upload_to=f'upload_files/order_files/', null=True, blank=True, max_length=255)
+    file_name = models.TextField(null=True, blank=True, default='file', max_length=255)
+    file_type = models.CharField(null=True, blank=True, default='')
+    client_order = models.ForeignKey(ClientOrder, on_delete=models.CASCADE, related_name='client_files')
+
+    def file_link(self):
+        if self.file:
+            return format_html(f"<a href='/api/admin_download/?file_path={self.file.url}' target=blank>download file</a>")
+        else:
+            return "No attachment"
+        
+    def __str__(self):
+
+        return f'{self.client_order.client_id.name} file'
+    
     
 class CoperationRequest(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True, default='')
     email = models.CharField(max_length=255, null=True, blank=True, default='testmail@test.ru')
     phone = models.CharField(max_length=255, null=True, blank=True, default='0xxxxxxxxxx')
     request_description = models.TextField(null=True, blank=True)
+    cooperation_type = models.CharField(max_length=255, null=True, blank=True)
     request_time = models.DateTimeField(auto_now_add=True)
 
     file = models.FileField(upload_to=f'upload_files/cooperation_files/', null=True, blank=True)
+
+    def __str__(self):
+
+        return self.cooperation_type
 
     def file_link(self):
         if self.file:
             return format_html("<a href='%s'>download</a>" % (self.file.url,))
         else:
             return "No attachment"
+        
+class CoperationRequestFile(models.Model):
+    file = models.FileField(upload_to=f'upload_files/cooperation_files/', null=True, blank=True, max_length=255)
+    file_name = models.TextField(null=True, blank=True, default='file', max_length=255)
+    file_type = models.CharField(null=True, blank=True, default='')
+    cooperation_request_id = models.ForeignKey(CoperationRequest, on_delete=models.CASCADE, related_name='cooperation_request_file')
+
+    def file_link(self):
+        if self.file:
+            return format_html(f"<a href='/api/admin_download/?file_path={self.file.url}' target=blank>download file</a>")
+        else:
+            return "No attachment"
+        
+    def __str__(self):
+
+        return f'{self.file_name}'

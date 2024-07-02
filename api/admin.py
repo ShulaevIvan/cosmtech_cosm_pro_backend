@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest
+from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, CoperationRequest, CoperationRequestFile
 
 
 class AdminClientOrderInline(admin.TabularInline):
@@ -9,6 +9,17 @@ class AdminClientOrderInline(admin.TabularInline):
     ordering = ['order_date']
     readonly_fields = ['order_date']
 
+class ClientOrderFileInline(admin.TabularInline):
+    model = ClientOrderFile
+    extra = 0
+    fields = ['file_link',]
+    readonly_fields = ['file_link']
+
+class CoperationRequestFileInline(admin.TabularInline):
+    model = CoperationRequestFile
+    extra = 0
+    fields = ['file_link',]
+    readonly_fields = ['file_link']
 
 @admin.register(CallbackRequests)
 class AdminCallbackRequests(admin.ModelAdmin):
@@ -43,7 +54,17 @@ class AdminClient(admin.ModelAdmin):
 class AdminClientOrders(admin.ModelAdmin):
     model = ClientOrder
     extra = 0
-    fields = ['order_number', 'client_id', 'order_date', 'order_option', 'oreder_description']
-    list_display = ['order_number', 'client_id', 'order_date']
-    readonly_fields = ['order_date']
+    fields = ['order_number', 'client_id', 'order_date', 'order_option', 'oreder_description', 'file_link']
+    list_display = ['order_number', 'client_id', 'order_date',]
+    readonly_fields = ['order_date', 'file_link']
     ordering = ['-order_date']
+    inlines=[ClientOrderFileInline]
+
+@admin.register(CoperationRequest)
+class AdminCoperationRequest(admin.ModelAdmin):
+    model = CoperationRequest
+    list_display = ['cooperation_type','name', 'email', 'phone']
+    extra = 0
+    fields = ['cooperation_type','name', 'email', 'phone', 'request_description', 'file_link', 'request_time']
+    readonly_fields = ['request_time', 'file_link']
+    inlines=[CoperationRequestFileInline]

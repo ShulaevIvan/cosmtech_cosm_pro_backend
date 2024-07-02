@@ -1,24 +1,25 @@
 import datetime
 import random
-import os
-import asyncio
 import base64
-
+import re
+import uuid
+from django.core.mail import EmailMessage
 from django.conf import settings
 from django.utils import timezone
 from django.utils import timezone
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import HttpResponse, render, get_object_or_404
 from django.contrib.auth import authenticate, logout
 from django.core.mail import send_mail
 from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 
-from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest
+from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, CoperationRequest, CoperationRequestFile
 
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -126,7 +127,7 @@ class RequestOrderView(APIView):
             
             if not order_data['options']:
                 order_data['options'] = 'none'
-
+            
             order = generate_order_number('production', target_client[0].id)
             target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
             target_order.save()
@@ -164,6 +165,7 @@ class ContactsRequestView(APIView):
         req_body = request.data
         order_types = ['contract', 'lab', 'pack', 'cert']
         order_cooperations = ['trade', 'cooperation']
+        file_path = ''
         contacts_data = {
             'name': req_body.get('name'),
             'email': req_body.get('email'),
@@ -173,32 +175,124 @@ class ContactsRequestView(APIView):
             'comment': req_body.get('comment'),
             'file': req_body.get('file'),
         }
-
-        if contacts_data['file'][0] and len(contacts_data['file']) > 0:
-            files_list = contacts_data['file']
-            for file in files_list:
-                create_file(file, settings.ORDER_FILES)
+        client_data = {}
+        client_files = []
+        cooperation_files = []
         
         if contacts_data['orderType'] in order_types and contacts_data['orderType'] not in order_cooperations:
             target_client = find_existing_client(contacts_data['phone'], contacts_data['email'])
             if not target_client.exists():
-                pass
+                Client.objects.create(
+                    name=contacts_data['name'], 
+                    phone=contacts_data['phone'], 
+                    email=contacts_data['email'],
+                ).save()
+                target_client = Client.objects.filter(name=contacts_data['name'], phone=contacts_data['phone'], email=contacts_data['email'])
+
             order = generate_order_number(contacts_data['orderType'], target_client[0].id)
             target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
             target_order.save()
+            
             ClientOrder.objects.create(
                 client_id=target_client.first(), 
                 order_id=Order.objects.filter(id=target_order.id).first(),
                 order_number = order['number'], 
                 order_date = order['date'],
                 oreder_description = contacts_data['comment'],
-                order_option = contacts_data['orderType']
+                order_option = contacts_data['orderType'],
+                file = 'test'
             ).save()
-            
-            not_format_date = datetime.datetime.now(tz=timezone.utc)
-            time = get_time(not_format_date)
 
-        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+            if contacts_data['file'] and len(contacts_data['file']) > 0:
+                files_list = contacts_data['file']
+                target_order = ClientOrder.objects.filter(order_number=order['number'])
+               
+                for file in files_list:
+                    file_path = create_file(file, settings.ORDER_FILES)
+                    ClientOrderFile.objects.create(client_order=ClientOrder.objects.get(id=target_order[0].id), file=file_path,).save()
+                    client_files.append(file_path)
+            
+            client_data = {
+                'client_name': contacts_data['name'],
+                'client_phone': contacts_data['phone'],
+                'client_email': contacts_data['email'],
+                'order_number': order['number'],
+                'order_type': order['type'],
+            }
+            client_data['files'] = client_files
+            send_order_mail(client_data)
+
+            return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+        
+        elif contacts_data['orderType'] in order_cooperations and contacts_data['orderType'] not in order_types:
+            if contacts_data['phone'] or contacts_data['email']:
+                cooperation_request, created = CoperationRequest.objects.get_or_create(
+                    name = contacts_data['name'],
+                    email = contacts_data['email'],
+                    phone = contacts_data['phone'],
+                    request_description = contacts_data['comment'],
+                    cooperation_type = contacts_data['orderType'],
+                )
+
+                if contacts_data['file'] and len(contacts_data['file']) > 0:
+                    files_list = contacts_data['file']
+                    target_cooperation = CoperationRequest.objects.filter(id=cooperation_request.id)
+                    for file in files_list:
+                        file_path = create_file(file, settings.COOPERATION_FILES)
+                        CoperationRequestFile.objects.create(
+                            cooperation_request_id=CoperationRequest.objects.get(id=target_cooperation[0].id), 
+                            file=file_path,
+                        ).save()
+                        cooperation_files.append(file_path)
+
+                print(cooperation_files)
+
+                return Response(
+                    {'message': 'ok', 'description': f"Спасибо! Запрос отправлен"}, 
+                    status=status.HTTP_201_CREATED)
+        
+        return Response({'message': 'ok', 'description': f"err"}, status=status.HTTP_201_CREATED)
+    
+@permission_classes([IsAuthenticated,]) 
+@api_view(['GET'])
+def download_admin_file(request):
+    params = request.query_params
+    file_path = params.get('file_path')
+    file_name = re.findall(r'[\w-]+\.\S+|\s+$', file_path)
+    if len(file_name) > 0:
+        file_name = file_name[0]
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read())
+            response['Content-Disposition'] = 'attachment; filename=' + file_name
+        
+            return response
+    return Response({'status': 'ok'}, status=status.HTTP_200_OK)
+
+
+def send_order_mail(client_data):
+    
+    not_format_date = datetime.datetime.now(tz=timezone.utc)
+    time = get_time(not_format_date)
+    msg_mail = EmailMessage(
+        'Новый запрос с сайта cosmtech.ru', 
+        f"""<p>Пришел запрос на (контрактное производство)</p>
+            <p>Имя клиента: {client_data['client_name']}</p>
+            <p>Телефон клиента: {client_data['client_phone']}
+            <p>Email клиента: {client_data['client_email']}</p>
+            <p>Номер заказа: <b>№{client_data['order_number']}</b></p>
+            <p>Тип заказа: {client_data['order_type']}</p>
+            <p><b>{time}</b></p>
+        """,
+        'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
+    )
+    msg_mail.content_subtype = "html"  
+    for file_path in client_data['files']:
+        msg_mail.content_subtype = "html" 
+        msg_mail.attach_file(f'{file_path}')
+    msg_mail.send()
+
+def send_mail_to_client():
+    pass
     
 def find_existing_client(phone='', email=''):
     if phone and email:
@@ -233,9 +327,26 @@ def generate_order_number(order_type, client_id):
         'date': datetime.datetime.now(tz=timezone.utc)
     }
 
+
 def create_file(file_obj, path):
-    with open(f"{path}{file_obj['name']}", "wb") as file:
+    ext = re.findall(r'.\w+$', file_obj['name'])[0]
+    full_name = f"{path}{uuid.uuid4()}{ext}"
+
+    with open(full_name, "wb") as file:
         file.write(base64.b64decode(file_obj['file']))
+
+    return full_name
+
+def get_request_name(value):
+    request_types = {
+        'contract': 'Контрактное производство',
+        'lab': 'Услуги лаборатории',
+        'pack': 'Упаковка и соправождение',
+        'cert': 'Сертификаиця продукции',
+        'trade': 'Торговое предложение',
+        'cooperation': 'Сотрудничество',
+    }
+    return request_types.get(value)
 
 def get_time(date):
     result_str = ''

@@ -15,9 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import os
+from django.conf.urls.static import static
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path
-from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView
+from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
 
 upload_files = f'{os.getcwd()}/upload_files/'
 order_files = f'{upload_files}/order_files/'
@@ -37,5 +39,7 @@ urlpatterns = [
     path('api/callbackreq/', CallbackRequestView.as_view()),
     path('api/order/', RequestOrderView.as_view()),
     path('api/consultreq/', RequestConsultView.as_view()),
-    path('api/contactreq/', ContactsRequestView.as_view())
-]
+    path('api/contactreq/', ContactsRequestView.as_view()),
+    path('api/admin_download/', download_admin_file)
+]+ static(settings.UPLOAD_FILES, document_root=settings.ORDER_FILES)
+
