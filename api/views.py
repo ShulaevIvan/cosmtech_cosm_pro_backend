@@ -171,6 +171,7 @@ class ContactsRequestView(APIView):
             'email': req_body.get('email'),
             'phone': req_body.get('phone'),
             'orderType': req_body.get('orderType'),
+            'call_option': req_body.get('callOption'),
             'city': req_body.get('city'),
             'comment': req_body.get('comment'),
             'file': req_body.get('file'),
@@ -216,8 +217,11 @@ class ContactsRequestView(APIView):
                 'client_name': contacts_data['name'],
                 'client_phone': contacts_data['phone'],
                 'client_email': contacts_data['email'],
+                'call_option': get_request_name(contacts_data['call_option']),
+                'client_comment': contacts_data['comment'],
                 'order_number': order['number'],
                 'order_type': order['type'],
+                'order_type_name': get_request_name(contacts_data['orderType']),
             }
             client_data['files'] = client_files
             send_order_mail(client_data)
@@ -245,7 +249,16 @@ class ContactsRequestView(APIView):
                         ).save()
                         cooperation_files.append(file_path)
 
-                print(cooperation_files)
+                client_data = {
+                    'client_name': contacts_data['name'],
+                    'client_phone': contacts_data['phone'],
+                    'client_email': contacts_data['email'],
+                    'call_option': get_request_name(contacts_data['call_option']),
+                    'order_type_name': get_request_name(contacts_data['orderType']),
+                    'client_comment': contacts_data['comment'],
+                }
+                client_data['files'] = client_files
+                send_order_mail(client_data)
 
                 return Response(
                     {'message': 'ok', 'description': f"Спасибо! Запрос отправлен"}, 
@@ -270,21 +283,44 @@ def download_admin_file(request):
 
 
 def send_order_mail(client_data):
+    if client_data['order_type_name'] is None:
+        client_data['order_type_name'] = 'Контрактное производство'
     
     not_format_date = datetime.datetime.now(tz=timezone.utc)
     time = get_time(not_format_date)
-    msg_mail = EmailMessage(
-        'Новый запрос с сайта cosmtech.ru', 
-        f"""<p>Пришел запрос на (контрактное производство)</p>
-            <p>Имя клиента: {client_data['client_name']}</p>
-            <p>Телефон клиента: {client_data['client_phone']}
-            <p>Email клиента: {client_data['client_email']}</p>
-            <p>Номер заказа: <b>№{client_data['order_number']}</b></p>
-            <p>Тип заказа: {client_data['order_type']}</p>
-            <p><b>{time}</b></p>
-        """,
-        'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
-    )
+
+    if client_data.get('order_number'):
+        msg_mail = EmailMessage(
+            f"Новый запрос {client_data['order_type_name']} с сайта cosmtech.ru", 
+            f"""
+                <p>Пришел запрос на ({client_data['order_type_name']})</p>
+                <p>Имя клиента: {client_data['client_name']}</p>
+                <p>Телефон клиента: {client_data['client_phone']}
+                <p>Email клиента: {client_data['client_email']}</p>
+                <p>Предпочитаемый способ связи: {client_data['call_option']}</p>
+                <p>Номер заказа: <b>№{client_data['order_number']}</b></p>
+                <p>Тип заказа: {client_data['order_type_name']}</p>
+                <p>Комментарий: {client_data['client_comment']}</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
+        )
+    else:
+        msg_mail = EmailMessage(
+            f"Новый запрос {client_data['order_type_name']} с сайта cosmtech.ru", 
+            f"""
+                <p>Пришел запрос на ({client_data['order_type_name']})</p>
+                <p>Имя: {client_data['client_name']}</p>
+                <p>Телефон: {client_data['client_phone']}
+                <p>Email: {client_data['client_email']}</p>
+                <p>Предпочитаемый способ связи: {client_data['call_option']}</p>
+                <p>Тип запроса: {client_data['order_type_name']}</p>
+                <p>Комментарий: {client_data['client_comment']}</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
+        )
+
     msg_mail.content_subtype = "html"  
     for file_path in client_data['files']:
         msg_mail.content_subtype = "html" 
@@ -341,10 +377,14 @@ def get_request_name(value):
     request_types = {
         'contract': 'Контрактное производство',
         'lab': 'Услуги лаборатории',
-        'pack': 'Упаковка и соправождение',
+        'pack': 'Упаковка и сопровождение',
         'cert': 'Сертификаиця продукции',
         'trade': 'Торговое предложение',
         'cooperation': 'Сотрудничество',
+        'msg': 'Мессанджеры',
+        'phone': 'Телефон',
+        'email': 'Email',
+
     }
     return request_types.get(value)
 
