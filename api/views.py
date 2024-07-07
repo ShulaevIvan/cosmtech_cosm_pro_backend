@@ -43,11 +43,11 @@ class CallbackRequestView(APIView):
                 request_time = not_format_date
             ).save()
 
-            # send_mail(
-            #     'Заказ обратного звонка', 
-            #     f"Пришел запрос перезвонить клиенту по поводу консультации (контрактное производство)\n, Телефон клиента: {email_data['phone']}\n {time}", 
-            #     'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
-            # )
+            send_mail(
+                'Заказ обратного звонка', 
+                f"Пришел запрос перезвонить клиенту по поводу консультации (контрактное производство)\n, Телефон клиента: {email_data['phone']}\n {time}", 
+                'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
+            )
 
             return Response({
                 'message': 'ok', 'description': 'Спасибо! Ваш запрос № 999 отправлен, вам перезвонят в течении 30 мин'}, status=status.HTTP_201_CREATED)
@@ -127,8 +127,7 @@ class RequestOrderView(APIView):
             
             if not order_data['options']:
                 order_data['options'] = 'none'
-            
-            order = generate_order_number('production', target_client[0].id)
+            order = generate_order_number(order_data['options'], target_client[0].id)
             target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
             target_order.save()
             ClientOrder.objects.create(
@@ -140,26 +139,22 @@ class RequestOrderView(APIView):
                 order_option = order_data['options']
             ).save()
             
-            not_format_date = datetime.datetime.now(tz=timezone.utc)
-            time = get_time(not_format_date)
-
-            # send_mail(
-            #     'Новый запрос с сайта cosmtech.ru', 
-            #     f"""Пришел запрос на (контрактное производство),
-            #     Имя клиента: {order_data['name']};
-            #     Телефон клиента: {order_data['phone']};
-            #     Email клиента: {order_data['email']};
-            #     Номер заказа: №{order['number']};
-            #     Тип заказа: {order['type']};
-            #     {time}""", 
-            #     'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
-            # )
+            client_data = {
+                'client_name': order_data['name'],
+                'client_phone': order_data['phone'],
+                'client_email': order_data['email'],
+                'call_option': '',
+                'order_type_name': order_data['options'],
+                'client_comment': order_data['comment'],
+            }
+            send_order_mail(client_data)
             return Response({
                 'message': 'ok', 'description': f"Спасибо! Запрос отправлен, Номер запроса: №{order['number']}"}, status=status.HTTP_201_CREATED)
 
         return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
     
 class ContactsRequestView(APIView):
+    permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
         req_body = request.data
@@ -225,8 +220,11 @@ class ContactsRequestView(APIView):
             }
             client_data['files'] = client_files
             send_order_mail(client_data)
+            send_mail_to_client(client_data)
 
-            return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+            return Response(
+                    {'message': 'ok', 'description': f"Спасибо! Запрос №{order['number']} зарегистрирован"}, 
+                    status=status.HTTP_201_CREATED)
         
         elif contacts_data['orderType'] in order_cooperations and contacts_data['orderType'] not in order_types:
             if contacts_data['phone'] or contacts_data['email']:
@@ -259,6 +257,7 @@ class ContactsRequestView(APIView):
                 }
                 client_data['files'] = client_files
                 send_order_mail(client_data)
+                send_mail_to_client(client_data)
 
                 return Response(
                     {'message': 'ok', 'description': f"Спасибо! Запрос отправлен"}, 
@@ -303,9 +302,9 @@ def send_order_mail(client_data):
                 <p>Комментарий: {client_data['client_comment']}</p>
                 <p><b>{time}</b></p>
             """,
-            'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
         )
-    else:
+    elif not client_data.get('order_number'):
         msg_mail = EmailMessage(
             f"Новый запрос {client_data['order_type_name']} с сайта cosmtech.ru", 
             f"""
@@ -318,17 +317,44 @@ def send_order_mail(client_data):
                 <p>Комментарий: {client_data['client_comment']}</p>
                 <p><b>{time}</b></p>
             """,
-            'django_mail@cosmtech.ru', ["pro@cosmtech.ru"]
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
         )
+    if client_data.get('files'):
+        msg_mail.content_subtype = "html"  
+        for file_path in client_data['files']:
+            msg_mail.attach_file(f'{file_path}')
 
-    msg_mail.content_subtype = "html"  
-    for file_path in client_data['files']:
-        msg_mail.content_subtype = "html" 
-        msg_mail.attach_file(f'{file_path}')
+    msg_mail.content_subtype = "html" 
     msg_mail.send()
 
-def send_mail_to_client():
-    pass
+def send_mail_to_client(order_data):
+    not_format_date = datetime.datetime.now(tz=timezone.utc)
+    time = get_time(not_format_date)
+    if not order_data.get('order_number') and order_data.get('client_email'):
+        msg_mail = EmailMessage(
+            f"Ваш запрос  на {order_data['order_type_name']} отправлен", 
+            f"""
+                <p>Спасибо  {order_data['client_name']}! Ваш запрос зарегистрирован. С вами свяжутся в ближайшее время </p>
+            """,
+            'django_mail@cosmtech.ru', [f"{order_data['client_email']}"]
+        )
+        msg_mail.content_subtype = "html"  
+        msg_mail.send()
+        return
+    
+    elif order_data.get('order_number') and order_data.get('client_email'):
+        msg_mail = EmailMessage(
+            f"Ваш заказ на {order_data['order_type_name']} зарегистрирован", 
+            f"""
+                <p>Спасибо {order_data['client_name']} за проявленый интерес! Менеджеры свяжутся с вами в в ближайшее время </p>
+                <p>Номер заказа: <b>{order_data['order_number']}</b></p>
+                <p>Время запроса: <b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{order_data['client_email']}"]
+        )
+        msg_mail.content_subtype = "html"  
+        msg_mail.send()
+        return
     
 def find_existing_client(phone='', email=''):
     if phone and email:

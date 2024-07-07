@@ -2,3 +2,4 @@ api/migrations
 cosmtech/migrations
 api/__pycache__
 cosmtech/__pycache__
+upload_files
