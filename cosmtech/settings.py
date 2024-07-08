@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from os.path import join
-import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -84,7 +84,7 @@ ROOT_URLCONF = 'cosmtech.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'frontend/build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -158,10 +158,24 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "upload_files"),
-    os.path.join(BASE_DIR, "order_files"),
+    os.path.join(BASE_DIR, "frontend/build/"),
+    os.path.join(BASE_DIR, "frontend/build/static/")
 )
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+def create_upload_folders():
+    upload_files = f'{os.getcwd()}/upload_files/'
+    order_files = f'{upload_files}/order_files/'
+    cooperation_files = f'{upload_files}/cooperation_files/'
+
+    if not os.path.exists(f'{upload_files}'):
+        os.mkdir(f'{upload_files}')
+
+    if not os.path.exists(f'{order_files}'):
+        os.mkdir(f'{order_files}')
+
+    if not os.path.exists(f'{cooperation_files}'):
+        os.mkdir(f'{cooperation_files}')

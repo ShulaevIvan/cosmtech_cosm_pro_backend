@@ -3,12 +3,14 @@ import random
 import base64
 import re
 import uuid
+
+from django.http import request
+from django.shortcuts import render
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.utils import timezone
 from django.utils import timezone
-from django.shortcuts import HttpResponse, render, get_object_or_404
-from django.contrib.auth import authenticate, logout
+from django.shortcuts import HttpResponse
 from django.core.mail import send_mail
 from django.db.models import Q
 
@@ -21,8 +23,12 @@ from rest_framework.authtoken.models import Token
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, CoperationRequest, CoperationRequestFile
 
+def index(request):
+    return render(request, 'index.html')
+
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
+
     def get(self, request):
         
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
@@ -50,7 +56,7 @@ class CallbackRequestView(APIView):
             )
 
             return Response({
-                'message': 'ok', 'description': 'Спасибо! Ваш запрос № 999 отправлен, вам перезвонят в течении 30 мин'}, status=status.HTTP_201_CREATED)
+                'message': 'ok', 'description': 'Спасибо! Вам перезвонят в течении 30 мин'}, status=status.HTTP_201_CREATED)
         return Response({'message': 'err phone not valid'}, status=status.HTTP_200_OK)
     
 class RequestConsultView(APIView):
@@ -87,9 +93,21 @@ class RequestConsultView(APIView):
             comment=consult_data['comment'],
             request_time = datetime.datetime.now(tz=timezone.utc)
         ).save()
+
+        client_data = {
+            'client_name': consult_data['name'],
+            'client_phone': consult_data['phone'],
+            'client_email': consult_data['email'],
+            'client_city': consult_data['city'],
+            'call_option': '',
+            'order_type_name': 'Консультация',
+            'client_comment': consult_data['comment'],
+        }
+
+        send_order_mail(client_data)
         
         
-        return Response({'status': 'ok', 'description': 'Ваш запрос принят!'}, status=status.HTTP_200_OK)
+        return Response({'status': 'ok', 'description': 'Спасибо, с вами свяжутся в ближайшее время!'}, status=status.HTTP_200_OK)
 
 class RequestOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -130,6 +148,7 @@ class RequestOrderView(APIView):
             order = generate_order_number(order_data['options'], target_client[0].id)
             target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
             target_order.save()
+
             ClientOrder.objects.create(
                 client_id=target_client.first(), 
                 order_id=Order.objects.filter(id=target_order.id).first(),
@@ -147,7 +166,9 @@ class RequestOrderView(APIView):
                 'order_type_name': order_data['options'],
                 'client_comment': order_data['comment'],
             }
+
             send_order_mail(client_data)
+
             return Response({
                 'message': 'ok', 'description': f"Спасибо! Запрос отправлен, Номер запроса: №{order['number']}"}, status=status.HTTP_201_CREATED)
 
@@ -212,6 +233,7 @@ class ContactsRequestView(APIView):
                 'client_name': contacts_data['name'],
                 'client_phone': contacts_data['phone'],
                 'client_email': contacts_data['email'],
+                'client_city': contacts_data['city'],
                 'call_option': get_request_name(contacts_data['call_option']),
                 'client_comment': contacts_data['comment'],
                 'order_number': order['number'],
@@ -219,6 +241,7 @@ class ContactsRequestView(APIView):
                 'order_type_name': get_request_name(contacts_data['orderType']),
             }
             client_data['files'] = client_files
+
             send_order_mail(client_data)
             send_mail_to_client(client_data)
 
@@ -251,11 +274,13 @@ class ContactsRequestView(APIView):
                     'client_name': contacts_data['name'],
                     'client_phone': contacts_data['phone'],
                     'client_email': contacts_data['email'],
+                    'client_city': contacts_data['city'],
                     'call_option': get_request_name(contacts_data['call_option']),
                     'order_type_name': get_request_name(contacts_data['orderType']),
                     'client_comment': contacts_data['comment'],
                 }
                 client_data['files'] = client_files
+
                 send_order_mail(client_data)
                 send_mail_to_client(client_data)
 
@@ -296,6 +321,7 @@ def send_order_mail(client_data):
                 <p>Имя клиента: {client_data['client_name']}</p>
                 <p>Телефон клиента: {client_data['client_phone']}
                 <p>Email клиента: {client_data['client_email']}</p>
+                <p>Город клиента: {client_data.get('client_city')}</p>
                 <p>Предпочитаемый способ связи: {client_data['call_option']}</p>
                 <p>Номер заказа: <b>№{client_data['order_number']}</b></p>
                 <p>Тип заказа: {client_data['order_type_name']}</p>
@@ -312,6 +338,7 @@ def send_order_mail(client_data):
                 <p>Имя: {client_data['client_name']}</p>
                 <p>Телефон: {client_data['client_phone']}
                 <p>Email: {client_data['client_email']}</p>
+                <p>Город клиента: {client_data.get('client_city')}</p>
                 <p>Предпочитаемый способ связи: {client_data['call_option']}</p>
                 <p>Тип запроса: {client_data['order_type_name']}</p>
                 <p>Комментарий: {client_data['client_comment']}</p>
@@ -319,6 +346,7 @@ def send_order_mail(client_data):
             """,
             'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
         )
+
     if client_data.get('files'):
         msg_mail.content_subtype = "html"  
         for file_path in client_data['files']:
@@ -330,6 +358,7 @@ def send_order_mail(client_data):
 def send_mail_to_client(order_data):
     not_format_date = datetime.datetime.now(tz=timezone.utc)
     time = get_time(not_format_date)
+    
     if not order_data.get('order_number') and order_data.get('client_email'):
         msg_mail = EmailMessage(
             f"Ваш запрос  на {order_data['order_type_name']} отправлен", 
@@ -340,6 +369,7 @@ def send_mail_to_client(order_data):
         )
         msg_mail.content_subtype = "html"  
         msg_mail.send()
+
         return
     
     elif order_data.get('order_number') and order_data.get('client_email'):
@@ -354,6 +384,7 @@ def send_mail_to_client(order_data):
         )
         msg_mail.content_subtype = "html"  
         msg_mail.send()
+
         return
     
 def find_existing_client(phone='', email=''):
