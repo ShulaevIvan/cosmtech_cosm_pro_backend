@@ -9,7 +9,6 @@ from django.shortcuts import render
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.utils import timezone
-from django.utils import timezone
 from django.shortcuts import HttpResponse
 from django.core.mail import send_mail
 from django.db.models import Q
