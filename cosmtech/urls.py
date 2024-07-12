@@ -18,20 +18,23 @@ from .settings import create_upload_folders
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path
-from api.views import index
+from django.urls import path, re_path
+from api.views import index, default
 from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
 
 
 create_upload_folders()
-
 urlpatterns = [
     path('', index),
+    # path('about', index),
+    # path('contacts', index),
+    # re_path(r'^services$|services\/', index),
+    # path('about/job/', index),
     path('admin/', admin.site.urls),
     path('api/callbackreq/', CallbackRequestView.as_view()),
     path('api/order/', RequestOrderView.as_view()),
     path('api/consultreq/', RequestConsultView.as_view()),
     path('api/contactreq/', ContactsRequestView.as_view()),
-    path('api/admin_download/', download_admin_file)
+    path('api/admin_download/', download_admin_file),
+    re_path('.*', default),
 ]+ static(settings.UPLOAD_FILES, document_root=settings.ORDER_FILES)
-

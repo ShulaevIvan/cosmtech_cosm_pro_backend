@@ -4,26 +4,27 @@ import base64
 import re
 import uuid
 
-from django.http import request
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
 from django.conf import settings
-from django.utils import timezone
 from django.shortcuts import HttpResponse
 from django.core.mail import send_mail
 from django.db.models import Q
-
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, CoperationRequest, CoperationRequestFile
 
 def index(request):
     return render(request, 'index.html')
+
+def default(request):
+    if request.method == 'GET' and request.path != '/admin/':
+        return redirect('/')
+    
 
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -34,7 +35,7 @@ class CallbackRequestView(APIView):
     
     def post(self, request):
         req_body = request.data
-        not_format_date = datetime.datetime.now(tz=timezone.utc)
+        not_format_date = datetime.datetime.now()
         time = get_time(not_format_date)
         email_data = {
             'phone': req_body.get('phone'),
@@ -90,7 +91,7 @@ class RequestConsultView(APIView):
             email=consult_data['email'],
             city=consult_data['city'],
             comment=consult_data['comment'],
-            request_time = datetime.datetime.now(tz=timezone.utc)
+            request_time = datetime.datetime.now()
         ).save()
 
         client_data = {
@@ -309,7 +310,7 @@ def send_order_mail(client_data):
     if client_data['order_type_name'] is None:
         client_data['order_type_name'] = 'Контрактное производство'
     
-    not_format_date = datetime.datetime.now(tz=timezone.utc)
+    not_format_date = datetime.datetime.now()
     time = get_time(not_format_date)
 
     if client_data.get('order_number'):
@@ -355,7 +356,7 @@ def send_order_mail(client_data):
     msg_mail.send()
 
 def send_mail_to_client(order_data):
-    not_format_date = datetime.datetime.now(tz=timezone.utc)
+    not_format_date = datetime.datetime.now()
     time = get_time(not_format_date)
     
     if not order_data.get('order_number') and order_data.get('client_email'):
@@ -416,7 +417,7 @@ def generate_order_number(order_type, client_id):
         'name': order_name, 
         'type': order_type, 
         'number': order_number,
-        'date': datetime.datetime.now(tz=timezone.utc)
+        'date': datetime.datetime.now()
     }
 
 

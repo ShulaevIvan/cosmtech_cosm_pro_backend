@@ -39,8 +39,7 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 SECURE_CROSS_ORIGIN_OPENER_POLICY=None
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1']
 CORS_ALLOW_METHODS = ('GET','POST','PUT','PATCH','DELETE','OPTIONS',)
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
@@ -80,7 +79,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'cosmtech.urls'
-
+APPEND_SLASH = False
+REMOVE_SLASH = True
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -144,9 +144,7 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Europe/Moscow'
-
 USE_I18N = True
 
 USE_TZ = True
