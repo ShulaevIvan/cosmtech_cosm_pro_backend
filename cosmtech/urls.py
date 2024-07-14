@@ -26,10 +26,6 @@ from api.views import CallbackRequestView, RequestOrderView, RequestConsultView,
 create_upload_folders()
 urlpatterns = [
     path('', index),
-    # path('about', index),
-    # path('contacts', index),
-    # re_path(r'^services$|services\/', index),
-    # path('about/job/', index),
     path('admin/', admin.site.urls),
     path('api/callbackreq/', CallbackRequestView.as_view()),
     path('api/order/', RequestOrderView.as_view()),

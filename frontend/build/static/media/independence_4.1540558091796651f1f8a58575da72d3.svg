@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 130 130" fill="none">
+<rect x="43.1798" y="43.1798" width="43.9326" height="43.9326" stroke="#00458b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 8" fill="#ffffff"/>
+<path d="M43.1798 43.1798H8.29211V87.1124H43.1798" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M87.1124 87.1123L122 87.1123L122 43.1797L87.1124 43.1797" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M87.1123 43.1798L87.1123 8.29211L43.1797 8.29211L43.1797 43.1798" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M43.1798 87.1124L43.1798 122L87.1124 122L87.1124 87.1124" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M8.29211 43.1798L17.3371 34.1349H33.4887L42.5337 43.1798" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M87.1124 8.29211L96.1573 17.3371L96.1573 33.4887L87.1124 42.5337" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M121.354 87.1124L112.309 96.1573L96.1573 96.1573L87.1123 87.1124" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M43.1798 121.354L34.1349 112.309L34.1349 96.1573L43.1798 87.1123" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<circle cx="13.4607" cy="13.4607" r="5.46067" stroke="#00458b" stroke-width="2" fill="#ffffff"/>
+<path d="M121.639 112.955L112.959 121.635" stroke="#00458b" stroke-width="2" stroke-linecap="round" fill="#ffffff"/>
+<path d="M112.957 112.955L121.637 121.635" stroke="#00458b" stroke-width="2" stroke-linecap="round" fill="#ffffff"/>
+</svg>
