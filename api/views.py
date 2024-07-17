@@ -3,7 +3,7 @@ import random
 import base64
 import re
 import uuid
-
+from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -25,7 +25,6 @@ def default(request):
     if request.method == 'GET' and request.path != '/admin/':
         return redirect('/')
     
-
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
 
@@ -475,3 +474,4 @@ def get_time(date):
 
     return f"Время: {result_str}"
 
+favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
