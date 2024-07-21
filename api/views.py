@@ -104,6 +104,7 @@ class RequestConsultView(APIView):
         }
 
         send_order_mail(client_data)
+        send_mail_to_client(client_data)
         
         
         return Response({'status': 'ok', 'description': 'Спасибо, с вами свяжутся в ближайшее время!'}, status=status.HTTP_200_OK)
@@ -161,12 +162,14 @@ class RequestOrderView(APIView):
                 'client_name': order_data['name'],
                 'client_phone': order_data['phone'],
                 'client_email': order_data['email'],
+                'order_number': order['number'],
                 'call_option': '',
                 'order_type_name': order_data['options'],
                 'client_comment': order_data['comment'],
             }
 
             send_order_mail(client_data)
+            send_mail_to_client(client_data)
 
             return Response({
                 'message': 'ok', 'description': f"Спасибо! Запрос отправлен, Номер запроса: №{order['number']}"}, status=status.HTTP_201_CREATED)
