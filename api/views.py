@@ -3,6 +3,7 @@ import random
 import base64
 import re
 import uuid
+from pprint import pprint
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
@@ -22,7 +23,17 @@ def index(request):
     return render(request, 'index.html')
 
 def default(request):
-    if request.method == 'GET' and request.path != '/admin/':
+    path_list = ['/services', '/services/', '/contacts/', '/contacts', '/about', '/about/']
+    slash_pattern = re.compile(r'\s*\/$')
+    find_slash = re.search(slash_pattern, request.path)
+    target_url = list(filter(lambda url: url == request.path, path_list))
+    
+    if request.method == 'GET' and request.path in path_list and len(target_url) > 0:
+        if find_slash:
+            target_url = re.sub(slash_pattern, '', target_url[0])
+            return redirect(f'{target_url}')
+        return render(request, 'index.html')
+    elif request.method == 'GET' and request.path != '/admin/':
         return redirect('/')
     
 class CallbackRequestView(APIView):
