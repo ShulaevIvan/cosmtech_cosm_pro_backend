@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from os.path import join
-
+from pprint import pprint
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -155,6 +156,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "upload_files"),
     os.path.join(BASE_DIR, "frontend/build/"),
     os.path.join(BASE_DIR, "frontend/build/static/"),
+    os.path.join(BASE_DIR, "download"),
+    os.path.join(BASE_DIR, "download/company_files")
 )
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -165,6 +168,8 @@ def create_upload_folders():
     upload_files = f'{os.getcwd()}/upload_files/'
     order_files = f'{upload_files}/order_files/'
     cooperation_files = f'{upload_files}/cooperation_files/'
+    download_files = f'{os.getcwd()}/download/'
+    company_files = f'{download_files}/company_files/'
 
     if not os.path.exists(f'{upload_files}'):
         os.mkdir(f'{upload_files}')
@@ -174,3 +179,29 @@ def create_upload_folders():
 
     if not os.path.exists(f'{cooperation_files}'):
         os.mkdir(f'{cooperation_files}')
+    if not os.path.exists(f'{download_files}'):
+        os.mkdir(f'{download_files}')
+    if not os.path.exists(f'{company_files}'):
+        os.mkdir(f'{company_files}')
+
+def rebuild_json():
+    result_data = []
+    i = 0
+    with open (f'{os.getcwd()}/download/fixtures_city.json', 'r') as file:
+        data = json.load(file)
+        for obj in data:
+            i = i + 1
+            result_data.append({
+                "pk": i,
+                "model": "api.CityData",
+                "fields": {
+                    "name": f'{obj["name"]}',
+                    "subject": f'{obj["subject"]}',
+                    "population": int(f'{obj["population"]}'),
+                    "range": int(obj["range"]),
+                    "lat": float(obj["coords"]["lat"]),
+                    "lon": float(obj["coords"]["lon"])
+                }
+            })
+        with open(f'{os.getcwd()}/download/fixtures_city2.json', 'w') as file:
+            json.dump(result_data, file, ensure_ascii=False, indent=4)

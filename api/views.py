@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.shortcuts import HttpResponse
+from django.http import Http404
 from django.core.mail import send_mail
 from django.db.models import Q
 from rest_framework import status
@@ -34,7 +35,8 @@ def default(request):
             return redirect(f'{target_url}')
         return render(request, 'index.html')
     elif request.method == 'GET' and request.path != '/admin/':
-        return redirect('/')
+        # redirect('/page404')
+        return render(request, '404.html', status=404)
     
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]

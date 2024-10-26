@@ -138,3 +138,15 @@ class CoperationRequestFile(models.Model):
     def __str__(self):
 
         return f'{self.file_name}'
+
+class CityData(models.Model):
+    name = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    population = models.IntegerField()
+    range = models.IntegerField()
+    lat = models.FloatField()
+    lon = models.FloatField()
+
+    def __str__(self):
+
+        return f'{self.name}'
