@@ -20,7 +20,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path
 from api.views import index, default, favicon_view
-from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
+from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, CityDataView, download_admin_file, get_presentation
 
 
 
@@ -33,7 +33,9 @@ urlpatterns = [
     path('api/order/', RequestOrderView.as_view()),
     path('api/consultreq/', RequestConsultView.as_view()),
     path('api/contactreq/', ContactsRequestView.as_view()),
+    path('api/city/', CityDataView.as_view()),
     path('api/admin_download/', download_admin_file),
+    path('company_files/presentation/', get_presentation),
     re_path(r'^favicon\.ico$', favicon_view),
     re_path('.*', default),
 ]+ static(settings.UPLOAD_FILES, document_root=settings.ORDER_FILES)

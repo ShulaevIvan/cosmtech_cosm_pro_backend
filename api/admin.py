@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, CoperationRequest, CoperationRequestFile
+from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
+    CoperationRequest, CoperationRequestFile, CityData
 
 
 class AdminClientOrderInline(admin.TabularInline):
@@ -20,6 +21,14 @@ class CoperationRequestFileInline(admin.TabularInline):
     extra = 0
     fields = ['file_link',]
     readonly_fields = ['file_link']
+
+@admin.register(CityData)
+class CityDataAdmin(admin.ModelAdmin):
+    model = CityData
+    list_display = ['name', 'subject']
+    ordering=['name', 'subject']
+    search_fields = ['name', 'subject']
+    readonly_fields = ['name', 'subject', 'lat', 'lon', ]
 
 @admin.register(CallbackRequests)
 class AdminCallbackRequests(admin.ModelAdmin):

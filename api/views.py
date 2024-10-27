@@ -3,7 +3,7 @@ import random
 import base64
 import re
 import uuid
-from pprint import pprint
+import os
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
@@ -12,31 +12,35 @@ from django.shortcuts import HttpResponse
 from django.http import Http404
 from django.core.mail import send_mail
 from django.db.models import Q
+from django.http import FileResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, CoperationRequest, CoperationRequestFile
+from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
+    CoperationRequest, CoperationRequestFile, CityData
 
 def index(request):
     return render(request, 'index.html')
 
 def default(request):
     path_list = ['/services', '/services/', '/contacts/', '/contacts', '/about', '/about/']
+    path_ignore_list = ['/admin/', 'company_files/presentation/',]
     slash_pattern = re.compile(r'\s*\/$')
     find_slash = re.search(slash_pattern, request.path)
     target_url = list(filter(lambda url: url == request.path, path_list))
-    
+
     if request.method == 'GET' and request.path in path_list and len(target_url) > 0:
         if find_slash:
             target_url = re.sub(slash_pattern, '', target_url[0])
             return redirect(f'{target_url}')
         return render(request, 'index.html')
-    elif request.method == 'GET' and request.path != '/admin/':
+    elif request.method == 'GET' and request.path not in path_ignore_list:
         # redirect('/page404')
         return render(request, '404.html', status=404)
+
     
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -304,6 +308,44 @@ class ContactsRequestView(APIView):
                     status=status.HTTP_201_CREATED)
         
         return Response({'message': 'ok', 'description': f"err"}, status=status.HTTP_201_CREATED)
+    
+class CityDataView(APIView):
+
+    def get(self, request):
+        params = request.query_params
+        city_param = params.get('city')
+        check_dach = re.search('-', city_param)
+
+        if not city_param:
+            target_city = CityData.objects.all().values()
+            return Response({'cities': target_city}, status=status.HTTP_200_OK)
+        format_city_name = f'{city_param[0].upper()}{city_param[1:len(city_param)]}'
+        
+        if check_dach:
+            name_part = city_param.split('-')
+            format_city_name = f'{name_part[0][0].upper()}{name_part[0][1:len(name_part[0])]}-{name_part[1][0].upper()}{name_part[1][1:len(name_part[1])]}'
+
+        city_name = fr'^{format_city_name}|^{format_city_name}(\w*|.*)(.|\w)(\w+)$'
+
+        target_city = CityData.objects.filter(name__regex=city_name).values()
+
+        return Response({'cities': target_city}, status=status.HTTP_200_OK)
+    
+@api_view(['GET'])
+def get_presentation(request):
+    download_param = request.query_params.get('download')
+    presentation_path = f'{os.getcwd()}/download/company_files/cosmtech-presentation.pdf'
+    if download_param:
+        file_name = re.findall(r'[\w-]+\.\S+|\s+$', presentation_path)[0]
+        with open(f'{presentation_path}', 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/pdf')
+            response.headers = {
+                "Content-Type": "application/pdf",
+                "Content-Disposition": f'attachment; filename="{file_name}"',
+            }
+            return response
+   
+    return FileResponse(open(f'{presentation_path}', 'rb'), content_type='application/pdf')
     
 @permission_classes([IsAuthenticated,]) 
 @api_view(['GET'])
