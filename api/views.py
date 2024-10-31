@@ -4,6 +4,7 @@ import base64
 import re
 import uuid
 import os
+from pprint import pprint
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
@@ -20,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
-    CoperationRequest, CoperationRequestFile, CityData
+    CoperationRequest, CoperationRequestFile, CityData, QuizOrder
 
 def index(request):
     return render(request, 'index.html')
@@ -311,6 +312,8 @@ class ContactsRequestView(APIView):
     
 class CityDataView(APIView):
 
+    permission_classes = [IsAuthenticated, ]
+
     def get(self, request):
         params = request.query_params
         city_param = params.get('city')
@@ -330,6 +333,85 @@ class CityDataView(APIView):
         target_city = CityData.objects.filter(name__regex=city_name).values()
 
         return Response({'cities': target_city}, status=status.HTTP_200_OK)
+
+class QuizOrderView(APIView):
+
+    def post(self, request):
+        
+        req_body = request.data
+        client_name = req_body.get('name').get('value')
+        client_phone = req_body.get('phone').get('value')
+        client_email = req_body.get('email').get('value')
+        send_data = req_body.get('sendData')
+        order_data = dict()
+        not_format_date = datetime.datetime.now()
+        upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
+        order_number = generate_quiz_order_number()
+        order_time = get_time(not_format_date)
+        order_folder_name = f'quiz_{order_number}'
+        order_folder_path = f'{upload_folder}/{order_folder_name}/'
+
+        if not client_email or not client_phone:
+            return Response({'status': 'err'}, status=status.HTTP_201_CREATED)
+        
+        for key, value in send_data.items():
+            re_pattern = r'\*?([A-Z])'
+            start_index = list(re.finditer(re_pattern, key))[0].start()
+            end_index = list(re.finditer(re_pattern, key))[0].end()
+        
+            replace_key = key[:start_index] + '_' + key[end_index -1:]
+            order_data[replace_key.lower()] = value
+
+        custom_delivery_city_to = ''
+        custom_delivery_city_from = 'Санкт-Петербург'
+        custom_delivery_range = 0
+        custom_delivery_subject = ''
+        custom_delivery_city_population = ''
+
+        print(order_data.get('custom_delivery'))
+        if order_data.get('custom_delivery') != 'empty':
+            custom_delivery_city_to = order_data['custom_delivery']['to']
+            custom_delivery_city_from = order_data['custom_delivery']['from']
+            custom_delivery_range = order_data['custom_delivery']['range']
+            custom_delivery_subject = order_data['custom_delivery']['subject']
+            custom_delivery_city_population = order_data['custom_delivery']['population']
+
+        custom_tz_file = order_data.get('custom_tz')
+        custom_package_file = order_data.get('custom_package')
+
+        if (custom_tz_file != 'empty' or custom_package_file != 'empty') and not os.path.exists(f'{order_folder_path}'):
+            os.mkdir(order_folder_path)
+
+        if custom_tz_file != 'empty':
+            create_file(custom_tz_file, order_folder_path)
+        if custom_package_file != 'empty':
+            create_file(custom_package_file, order_folder_path)
+        print(order_data.get('order_service'))
+        QuizOrder.objects.create(
+            order_number=order_number,
+            order_date=not_format_date,
+            client_name=client_name,
+            client_email=client_email,
+            client_phone=client_phone,
+            client_budget=order_data.get('client_budget'),
+            order_deadline=order_data.get('order_deadline'),
+            order_production_date=order_data.get('production_date'),
+            order_service = order_data.get('order_service'),
+            order_service_price=order_data.get('service_price'),
+            order_product=order_data.get('product_name'),
+            order_product_quantity=order_data.get('product_qnt'),
+            order_product_package=order_data.get('order_package'),
+            order_product_sum=int(order_data.get('calc_sum')),
+            delivery_city_from=custom_delivery_city_from,
+            delivery_city_to=custom_delivery_city_to,
+            delivery_region=custom_delivery_subject,
+            delivery_range=custom_delivery_range,
+            delivery_weight=order_data.get('delivery_weight'),
+            delivery_price_point=order_data.get('price_perpoint'),
+            delivery_price= order_data.get('delivery_price'),
+        )
+
+        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
     
 @api_view(['GET'])
 def get_presentation(request):
@@ -477,6 +559,14 @@ def generate_order_number(order_type, client_id):
         'date': datetime.datetime.now()
     }
 
+def generate_quiz_order_number():
+    order_modifer = []
+    for i in range(6):
+        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
+    order_modifer.append('_qz_oer')
+    order_modifer = f''.join(map(str, order_modifer))
+
+    return order_modifer
 
 def create_file(file_obj, path):
     ext = re.findall(r'.\w+$', file_obj['name'])[0]

@@ -170,19 +170,21 @@ def create_upload_folders():
     cooperation_files = f'{upload_files}/cooperation_files/'
     download_files = f'{os.getcwd()}/download/'
     company_files = f'{download_files}/company_files/'
+    quiz_files = f'{upload_files}/quiz_files/'
 
     if not os.path.exists(f'{upload_files}'):
         os.mkdir(f'{upload_files}')
 
     if not os.path.exists(f'{order_files}'):
         os.mkdir(f'{order_files}')
-
     if not os.path.exists(f'{cooperation_files}'):
         os.mkdir(f'{cooperation_files}')
     if not os.path.exists(f'{download_files}'):
         os.mkdir(f'{download_files}')
     if not os.path.exists(f'{company_files}'):
         os.mkdir(f'{company_files}')
+    if not os.path.exists(f'{quiz_files}'):
+        os.mkdir(f'{quiz_files}')
 
 def rebuild_json():
     result_data = []

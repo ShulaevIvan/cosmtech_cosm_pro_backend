@@ -150,3 +150,41 @@ class CityData(models.Model):
     def __str__(self):
 
         return f'{self.name}'
+    
+class QuizOrder(models.Model):
+    order_number = models.CharField(max_length=255)
+    order_date = models.DateTimeField(auto_now_add=True)
+    client_name = models.CharField(max_length=255, default='')
+    client_email = models.CharField(max_length=255, default='testmail@test.ru')
+    client_phone = models.CharField(max_length=255, default='0xxxxxxxxxx')
+    client_budget = models.CharField(max_length=255, null=True, blank=True)
+    order_deadline = models.TextField(null=True, blank=True)
+    order_production_date = models.CharField(max_length=255, null=True, blank=True)
+    order_service = models.CharField(max_length=255, null=True, blank=True)
+    order_service_price = models.IntegerField(null=True, blank=True)
+    order_product = models.CharField(max_length=255)
+    order_product_quantity = models.IntegerField()
+    order_product_package = models.TextField(null=True, blank=True)
+    order_product_sum = models.IntegerField(null=True, blank=True)
+    delivery_city_from = models.CharField(null=True, blank=True)
+    delivery_city_to = models.CharField(null=True, blank=True)
+    delivery_region = models.CharField(max_length=255, blank=True, null=True)
+    delivery_range = models.IntegerField(null=True, blank=True)
+    delivery_weight = models.CharField(null=True, blank=True)
+    delivery_price_point = models.IntegerField(null=True, blank=True)
+    delivery_price = models.IntegerField(null=True, blank=True)
+    custom_tz_file =  models.FileField(upload_to=f'upload_files/quiz_files/{order_number}/', null=True, blank=True, max_length=255)
+    custom_package_file = models.FileField(upload_to=f'upload_files/quiz_files/{order_number}/', null=True, blank=True, max_length=255)
+
+    def file_link(self):
+        if self.custom_tz_file:
+            return format_html("<a href='%s'>download</a>" % (self.custom_tz_file.url,))
+        elif self.custom_package_file:
+            return format_html("<a href='%s'>download</a>" % (self.custom_package_file.url,))
+        else:
+            return "No attachment"
+        
+
+    def __str__(self):
+
+        return f'{self.order_number}'

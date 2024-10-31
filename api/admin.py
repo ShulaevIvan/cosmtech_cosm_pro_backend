@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
-    CoperationRequest, CoperationRequestFile, CityData
+    CoperationRequest, CoperationRequestFile, CityData, QuizOrder
 
 
 class AdminClientOrderInline(admin.TabularInline):
@@ -29,6 +29,12 @@ class CityDataAdmin(admin.ModelAdmin):
     ordering=['name', 'subject']
     search_fields = ['name', 'subject']
     readonly_fields = ['name', 'subject', 'lat', 'lon', ]
+    
+@admin.register(QuizOrder)
+class QuizOrderAdmin(admin.ModelAdmin):
+    model = QuizOrder
+    search_fields = ['order_number', 'client_name']
+    readonly_fields=['custom_tz_file', 'custom_package_file']
 
 @admin.register(CallbackRequests)
 class AdminCallbackRequests(admin.ModelAdmin):
