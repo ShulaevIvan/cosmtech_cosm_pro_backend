@@ -349,7 +349,7 @@ class QuizOrderView(APIView):
         order_number = generate_quiz_order_number()
         order_time = get_time(not_format_date)
         order_folder_name = f'quiz_{order_number}'
-        order_folder_path = f'{upload_folder}/{order_folder_name}/'
+        order_folder_path = f'{upload_folder}{order_folder_name}/'
 
         if not client_email or not client_phone:
             return Response({'status': 'err'}, status=status.HTTP_201_CREATED)
@@ -368,7 +368,6 @@ class QuizOrderView(APIView):
         custom_delivery_subject = ''
         custom_delivery_city_population = ''
 
-        print(order_data.get('custom_delivery'))
         if order_data.get('custom_delivery') != 'empty':
             custom_delivery_city_to = order_data['custom_delivery']['to']
             custom_delivery_city_from = order_data['custom_delivery']['from']
@@ -377,16 +376,22 @@ class QuizOrderView(APIView):
             custom_delivery_city_population = order_data['custom_delivery']['population']
 
         custom_tz_file = order_data.get('custom_tz')
+        custom_tz_file_url = ''
         custom_package_file = order_data.get('custom_package')
+        custom_package_file_url = ''
 
         if (custom_tz_file != 'empty' or custom_package_file != 'empty') and not os.path.exists(f'{order_folder_path}'):
             os.mkdir(order_folder_path)
 
         if custom_tz_file != 'empty':
-            create_file(custom_tz_file, order_folder_path)
+            custom_tz_file_url = create_file(custom_tz_file, order_folder_path)
+            
         if custom_package_file != 'empty':
-            create_file(custom_package_file, order_folder_path)
-        print(order_data.get('order_service'))
+            print('test')
+            custom_package_file_url = create_file(custom_package_file, order_folder_path)
+            print(custom_package_file_url)
+
+
         QuizOrder.objects.create(
             order_number=order_number,
             order_date=not_format_date,
@@ -409,6 +414,8 @@ class QuizOrderView(APIView):
             delivery_weight=order_data.get('delivery_weight'),
             delivery_price_point=order_data.get('price_perpoint'),
             delivery_price= order_data.get('delivery_price'),
+            custom_tz_file=custom_tz_file_url,
+            custom_package_file=custom_package_file_url
         )
 
         return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)

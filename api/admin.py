@@ -34,7 +34,8 @@ class CityDataAdmin(admin.ModelAdmin):
 class QuizOrderAdmin(admin.ModelAdmin):
     model = QuizOrder
     search_fields = ['order_number', 'client_name']
-    readonly_fields=['custom_tz_file', 'custom_package_file']
+    exclude = ['custom_tz_file', 'custom_package_file',]
+    readonly_fields=[ 'package_file_link', 'tz_file_link']
 
 @admin.register(CallbackRequests)
 class AdminCallbackRequests(admin.ModelAdmin):

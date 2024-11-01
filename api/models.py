@@ -176,11 +176,15 @@ class QuizOrder(models.Model):
     custom_tz_file =  models.FileField(upload_to=f'upload_files/quiz_files/{order_number}/', null=True, blank=True, max_length=255)
     custom_package_file = models.FileField(upload_to=f'upload_files/quiz_files/{order_number}/', null=True, blank=True, max_length=255)
 
-    def file_link(self):
+    def tz_file_link(self):
         if self.custom_tz_file:
-            return format_html("<a href='%s'>download</a>" % (self.custom_tz_file.url,))
-        elif self.custom_package_file:
-            return format_html("<a href='%s'>download</a>" % (self.custom_package_file.url,))
+            return format_html(f"<a href='/api/admin_download/?file_path={self.custom_tz_file.url}' target=blank>download file</a>")
+        else:
+            return "No attachment"
+        
+    def package_file_link(self):
+        if self.custom_package_file:
+            return format_html(f"<a href='/api/admin_download/?file_path={self.custom_package_file.url}' target=blank>download file</a>")
         else:
             return "No attachment"
         
