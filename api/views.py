@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
-    CoperationRequest, CoperationRequestFile, CityData, QuizOrder
+    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder
 
 def index(request):
     return render(request, 'index.html')
@@ -387,9 +387,7 @@ class QuizOrderView(APIView):
             custom_tz_file_url = create_file(custom_tz_file, order_folder_path)
             
         if custom_package_file != 'empty':
-            print('test')
             custom_package_file_url = create_file(custom_package_file, order_folder_path)
-            print(custom_package_file_url)
 
 
         QuizOrder.objects.create(
@@ -419,6 +417,62 @@ class QuizOrderView(APIView):
         )
 
         return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+
+class QuestionOrderView(APIView):
+
+    def post(self, request):
+        req_body = request.data
+        print(req_body)
+        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+    
+class TzOrderView(APIView):
+
+    def post(self, request):
+        req_body = request.data
+        order_number = generate_quiz_order_number()
+        not_format_date = datetime.datetime.now()
+        order_time = get_time(not_format_date)
+        upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
+        order_folder_name = f'tz_{order_number}'
+        order_folder_full_path = f'{upload_folder}{order_folder_name}/'
+        client_name = req_body.get('name')
+        client_phone = req_body.get('phone')
+        client_email = req_body.get('email')
+        client_tz_file = req_body.get('file')
+
+        if not client_tz_file:
+            return Response({'status': 'err'}, status=status.HTTP_200_OK)
+        if not os.path.exists(f'{order_folder_full_path}'):
+            os.mkdir(f'{order_folder_full_path}')
+        tz_file_url = create_file(client_tz_file, f'{order_folder_full_path}')
+
+        QuizTzOrder.objects.create(
+            order_number = order_number,
+            order_date = not_format_date,
+            client_name = client_name,
+            client_phone = client_phone,
+            client_email = client_email,
+            tz_file = tz_file_url,
+        )
+
+        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+def get_tz_template(request):
+    download_param = request.query_params.get('download')
+    tz_path = f'{os.getcwd()}/download/company_files/tz_template.docx'
+    file_content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    if download_param:
+        file_name = re.findall(r'[\w-]+\.\S+|\s+$', tz_path)[0]
+        with open(f'{tz_path}', 'rb') as file:
+            response = HttpResponse(file.read())
+            response.headers = {
+                "Content-Type": file_content_type,
+                "Content-Disposition": f'attachment; filename="{file_name}"',
+            }
+            return response
+
+    return FileResponse(open(f'{tz_path}', 'rb'), content_type=file_content_type, status=status.HTTP_200_OK)
     
 @api_view(['GET'])
 def get_presentation(request):

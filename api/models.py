@@ -192,3 +192,34 @@ class QuizOrder(models.Model):
     def __str__(self):
 
         return f'{self.order_number}'
+    
+class QuizQuestionOrder(models.Model):
+    order_number = models.CharField(max_length=255)
+    order_date = models.DateTimeField(auto_now_add=True)
+    client_name = models.CharField(max_length=255, null=True, blank=True)
+    client_phone = models.CharField(max_length=255, null=True, blank=True, default='0xxxxxxxxxx')
+    client_email = models.CharField(max_length=255, null=True, blank=True, default='testmail@test.ru')
+    communication_type = models.CharField(null=True, blank=True)
+    client_question = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+
+        return f'{self.order_number}'
+
+class QuizTzOrder(models.Model):
+    order_number = models.CharField(max_length=255)
+    order_date = models.DateTimeField(auto_now_add=True)
+    client_name = models.CharField(max_length=255, null=True, blank=True)
+    client_phone = models.CharField(max_length=255, null=True, blank=True, default='0xxxxxxxxxx')
+    client_email = models.CharField(max_length=255, null=True, blank=True, default='testmail@test.ru')
+    tz_file = models.FileField(upload_to=f'upload_files/quiz_files/{order_number}/', max_length=255)
+
+    def tz_file_link(self):
+        if self.tz_file:
+            return format_html(f"<a href='/api/admin_download/?file_path={self.tz_file.url}' target=blank>download file</a>")
+        else:
+            return "No attachment"
+
+    def __str__(self):
+
+        return f'{self.order_number}'
