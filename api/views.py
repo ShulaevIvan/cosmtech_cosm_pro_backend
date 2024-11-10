@@ -336,6 +336,8 @@ class CityDataView(APIView):
 
 class QuizOrderView(APIView):
 
+    permission_classes = [IsAuthenticated, ]
+
     def post(self, request):
         
         req_body = request.data
@@ -350,9 +352,19 @@ class QuizOrderView(APIView):
         order_time = get_time(not_format_date)
         order_folder_name = f'quiz_{order_number}'
         order_folder_path = f'{upload_folder}{order_folder_name}/'
+        send_description = {
+            'title': f'Спасибо за обращение {client_name}',
+            'order': order_number,
+            'description': 'Наш сотрудник пришлет рассчет/свяжется с вами в билижайшее время'
+        }
 
         if not client_email or not client_phone:
-            return Response({'status': 'err'}, status=status.HTTP_201_CREATED)
+            send_description = {
+                'title': f'Спасибо за обращение {client_name}',
+                'order': order_number,
+                'description': 'Что-то пошло не так, пожалуйста продублируйте свой запрос на pro@cosmtech.ru '
+            }
+            return Response({'status': 'err', 'created': False, 'message': ''}, status=status.HTTP_200_OK)
         
         for key, value in send_data.items():
             re_pattern = r'\*?([A-Z])'
@@ -416,16 +428,50 @@ class QuizOrderView(APIView):
             custom_package_file=custom_package_file_url
         )
 
-        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+        return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
 
 class QuestionOrderView(APIView):
 
+    permission_classes = [IsAuthenticated, ]
+
     def post(self, request):
         req_body = request.data
-        print(req_body)
-        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+        order_number = generate_quiz_order_number()
+        not_format_date = datetime.datetime.now()
+        client_name = req_body.get('name')
+        client_phone = req_body.get('phone')
+        client_email = req_body.get('email')
+        client_question = req_body.get('comment')
+        client_communication_type = req_body.get('communicationType')
+        send_description = {
+            'title': f'Спасибо за обращение {client_name}',
+            'order': order_number,
+            'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
+        }
+
+        if not (client_phone or client_email):
+            send_description = {
+                'title': f'Спасибо за обращение {client_name}',
+                'order': '',
+                'description': 'Произошла ошибка, попробуйте позднее, либо напишите запрос на pro@cosmtech.ru'
+            }
+            return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
+        
+        QuizQuestionOrder.objects.create(
+            order_number = order_number,
+            order_date = not_format_date,
+            client_name = client_name,
+            client_phone = client_phone,
+            client_email = client_email,
+            communication_type = client_communication_type,
+            client_question = client_question,
+        )
+
+        return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
     
 class TzOrderView(APIView):
+
+    permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
         req_body = request.data
@@ -439,9 +485,19 @@ class TzOrderView(APIView):
         client_phone = req_body.get('phone')
         client_email = req_body.get('email')
         client_tz_file = req_body.get('file')
+        send_description = {
+            'title': f'Спасибо за обращение {client_name}',
+            'order': order_number,
+            'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
+        }
 
         if not client_tz_file:
-            return Response({'status': 'err'}, status=status.HTTP_200_OK)
+            send_description = {
+                'title': f'Спасибо за обращение {client_name}',
+                'order': order_number,
+                'description': 'Произошла ошибка, попробуйте позднее, либо отправьте тз на pro@cosmtech.ru'
+            }
+            return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
         if not os.path.exists(f'{order_folder_full_path}'):
             os.mkdir(f'{order_folder_full_path}')
         tz_file_url = create_file(client_tz_file, f'{order_folder_full_path}')
@@ -455,7 +511,7 @@ class TzOrderView(APIView):
             tz_file = tz_file_url,
         )
 
-        return Response({'status': 'ok'}, status=status.HTTP_201_CREATED)
+        return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 def get_tz_template(request):
