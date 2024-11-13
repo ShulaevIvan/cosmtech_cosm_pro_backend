@@ -427,6 +427,34 @@ class QuizOrderView(APIView):
             custom_tz_file=custom_tz_file_url,
             custom_package_file=custom_package_file_url
         )
+        email_data = {
+            'order_type_name': 'Калькулятор производства',
+            'order_number': order_number,
+            'order_date':  get_time(not_format_date),
+            'client_name': client_name,
+            'client_email': client_email,
+            'client_phone': client_phone,
+            'client_budget': order_data.get('client_budget'),
+            'order_deadline': order_data.get('order_deadline'),
+            'order_production_date': order_data.get('production_date'),
+            'order_service': order_data.get('order_service'),
+            'order_service_price': order_data.get('service_price'),
+            'order_product': order_data.get('product_name'),
+            'order_product_quantity': order_data.get('product_qnt'),
+            'order_product_package': order_data.get('order_package'),
+            'order_product_sum': int(order_data.get('calc_sum')),
+            'delivery_city_from': custom_delivery_city_from,
+            'delivery_city_to': custom_delivery_city_to,
+            'delivery_region': custom_delivery_subject,
+            'delivery_range': custom_delivery_range,
+            'delivery_weight': order_data.get('delivery_weight'),
+            'delivery_price_point': order_data.get('price_perpoint'),
+            'delivery_price': order_data.get('delivery_price'),
+            'custom_tz_file': custom_tz_file_url,
+            'custom_package_file': custom_package_file_url
+        }
+
+        send_quiz_result_to_email(email_data, 'quiz')
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
 
@@ -466,6 +494,17 @@ class QuestionOrderView(APIView):
             communication_type = client_communication_type,
             client_question = client_question,
         )
+        email_data = {
+            'order_type_name': 'Задать вопрос технологу',
+            'order_number': order_number,
+            'order_date':  get_time(not_format_date),
+            'client_name': client_name,
+            'client_phone': client_phone,
+            'client_email': client_email,
+            'communication_type': client_communication_type,
+            'client_question': client_question
+        }
+        send_quiz_result_to_email(email_data, 'question')
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
     
@@ -510,6 +549,16 @@ class TzOrderView(APIView):
             client_email = client_email,
             tz_file = tz_file_url,
         )
+        email_data = {
+            'order_type_name': 'Техническое Задание',
+            'order_number': order_number,
+            'order_date': order_time,
+            'client_name': client_name,
+            'client_phone': client_phone,
+            'client_email': client_email,
+            'tz_file': tz_file_url,
+        }
+        send_quiz_result_to_email(email_data, 'tz')
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
 
@@ -642,6 +691,94 @@ def send_mail_to_client(order_data):
         msg_mail.send()
 
         return
+
+def send_quiz_result_to_email(quiz_data, order_type='quiz'):
+    time = quiz_data.get('order_date')
+    order_number = quiz_data.get('order_number')
+
+    if order_type == 'question':
+        msg_mail = EmailMessage(
+            f"Новый запрос {quiz_data['order_type_name']} с сайта cosmtech.ru", 
+            f"""
+                <p>Пришел запрос на ({quiz_data['order_type_name']})</p>
+                <p>Имя: {quiz_data['client_name']}</p>
+                <p>Телефон: {quiz_data['client_phone']}
+                <p>Email: {quiz_data['client_email']}</p>
+                <p>Предпочитаемый способ связи: {quiz_data['communication_type']}</p>
+                <p><b>Вопрос</b>: {quiz_data['client_question']}</p>
+                <p>Номер запроса ({order_number})</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+        )
+        msg_mail.content_subtype = "html"  
+        msg_mail.send()
+
+    if order_type == 'tz':
+        msg_mail = EmailMessage(
+            f"Новый запрос {quiz_data['order_type_name']} с сайта cosmtech.ru", 
+            f"""
+                <p>Пришел запрос на ({quiz_data['order_type_name']})</p>
+                <p>Имя: {quiz_data['client_name']}</p>
+                <p>Телефон: {quiz_data['client_phone']}
+                <p>Email: {quiz_data['client_email']}</p>
+                <p>Номер запроса ({order_number})</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+        )
+        if quiz_data.get('tz_file'):
+            msg_mail.content_subtype = "html" 
+            print(quiz_data['tz_file'])
+            msg_mail.attach_file(f"{quiz_data['tz_file']}")
+
+        msg_mail.content_subtype = "html"  
+        msg_mail.send()
+    
+    if order_type == 'quiz':
+        msg_mail = EmailMessage(
+            f"Новый запрос {quiz_data['order_type_name']} с сайта cosmtech.ru", 
+            f"""
+                <p>Пришел запрос на ({quiz_data['order_type_name']})</p>
+                <p>Имя: {quiz_data['client_name']}</p>
+                <p>Телефон: {quiz_data['client_phone']}
+                <p>Email: {quiz_data['client_email']}</p>
+                <p>Номер запроса ({order_number})</p>
+                <p><b>{time}</b></p>
+                <h4>Данные по запросу</h4>
+                <table>
+                    <tr><th>Продукт и услуги</th></tr>
+                    <tr><td><b>Количество:</b> {quiz_data['order_product_quantity']} шт</td></tr>
+                    <tr><td><b>Тип продукта:</b> {quiz_data['order_product']} </td></tr>
+                    <tr><td><b>Упаковка:</b> {quiz_data['order_product_package']}мл</td></tr>
+                    <tr><td><b>Бюджет:</b> {quiz_data['client_budget']}</td></tr>
+                    <tr><td><b>Срок:</b> {quiz_data['order_deadline']}</td></tr>
+                    <tr><td><b>Доп услуги:</b> {quiz_data['order_service']}</td></tr>
+                    <tr><td><b>Бюджет:</b> {quiz_data['client_budget']} руб</td></tr>
+                    <tr><td><b>Желаемые даты изготовления:</b> {quiz_data['order_production_date']}</td>
+                    <tr><td><b>Приблизительный вес партии:</b> {quiz_data['delivery_weight']}</td></tr>
+                </table>
+                <h4>Доставка</h4>
+                <p>Регион доставки {quiz_data['delivery_region']}</p>
+                <p>Из {quiz_data['delivery_city_from']} в {quiz_data['delivery_city_to']}</p>
+                <p>Расстоянеие в км от Салова 27 АБ по дорогам приблизительно:  {quiz_data['delivery_range']} км</p>
+                <p>Средняя цена доставки за км {quiz_data['delivery_price_point']} руб</p>
+                <h4>Стоимость</h4>
+                <p>Озвучена приблизительная стоимость проекта:</p>
+                <p>Стоимость доп услуг ({quiz_data['order_service']}): {quiz_data['order_service_price']} руб</p>
+                <p>Приблизительная стоимость доставки {int(quiz_data['delivery_price_point']) * int(quiz_data['delivery_range'])} руб</p>
+                <p>Полная сумма с учетом доп услуг: <b>{quiz_data['order_product_sum']} руб</b></p>
+                <p>Прикреп. файлы 1 файл - ТЗ 2 файл - упаковка</p>
+               
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+        )
+        msg_mail.attach_file(f'{quiz_data["custom_tz_file"]}')
+        msg_mail.attach_file(f'{quiz_data["custom_package_file"]}')
+        msg_mail.content_subtype = "html"  
+        msg_mail.send()
+        pprint(quiz_data)
+
     
 def find_existing_client(phone='', email=''):
     if phone and email:
