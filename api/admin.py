@@ -1,6 +1,7 @@
+import re
 from django.contrib import admin
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
-    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder
+    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, Vacancy
 
 
 class AdminClientOrderInline(admin.TabularInline):
@@ -98,3 +99,15 @@ class AdminCoperationRequest(admin.ModelAdmin):
     fields = ['cooperation_type','name', 'email', 'phone', 'request_description', 'file_link', 'request_time',]
     readonly_fields = ['request_time', 'file_link',]
     inlines=[CoperationRequestFileInline]
+
+@admin.register(Vacancy)
+class AdminVacancy(admin.ModelAdmin):
+    model = Vacancy
+    extra = 0
+
+    def save_model(self, request, obj, form, change):
+        check_pattern = r'^\s[2]|[•]'
+        obj.requirements = ' '.join(re.sub(check_pattern, '', obj.requirements).split())
+        obj.conditions = ' '.join(re.sub(check_pattern, '', obj.conditions).split())
+        obj.dutys = ' '.join(re.sub(check_pattern, '', obj.dutys).split())
+        obj.save()

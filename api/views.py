@@ -21,7 +21,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
-    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder
+    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
+    Vacancy
 
 def index(request):
     return render(request, 'index.html')
@@ -561,6 +562,24 @@ class TzOrderView(APIView):
         send_quiz_result_to_email(email_data, 'tz')
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+    
+class VacancyView(APIView):
+
+    def get(self, request):
+        data = [
+            { 
+                'id': vacancy_obj['id'],
+                'date':  get_time(vacancy_obj['open_date']),
+                'name': vacancy_obj['name'],
+                'departament': vacancy_obj['departament'],
+                'phone': vacancy_obj['contact_phone'],
+                'requirements': filter(lambda item: (item != '') , vacancy_obj['requirements'].split(';')),
+                'conditions': filter(lambda item: (item != ''), vacancy_obj['conditions'].split(';')),
+                'dutys': filter(lambda item: (item != ''), vacancy_obj['dutys'].split(';')),
+            } 
+            for vacancy_obj in Vacancy.objects.all().values()
+        ]
+        return Response({'vacancy': data}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_tz_template(request):

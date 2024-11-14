@@ -1,4 +1,4 @@
-import os
+import re
 from django.db import models
 from django.utils.html import format_html
 # Create your models here.
@@ -223,3 +223,12 @@ class QuizTzOrder(models.Model):
     def __str__(self):
 
         return f'{self.order_number}'
+    
+class Vacancy(models.Model):
+    name = models.CharField(max_length=255)
+    open_date = models.DateTimeField(auto_now_add=True)
+    departament = models.CharField(max_length=255)
+    contact_phone = models.CharField(max_length=255, null=True, blank=True)
+    requirements = models.TextField(null=True, blank=True)
+    conditions = models.TextField(null=True, blank=True)
+    dutys = models.TextField(null=True, blank=True)
