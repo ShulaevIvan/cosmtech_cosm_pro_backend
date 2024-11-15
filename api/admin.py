@@ -104,6 +104,7 @@ class AdminCoperationRequest(admin.ModelAdmin):
 class AdminVacancy(admin.ModelAdmin):
     model = Vacancy
     extra = 0
+    
 
     def save_model(self, request, obj, form, change):
         check_pattern = r'^\s[2]|[•]'

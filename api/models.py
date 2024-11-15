@@ -232,3 +232,7 @@ class Vacancy(models.Model):
     requirements = models.TextField(null=True, blank=True)
     conditions = models.TextField(null=True, blank=True)
     dutys = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+
+        return f'{self.name}'
