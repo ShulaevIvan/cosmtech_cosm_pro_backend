@@ -4,6 +4,7 @@ import base64
 import re
 import uuid
 import os
+import json
 from pprint import pprint
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
@@ -538,6 +539,7 @@ class TzOrderView(APIView):
                 'description': 'Произошла ошибка, попробуйте позднее, либо отправьте тз на pro@cosmtech.ru'
             }
             return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
+        
         if not os.path.exists(f'{order_folder_full_path}'):
             os.mkdir(f'{order_folder_full_path}')
         tz_file_url = create_file(client_tz_file, f'{order_folder_full_path}')
@@ -572,6 +574,7 @@ class VacancyView(APIView):
                 'date':  get_time(vacancy_obj['open_date']),
                 'name': vacancy_obj['name'],
                 'departament': vacancy_obj['departament'],
+                'salary': vacancy_obj['salary'],
                 'phone': vacancy_obj['contact_phone'],
                 'requirements': filter(lambda item: (item != '') , vacancy_obj['requirements'].split(';')),
                 'conditions': filter(lambda item: (item != ''), vacancy_obj['conditions'].split(';')),
@@ -580,6 +583,37 @@ class VacancyView(APIView):
             for vacancy_obj in Vacancy.objects.all().values()
         ]
         return Response({'vacancy': data}, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        send_data = json.loads(request.body)
+        vacancy_data = {
+            'resume_name': send_data.get('name'),
+            'resume_phone': send_data.get('phone'),
+            'resume_file': send_data.get('file'),
+            'vacancy_data': send_data.get('vacancy')
+        }
+
+        if not vacancy_data['resume_phone']:
+            return Response({'status': 'err'})
+        
+        resume_folder_name = f"{vacancy_data['resume_name']}_{vacancy_data['vacancy_data']}_{vacancy_data['resume_phone']}"
+        upload_folder = f'{os.getcwd()}/upload_files/resume_files/'
+        resume_folder_full_path = f'{upload_folder}{resume_folder_name}/'
+        file = ''
+
+        if vacancy_data['resume_file']:
+            if not os.path.exists(resume_folder_full_path):
+                os.mkdir(resume_folder_full_path)
+            vacancy_data['resume_file'] = create_file(vacancy_data['resume_file'], resume_folder_full_path)
+        
+        response_data = {
+            'title': f"Спасибо {vacancy_data['resume_name']}, Ваш отклик очень важен для нас!",
+            'description': 'Специалисты свяжутся с вами по телефону в ближайшее время'
+        }
+
+        send_vacancy_request(vacancy_data)
+
+        return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 def get_tz_template(request):
@@ -798,6 +832,23 @@ def send_quiz_result_to_email(quiz_data, order_type='quiz'):
         msg_mail.send()
         pprint(quiz_data)
 
+def send_vacancy_request(send_data):
+    not_format_date = datetime.datetime.now()
+    time = get_time(not_format_date)
+    msg_mail = EmailMessage(
+            f"Новый отклик на вакансию {send_data['vacancy_data']} с сайта cosmtech.ru", 
+            f"""
+                <p>Вакансия({send_data['vacancy_data']})</p>
+                <p>Имя({send_data['resume_name']})</p>
+                <p>Телефон: {send_data['resume_phone']}
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+    )
+    msg_mail.content_subtype = "html"
+    if send_data['resume_file']:
+        msg_mail.attach_file(f'{send_data["resume_file"]}')
+    # msg_mail.send()
     
 def find_existing_client(phone='', email=''):
     if phone and email:

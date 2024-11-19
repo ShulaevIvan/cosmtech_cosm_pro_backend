@@ -228,6 +228,7 @@ class Vacancy(models.Model):
     name = models.CharField(max_length=255)
     open_date = models.DateTimeField(auto_now_add=True)
     departament = models.CharField(max_length=255)
+    salary = models.CharField(max_length=255)
     contact_phone = models.CharField(max_length=255, null=True, blank=True)
     requirements = models.TextField(null=True, blank=True)
     conditions = models.TextField(null=True, blank=True)
@@ -235,4 +236,4 @@ class Vacancy(models.Model):
 
     def __str__(self):
 
-        return f'{self.name}'
+        return f'{self.name} / {self.salary}'

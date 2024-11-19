@@ -171,6 +171,7 @@ def create_upload_folders():
     download_files = f'{os.getcwd()}/download/'
     company_files = f'{download_files}/company_files/'
     quiz_files = f'{upload_files}/quiz_files/'
+    resume_files = f'{upload_files}/resume_files/'
 
     if not os.path.exists(f'{upload_files}'):
         os.mkdir(f'{upload_files}')
@@ -185,6 +186,8 @@ def create_upload_folders():
         os.mkdir(f'{company_files}')
     if not os.path.exists(f'{quiz_files}'):
         os.mkdir(f'{quiz_files}')
+    if not os.path.exists(f'{resume_files}'):
+        os.mkdir(f'{resume_files}')
 
 def rebuild_json():
     result_data = []
