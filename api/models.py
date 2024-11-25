@@ -60,7 +60,6 @@ class Order(models.Model):
 
         return self.order_type
     
-
 class ClientOrder(models.Model):
     order_number = models.CharField(max_length=255)
     order_date = models.DateTimeField(auto_now_add=True)

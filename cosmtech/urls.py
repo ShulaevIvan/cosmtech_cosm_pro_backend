@@ -24,11 +24,12 @@ from api.views import CallbackRequestView, RequestOrderView, RequestConsultView,
 ContactsRequestView,  QuizOrderView, QuestionOrderView, TzOrderView, CityDataView, \
     VacancyView, download_admin_file, get_presentation, get_tz_template
 
+from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
 
 
 
 create_upload_folders()
-rebuild_json()
+# rebuild_json()
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),

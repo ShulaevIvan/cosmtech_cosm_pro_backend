@@ -105,7 +105,6 @@ class AdminVacancy(admin.ModelAdmin):
     model = Vacancy
     extra = 0
     
-
     def save_model(self, request, obj, form, change):
         check_pattern = r'^\s[2]|[•]'
         obj.requirements = ' '.join(re.sub(check_pattern, '', obj.requirements).split())

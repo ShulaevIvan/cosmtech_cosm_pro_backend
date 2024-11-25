@@ -5,13 +5,11 @@ import re
 import uuid
 import os
 import json
-from pprint import pprint
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.shortcuts import HttpResponse
-from django.http import Http404
 from django.core.mail import send_mail
 from django.db.models import Q
 from django.http import FileResponse
@@ -457,6 +455,7 @@ class QuizOrderView(APIView):
         }
 
         send_quiz_result_to_email(email_data, 'quiz')
+        send_quiz_to_client(email_data)
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
 
@@ -507,6 +506,7 @@ class QuestionOrderView(APIView):
             'client_question': client_question
         }
         send_quiz_result_to_email(email_data, 'question')
+        send_quiz_to_client(email_data)
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
     
@@ -562,10 +562,13 @@ class TzOrderView(APIView):
             'tz_file': tz_file_url,
         }
         send_quiz_result_to_email(email_data, 'tz')
+        send_quiz_to_client(email_data)
 
         return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
     
 class VacancyView(APIView):
+
+    permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
         data = [
@@ -716,7 +719,8 @@ def send_order_mail(client_data):
 def send_mail_to_client(order_data):
     not_format_date = datetime.datetime.now()
     time = get_time(not_format_date)
-    
+    if not order_data['client_email']:
+        return
     if not order_data.get('order_number') and order_data.get('client_email'):
         msg_mail = EmailMessage(
             f"Ваш запрос  на {order_data['order_type_name']} отправлен", 
@@ -745,6 +749,25 @@ def send_mail_to_client(order_data):
 
         return
 
+def send_quiz_to_client(order_data):
+    if not order_data['client_email']:
+        return
+    if order_data['order_type_name'] and order_data['client_name']:
+        msg_mail = EmailMessage(
+        f"Ваш запрос ({order_data['order_type_name']}) зарегистрирован", 
+        f"""
+            <p>Спасибо {order_data['client_name']} за проявленый интерес! Менеджеры свяжутся с вами в в ближайшее время </p>
+            <p>Номер заказа: <b>{order_data['order_number']}</b></p>
+            <p>Время запроса: <b>{order_data['order_date']}</b></p>
+            <p>Вы всегда можете позвонить по телефону +7 (812) 363-06-14 для уточнения деталей.</p>
+        """,
+            'django_mail@cosmtech.ru', [f"{order_data['client_email']}"]
+        )
+        msg_mail.content_subtype = "html"  
+        msg_mail.send()
+        return
+
+    
 def send_quiz_result_to_email(quiz_data, order_type='quiz'):
     time = quiz_data.get('order_date')
     order_number = quiz_data.get('order_number')
@@ -826,11 +849,13 @@ def send_quiz_result_to_email(quiz_data, order_type='quiz'):
             """,
             'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
         )
-        msg_mail.attach_file(f'{quiz_data["custom_tz_file"]}')
-        msg_mail.attach_file(f'{quiz_data["custom_package_file"]}')
+        if quiz_data["custom_tz_file"]:
+            msg_mail.attach_file(f'{quiz_data["custom_tz_file"]}')
+        if quiz_data["custom_package_file"]:
+            msg_mail.attach_file(f'{quiz_data["custom_package_file"]}')
+
         msg_mail.content_subtype = "html"  
         msg_mail.send()
-        pprint(quiz_data)
 
 def send_vacancy_request(send_data):
     not_format_date = datetime.datetime.now()
@@ -848,7 +873,7 @@ def send_vacancy_request(send_data):
     msg_mail.content_subtype = "html"
     if send_data['resume_file']:
         msg_mail.attach_file(f'{send_data["resume_file"]}')
-    # msg_mail.send()
+    msg_mail.send()
     
 def find_existing_client(phone='', email=''):
     if phone and email:
