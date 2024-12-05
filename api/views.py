@@ -21,17 +21,18 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
-    Vacancy
+    Vacancy, Supplier, SupplierType
 
 def index(request):
     return render(request, 'index.html')
 
 def default(request):
-    path_list = ['/services', '/services/', '/contacts/', '/contacts', '/about', '/about/']
+    path_list = ['/services', '/services/', '/contacts/', '/contacts', '/about', '/about/', '/job', '/job/', '/policy', '/policy/']
     path_ignore_list = ['/admin/', 'company_files/presentation/',]
     slash_pattern = re.compile(r'\s*\/$')
     find_slash = re.search(slash_pattern, request.path)
     target_url = list(filter(lambda url: url == request.path, path_list))
+    print(request.path)
 
     if request.method == 'GET' and request.path in path_list and len(target_url) > 0:
         if find_slash:
@@ -617,6 +618,34 @@ class VacancyView(APIView):
         send_vacancy_request(vacancy_data)
 
         return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
+    
+class SupplierView(APIView):
+    # permission_classes = [IsAuthenticated, ]
+    
+    def get(self, request):
+        query_suppliers = Supplier.objects.all()
+        supplier_data = [
+            {
+                "name": supplier_obj['name'],
+                "city": supplier_obj['city'],
+                "phone": supplier_obj['phone'],
+                "phonelink": "".join(i for i in supplier_obj['phone'] if  i.isdecimal()),
+                "url": supplier_obj['url'],
+                "type": [type_obj for type_obj in SupplierType.objects.filter(id=supplier_obj['type_id']).values('name')][0]['name']
+
+            } 
+            for supplier_obj in query_suppliers.values()
+        ]
+
+        return Response({'status': 'ok', 'data': supplier_data}, status=status.HTTP_200_OK)
+
+class SuppliersTypeView(APIView):
+    # permission_classes = [IsAuthenticated, ]
+    
+    def get(self, request):
+        query_suppliers_type = SupplierType.objects.all().values()
+
+        return Response({'status': 'ok', 'data': query_suppliers_type}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_tz_template(request):

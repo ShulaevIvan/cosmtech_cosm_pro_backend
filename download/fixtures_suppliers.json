@@ -1,0 +1,134 @@
+[
+    {
+        "pk": 1,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Cosmopack",
+            "city": "Москва",
+            "phone": "+7 (499) 283-88-18",
+            "url": "https://www.cosmopack.ru/kontakty",
+            "type": 1
+        }
+    },
+    {
+        "pk": 2,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Upakovka24",
+            "city": "Москва",
+            "phone": "8 (800) 500-89-42",
+            "url": "https://upakovka24.com/contacts/",
+            "type": 1
+        }
+    },
+    {
+        "pk": 3,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Калкулейт",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 633-01-10",
+            "url": "https://www.calculate.ru/contacts",
+            "type": 1
+        }
+    },
+    {
+        "pk": 4,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Plastic-Kit",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 602-78-18",
+            "url": "https://plastic-kit.ru/kontakty",
+            "type": 1
+        }
+    },
+    {
+        "pk": 5,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "VitaPlastPack",
+            "city": "Москва",
+            "phone": "+7 (495) 979-22-88",
+            "url": "https://vitaplastpack.ru/contacts",
+            "type": 1
+        }
+    },
+    {
+        "pk": 6,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Протей",
+            "city": "Санкт-Петербург",
+            "phone": "8 (800) 301-37-74",
+            "url": "https://zavodprotey.ru/contacts",
+            "type": 1
+        }
+    },
+    {
+        "pk": 7,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "OKILSATO",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 327-57-37",
+            "url": "https://okil.ru/en/contact.html",
+            "type": 2
+        }
+    },
+    {
+        "pk": 8,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "StickyLine",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 335-66-30",
+            "url": "https://stickyline.ru/contacts/",
+            "type": 2
+        }
+    },
+    {
+        "pk": 9,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "MDMPrint",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (495) 256-10-00",
+            "url": "https://mdmprint.ru/contacts/",
+            "type": 2
+        }
+    },
+    {
+        "pk": 10,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "RPKGroup",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 985-94-48",
+            "url": "https://rpkgr.ru/kontakty/",
+            "type": 2
+        }
+    },
+    {
+        "pk": 11,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Аляска",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 380-33-59",
+            "url": "https://www.alaskapof.ru/contacts/",
+            "type": 2
+        }
+    },
+    {
+        "pk": 12,
+        "model": "api.Supplier",
+        "fields": {
+            "name": "Господин-Печатни",
+            "city": "Санкт-Петербург",
+            "phone": "+7 (812) 770-80-90",
+            "url": "https://gospechatnik.ru/",
+            "type": 2
+        }
+    }
+]

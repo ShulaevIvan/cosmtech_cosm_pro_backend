@@ -1,8 +1,8 @@
 import re
 from django.contrib import admin
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
-    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, Vacancy
-
+    CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, Vacancy, \
+    Supplier, SupplierType
 
 class AdminClientOrderInline(admin.TabularInline):
     model = ClientOrder
@@ -111,3 +111,13 @@ class AdminVacancy(admin.ModelAdmin):
         obj.conditions = ' '.join(re.sub(check_pattern, '', obj.conditions).split())
         obj.dutys = ' '.join(re.sub(check_pattern, '', obj.dutys).split())
         obj.save()
+
+@admin.register(Supplier)
+class AdminSupplier(admin.ModelAdmin):
+    model = Supplier
+
+@admin.register(SupplierType)
+class AdminSupplierType(admin.ModelAdmin):
+
+    model = SupplierType
+    fields=['name']

@@ -236,3 +236,29 @@ class Vacancy(models.Model):
     def __str__(self):
 
         return f'{self.name} / {self.salary}'
+    
+class SupplierType(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+
+        return f'{self.name}'
+    
+
+class SupplierType(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        
+        return f'{self.name}'
+    
+class Supplier(models.Model):
+    name = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    url = models.URLField(null=True, blank=True)
+    type = models.ForeignKey(SupplierType, on_delete=models.CASCADE, related_name='supplier_type')
+
+    def __str__(self):
+
+        return f'{self.name} | {self.type}'

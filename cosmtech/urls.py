@@ -22,7 +22,7 @@ from django.urls import path, re_path
 from api.views import index, default, favicon_view
 from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, \
 ContactsRequestView,  QuizOrderView, QuestionOrderView, TzOrderView, CityDataView, \
-    VacancyView, download_admin_file, get_presentation, get_tz_template
+    VacancyView, SupplierView, SuppliersTypeView, download_admin_file, get_presentation, get_tz_template
 
 from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
 
@@ -43,8 +43,10 @@ urlpatterns = [
     path('api/quiz/tz/', TzOrderView.as_view()),
     path('api/admin_download/', download_admin_file),
     path('api/vacancy/', VacancyView.as_view()),
+    path('api/suppliers/',SupplierView.as_view()),
+    path('api/suppliers-type/',SuppliersTypeView.as_view()),
     path('company_files/presentation/', get_presentation),
     path('company_files/tz/', get_tz_template,),
-    re_path(r'^favicon\.ico$', favicon_view),
+    # re_path(r'^favicon\.ico$', favicon_view),
     re_path('.*', default),
 ]+ static(settings.UPLOAD_FILES, document_root=settings.ORDER_FILES)
