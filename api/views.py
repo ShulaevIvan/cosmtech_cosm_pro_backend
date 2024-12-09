@@ -626,6 +626,7 @@ class SupplierView(APIView):
         query_suppliers = Supplier.objects.all()
         supplier_data = [
             {
+                "id": supplier_obj['id'],
                 "name": supplier_obj['name'],
                 "city": supplier_obj['city'],
                 "phone": supplier_obj['phone'],
@@ -641,7 +642,7 @@ class SupplierView(APIView):
 
 class SuppliersTypeView(APIView):
     # permission_classes = [IsAuthenticated, ]
-    
+
     def get(self, request):
         query_suppliers_type = SupplierType.objects.all().values()
 
