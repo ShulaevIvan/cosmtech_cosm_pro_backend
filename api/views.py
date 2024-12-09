@@ -647,6 +647,55 @@ class SuppliersTypeView(APIView):
         query_suppliers_type = SupplierType.objects.all().values()
 
         return Response({'status': 'ok', 'data': query_suppliers_type}, status=status.HTTP_200_OK)
+    
+class ForClientsRequestView(APIView):
+
+    def post(self, request):
+        req_data = json.loads(request.body)
+        not_format_date = datetime.datetime.now()
+        order_time = get_time(not_format_date)
+        email_data = dict()
+        description = f'спасибо ваш запрос зарегистрирован, менеджер свяжется с вами в ближайшее время'
+        client_data = {
+            "request_type": req_data.get('requestType'),
+            "name": req_data.get('name'),
+            "phone": req_data.get('phone'),
+            "email": req_data.get('email'),
+            "comment": req_data.get('comment'),
+        }
+
+        if not client_data['phone'] and not client_data['email']:
+            return Response({'status': 'err', 'message': 'phone or email not found'}, status=status.HTTP_200_OK)
+        
+        
+        if client_data['request_type'] and client_data['request_type'] == 'suplconsult':
+            email_data['order_type_name'] = 'Консультация по поставщикам'
+            email_data['order_date'] = order_time
+            email_data['client_name'] = client_data.get('name')
+            email_data['client_phone'] = client_data.get('phone')
+            description = f'Спасибо за ваше обращение {"".join(str(email_data["client_name"]))} менеджер свяжется с вами в течении 30 мин.'
+            email_data['description'] = description
+
+        elif client_data['request_type'] and client_data['request_type'] == 'prodquestion':
+            email_data['order_type_name'] = 'Вопрос по работе производства'
+            email_data['order_date'] = order_time
+            email_data['client_name'] = client_data.get('name')
+            email_data['client_email'] = client_data.get('email')
+            email_data['comment'] = client_data.get('comment')
+            description = f'Спасибо за ваше обращение {"".join(email_data["client_name"])} менеджер свяжется с вами в течении 30 мин.'
+            email_data['description'] = description
+
+        elif (not client_data['request_type'] and client_data['email']) or (not client_data['request_type'] and client_data['phone']):
+            email_data = {
+                'order_type_name': 'empty',
+                'order_date': order_time,
+                'client_name': client_data.get('name'),
+                'client_phone': client_data.get('phone'),
+                'client_email': client_data.get('email'),
+                "comment": client_data.get('comment'),
+            }
+
+        return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 def get_tz_template(request):
