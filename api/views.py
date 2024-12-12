@@ -620,7 +620,7 @@ class VacancyView(APIView):
         return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
     
 class SupplierView(APIView):
-    # permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, ]
     
     def get(self, request):
         query_suppliers = Supplier.objects.all()
@@ -641,7 +641,7 @@ class SupplierView(APIView):
         return Response({'status': 'ok', 'data': supplier_data}, status=status.HTTP_200_OK)
 
 class SuppliersTypeView(APIView):
-    # permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
         query_suppliers_type = SupplierType.objects.all().values()
@@ -652,8 +652,6 @@ class ForClientsRequestView(APIView):
 
     def post(self, request):
         req_data = json.loads(request.body)
-        not_format_date = datetime.datetime.now()
-        order_time = get_time(not_format_date)
         email_data = dict()
         description = f'спасибо ваш запрос зарегистрирован, менеджер свяжется с вами в ближайшее время'
         client_data = {
@@ -669,16 +667,16 @@ class ForClientsRequestView(APIView):
         
         
         if client_data['request_type'] and client_data['request_type'] == 'suplconsult':
-            email_data['order_type_name'] = 'Консультация по поставщикам'
-            email_data['order_date'] = order_time
+            email_data['order_type'] = client_data.get('request_type')
+            email_data['order_type_name'] = 'Вопрос по поставщикам'
             email_data['client_name'] = client_data.get('name')
             email_data['client_phone'] = client_data.get('phone')
             description = f'Спасибо за ваше обращение {"".join(str(email_data["client_name"]))} менеджер свяжется с вами в течении 30 мин.'
             email_data['description'] = description
 
         elif client_data['request_type'] and client_data['request_type'] == 'prodquestion':
+            email_data['order_type'] = client_data.get('request_type')
             email_data['order_type_name'] = 'Вопрос по работе производства'
-            email_data['order_date'] = order_time
             email_data['client_name'] = client_data.get('name')
             email_data['client_email'] = client_data.get('email')
             email_data['comment'] = client_data.get('comment')
@@ -688,12 +686,12 @@ class ForClientsRequestView(APIView):
         elif (not client_data['request_type'] and client_data['email']) or (not client_data['request_type'] and client_data['phone']):
             email_data = {
                 'order_type_name': 'empty',
-                'order_date': order_time,
                 'client_name': client_data.get('name'),
                 'client_phone': client_data.get('phone'),
                 'client_email': client_data.get('email'),
                 "comment": client_data.get('comment'),
             }
+        send_other_order(email_data)
 
         return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
 
@@ -953,6 +951,40 @@ def send_vacancy_request(send_data):
     if send_data['resume_file']:
         msg_mail.attach_file(f'{send_data["resume_file"]}')
     msg_mail.send()
+
+def send_other_order(send_data):
+    not_format_date = datetime.datetime.now()
+    time = get_time(not_format_date)
+    
+    if send_data.get('order_type') is None:
+        return
+
+    if send_data.get('order_type') == 'prodquestion':
+        msg_mail = EmailMessage(
+            f"Новый запрос ({send_data['order_type_name']}) с сайта cosmtech.ru", 
+            f"""
+                <p>Имя({send_data['client_name']})</p>
+                <p>Email: {send_data['client_email']}</p>
+                <p>Комментарий: {send_data['comment']}</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+        )
+        msg_mail.content_subtype = "html"
+        msg_mail.send()
+    elif send_data.get('order_type') == 'suplconsult':
+        msg_mail = EmailMessage(
+            f"Новый запрос перезвонить клиенту ({send_data['order_type_name']}) с сайта cosmtech.ru", 
+            f"""
+                <p>Имя({send_data['client_name']})</p>
+                <p>Имя({send_data['client_phone']})</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+        )
+        msg_mail.content_subtype = "html"
+        msg_mail.send()
+            
     
 def find_existing_client(phone='', email=''):
     if phone and email:
