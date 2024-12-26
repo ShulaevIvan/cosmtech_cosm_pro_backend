@@ -27,7 +27,12 @@ def index(request):
     return render(request, 'index.html')
 
 def default(request):
-    path_list = ['/services', '/services/', '/contacts/', '/contacts', '/about', '/about/', '/job', '/job/', '/policy', '/policy/']
+    path_list = [
+        '/services', '/services/', '/contacts/', 
+        '/contacts', '/about', '/about/', 
+        '/job', '/job/', '/policy', 
+        '/policy/', '/forclients/', '/forclients'
+    ]
     path_ignore_list = ['/admin/', 'company_files/presentation/',]
     slash_pattern = re.compile(r'\s*\/$')
     find_slash = re.search(slash_pattern, request.path)
@@ -121,12 +126,14 @@ class RequestConsultView(APIView):
             'order_type_name': 'Консультация',
             'client_comment': consult_data['comment'],
         }
-
+        if client_data.get('email'):
+            send_mail_to_client(client_data)
+        
         send_order_mail(client_data)
-        send_mail_to_client(client_data)
+        send_description = f"Спасибо за обращение {client_data.get('client_name')}, с вами свяжутся в ближайшее время (30 - 60 мин)!"
         
         
-        return Response({'status': 'ok', 'description': 'Спасибо, с вами свяжутся в ближайшее время!'}, status=status.HTTP_200_OK)
+        return Response({'status': 'ok', 'description': send_description}, status=status.HTTP_200_OK)
 
 class RequestOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
