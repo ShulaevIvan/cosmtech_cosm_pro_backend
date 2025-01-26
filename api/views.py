@@ -21,7 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
-    Vacancy, Supplier, SupplierType
+    Vacancy, Supplier, SupplierType, ExcursionProductionRequest
 
 def index(request):
     return render(request, 'index.html')
@@ -701,6 +701,68 @@ class ForClientsRequestView(APIView):
         send_other_order(email_data)
 
         return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
+    
+class ExcursionProductionView(APIView):
+
+    def get(self, request):
+
+        return Response({'status': 'ok'})
+    
+    def post(self, request):
+        data = json.loads(request.body)
+        cleint_name = data.get('name')
+        client_phone = data.get('phone')
+        excursion_data = data.get('date')
+        excursion_time = data.get('time')
+
+        if not cleint_name or not client_phone or not excursion_data or not excursion_time:
+            return Response({'status': 'err', 'description': 'send data err'}, status=status.HTTP_200_OK)
+        
+        order_number = generate_simple_order_number('_exc_oer')
+        send_description = {
+            'title': 'Спасибо, Ваш запрос на экскурсию принят!',
+            'order': order_number,
+            'description': f'Желаемая дата визита: {excursion_data} в {excursion_time}'
+        }
+        valid_date = datetime.datetime.strptime(re.sub(r'[-]', '/', excursion_data), "%Y/%m/%d").strftime('%Y-%m-%d')
+        valid_time = datetime.time(int(excursion_time[:2]), int(excursion_time[3:]), 00) 
+        
+        ExcursionProductionRequest.objects.create(
+            excursion_number = order_number,
+            client_name = cleint_name,
+            client_phone = client_phone,
+            excursion_date = valid_date,
+            excursion_time = valid_time
+        ).save()
+
+        return Response({'status': 'ok', 'description': send_description}, status=status.HTTP_201_CREATED)
+    
+class DecorativeCosmeticView(APIView):
+
+    def post(self, request):
+        send_data = json.loads(request.body)
+        client_name = send_data.get('name')
+        client_phone = send_data.get('phone')
+        client_email = send_data.get('email')
+
+        if not (client_phone or client_email):
+            return Response({'status': 'err', 'description': 'data is not valid'}, status=status.HTTP_200_OK)
+        
+        description = {
+            'title': 'Спасибо! Ваш запрос отправлен!',
+            'description': 'Менеджер свяжется с вами в течении 30 минут.'
+        }
+        client_data = {
+            'order_type': 'decorative_consult',
+            'order_type_name': 'Декоративная косметика консультация',
+            'client_name': client_name,
+            'client_phone': client_phone,
+            'client_email': client_email,
+        }
+        # send_other_order(client_data)
+
+        return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
+
 
 @api_view(['GET'])
 def get_tz_template(request):
@@ -965,6 +1027,20 @@ def send_other_order(send_data):
     
     if send_data.get('order_type') is None:
         return
+    
+    if send_data.get('order_type') == 'decorative_consult':
+        msg_mail = EmailMessage(
+            f"Новый запрос ({send_data['order_type_name']}) с сайта cosmtech.ru", 
+            f"""
+                <p>Имя({send_data['client_name']})</p>
+                <p>Телефон({send_data['client_phone']})</p>
+                <p>Email: {send_data['client_email']}</p>
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+        )
+        msg_mail.content_subtype = "html"
+        msg_mail.send()
 
     if send_data.get('order_type') == 'prodquestion':
         msg_mail = EmailMessage(
@@ -1031,6 +1107,15 @@ def generate_quiz_order_number():
     for i in range(6):
         order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
     order_modifer.append('_qz_oer')
+    order_modifer = f''.join(map(str, order_modifer))
+
+    return order_modifer
+
+def generate_simple_order_number(prefix):
+    order_modifer = []
+    for i in range(6):
+        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
+    order_modifer.append(prefix)
     order_modifer = f''.join(map(str, order_modifer))
 
     return order_modifer

@@ -254,3 +254,14 @@ class Supplier(models.Model):
     def __str__(self):
 
         return f'{self.name} | {self.type}'
+
+class ExcursionProductionRequest(models.Model):
+    excursion_number = models.CharField(max_length=255)
+    client_name = models.CharField(max_length=255)
+    client_phone = models.CharField(max_length=20)
+    excursion_date = models.DateTimeField()
+    excursion_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.client_name} {self.excursion_time} {str(self.excursion_date).replace('00:00:00', '')}"
+    

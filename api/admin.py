@@ -2,7 +2,7 @@ import re
 from django.contrib import admin
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, Vacancy, \
-    Supplier, SupplierType
+    Supplier, SupplierType, ExcursionProductionRequest
 
 class AdminClientOrderInline(admin.TabularInline):
     model = ClientOrder
@@ -121,3 +121,9 @@ class AdminSupplierType(admin.ModelAdmin):
 
     model = SupplierType
     fields=['name']
+
+@admin.register(ExcursionProductionRequest)
+class AdminExcursionProductionRequest(admin.ModelAdmin):
+
+    model=ExcursionProductionRequest
+    fields=['excursion_number', 'client_name', 'client_phone', 'excursion_date', 'excursion_time']
