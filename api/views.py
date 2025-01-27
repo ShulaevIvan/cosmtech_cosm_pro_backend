@@ -744,24 +744,83 @@ class DecorativeCosmeticView(APIView):
         client_name = send_data.get('name')
         client_phone = send_data.get('phone')
         client_email = send_data.get('email')
+        client_comment = send_data.get('comment')
+        file_obj = send_data.get('fileData')
+        request_type = send_data.get('reqType')
+        client_data = dict()
+        description = dict()
 
         if not (client_phone or client_email):
             return Response({'status': 'err', 'description': 'data is not valid'}, status=status.HTTP_200_OK)
         
-        description = {
-            'title': 'Спасибо! Ваш запрос отправлен!',
-            'description': 'Менеджер свяжется с вами в течении 30 минут.'
-        }
-        client_data = {
-            'order_type': 'decorative_consult',
-            'order_type_name': 'Декоративная косметика консультация',
-            'client_name': client_name,
-            'client_phone': client_phone,
-            'client_email': client_email,
-        }
-        # send_other_order(client_data)
+        if request_type == 'consult':
+            description['title'] = 'Спасибо! Ваш запрос отправлен!'
+            description['description'] = 'Менеджер свяжется с вами в течении 30 минут.'
 
-        return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
+            client_data['order_type'] = 'decorative_consult'
+            client_data['order_type_name'] = 'Декоративная косметика консультация'
+            client_data['client_name'] = client_name
+            client_data['client_phone'] = client_phone
+            client_data['client_email'] = client_email
+
+            send_other_order(client_data)
+
+            return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
+        
+        if request_type == 'order':
+            client_data['order_type_name'] = 'Декоративная косметика запрос рассчета'
+            description['title'] = 'Спасибо! Ваш запрос отправлен!'
+            description['description'] = 'Менеджер свяжется с вами в течении 30 минут.'
+            description['order'] = ''
+            client_files = []
+
+            target_client = find_existing_client(client_phone, client_email)
+            if not target_client.exists():
+                Client.objects.create(
+                    name=client_name, 
+                    phone=client_phone, 
+                    email=client_email,
+                ).save()
+                target_client = Client.objects.filter(name=client_name, phone=client_phone, email=client_email)
+            
+            order = generate_order_number(client_data['order_type_name'], target_client[0].id)
+            description['order'] = order['number']
+            target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
+            target_order.save()
+            
+            ClientOrder.objects.create(
+                client_id=target_client.first(), 
+                order_id=Order.objects.filter(id=target_order.id).first(),
+                order_number = order['number'], 
+                order_date = order['date'],
+                oreder_description = client_comment,
+                order_option = client_data['order_type_name'],
+                file = 'test'
+            ).save()
+
+            if file_obj and file_obj['file'] and file_obj['type']:
+                file = file_obj
+                file_path = create_file(file, settings.ORDER_FILES)
+                target_order = ClientOrder.objects.filter(order_number=order['number'])
+                ClientOrderFile.objects.create(client_order=ClientOrder.objects.get(id=target_order[0].id), file=file_path,).save()
+                client_files.append(file_path)
+
+            client_data = {
+                'client_name': client_name,
+                'client_phone': client_phone,
+                'client_email': client_email,
+                'client_city': '',
+                'call_option': '',
+                'client_comment': client_comment,
+                'order_number': order['number'],
+                'order_type': order['type'],
+                'order_type_name': get_request_name('decor'),
+            }
+            client_data['files'] = client_files
+            # send_order_mail(client_data)
+                
+
+            return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
@@ -1137,6 +1196,7 @@ def get_request_name(value):
         'cert': 'Сертификаиця продукции',
         'trade': 'Торговое предложение',
         'cooperation': 'Сотрудничество',
+        'decor': 'Декоративная косметика производство',
         'msg': 'Мессанджеры',
         'phone': 'Телефон',
         'email': 'Email',
