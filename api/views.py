@@ -37,7 +37,6 @@ def default(request):
     slash_pattern = re.compile(r'\s*\/$')
     find_slash = re.search(slash_pattern, request.path)
     target_url = list(filter(lambda url: url == request.path, path_list))
-    print(request.path)
 
     if request.method == 'GET' and request.path in path_list and len(target_url) > 0:
         if find_slash:
@@ -656,6 +655,7 @@ class SuppliersTypeView(APIView):
         return Response({'status': 'ok', 'data': query_suppliers_type}, status=status.HTTP_200_OK)
     
 class ForClientsRequestView(APIView):
+    permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
         req_data = json.loads(request.body)
@@ -703,6 +703,7 @@ class ForClientsRequestView(APIView):
         return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
     
 class ExcursionProductionView(APIView):
+    permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
 
@@ -714,6 +715,7 @@ class ExcursionProductionView(APIView):
         client_phone = data.get('phone')
         excursion_data = data.get('date')
         excursion_time = data.get('time')
+        client_data = dict()
 
         if not cleint_name or not client_phone or not excursion_data or not excursion_time:
             return Response({'status': 'err', 'description': 'send data err'}, status=status.HTTP_200_OK)
@@ -735,9 +737,18 @@ class ExcursionProductionView(APIView):
             excursion_time = valid_time
         ).save()
 
+        client_data['order_number'] = order_number
+        client_data['name'] = cleint_name
+        client_data['client_phone'] = client_phone
+        client_data['excursion_data'] = excursion_data
+        client_data['excursion_time'] = excursion_time
+
+        send_excursion_to_email(client_data)
+
         return Response({'status': 'ok', 'description': send_description}, status=status.HTTP_201_CREATED)
     
 class DecorativeCosmeticView(APIView):
+    permission_classes = [IsAuthenticated, ]
 
     def post(self, request):
         send_data = json.loads(request.body)
@@ -749,7 +760,6 @@ class DecorativeCosmeticView(APIView):
         request_type = send_data.get('reqType')
         client_data = dict()
         description = dict()
-
         if not (client_phone or client_email):
             return Response({'status': 'err', 'description': 'data is not valid'}, status=status.HTTP_200_OK)
         
@@ -762,8 +772,11 @@ class DecorativeCosmeticView(APIView):
             client_data['client_name'] = client_name
             client_data['client_phone'] = client_phone
             client_data['client_email'] = client_email
-
+            
             send_other_order(client_data)
+
+            if client_email:
+                send_mail_to_client(client_data)
 
             return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
         
@@ -817,7 +830,11 @@ class DecorativeCosmeticView(APIView):
                 'order_type_name': get_request_name('decor'),
             }
             client_data['files'] = client_files
-            # send_order_mail(client_data)
+
+            if client_email:
+                send_mail_to_client(client_data)
+
+            send_order_mail(client_data)
                 
 
             return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
@@ -1126,7 +1143,28 @@ def send_other_order(send_data):
         )
         msg_mail.content_subtype = "html"
         msg_mail.send()
-            
+
+def send_excursion_to_email(client_data):
+    not_format_date = datetime.datetime.now()
+    time = get_time(not_format_date)
+
+    if client_data.get('client_phone') is None:
+        return
+
+    msg_mail = EmailMessage(
+        f"Новый запрос (Экскурсия на производство) с сайта cosmtech.ru", 
+        f"""
+            <p>Имя {client_data['name']}</p>
+            <p>Телефон {client_data['client_phone']}</p>
+            <p>Желаемая дата экскурсии: {client_data['excursion_data']}</p>
+            <p>Желаемое время экскурсии: {client_data['excursion_time']}</p>
+            <p><b>{time}</b></p>
+        """,
+        'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+    )
+    msg_mail.content_subtype = "html"
+    msg_mail.send()
+
     
 def find_existing_client(phone='', email=''):
     if phone and email:
