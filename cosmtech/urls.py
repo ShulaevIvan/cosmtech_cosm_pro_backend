@@ -23,7 +23,7 @@ from api.views import index, default, favicon_view
 from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, \
 ContactsRequestView,  QuizOrderView, QuestionOrderView, TzOrderView, CityDataView, \
     VacancyView, SupplierView, SuppliersTypeView, ForClientsRequestView, ExcursionProductionView, \
-    DecorativeCosmeticView, download_admin_file, get_presentation, get_tz_template
+    DecorativeCosmeticView, SpecForProductionView, download_admin_file, get_presentation, get_tz_template
 
 from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
 
@@ -49,6 +49,7 @@ urlpatterns = [
     path('api/clients/request/', ForClientsRequestView.as_view()),
     path('api/clients/excursion/', ExcursionProductionView.as_view()),
     path('api/decorative-cosmetic/', DecorativeCosmeticView.as_view()),
+    path('api/specification/', SpecForProductionView.as_view()),
     path('company_files/presentation/', get_presentation),
     path('company_files/tz/', get_tz_template,),
     # re_path(r'^favicon\.ico$', favicon_view),

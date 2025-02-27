@@ -5,6 +5,7 @@ import re
 import uuid
 import os
 import json
+from pprint import pprint
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
@@ -18,6 +19,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+
+from docxtpl import DocxTemplate
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
@@ -839,6 +842,23 @@ class DecorativeCosmeticView(APIView):
 
             return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
 
+class SpecForProductionView(APIView):
+
+    def get(self, request):
+        return Response({'status': 'ok'}, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        send_data = json.loads(request.body)
+        happy_state_description = dict()
+        specification_file = create_specification_file(send_data)
+
+        if not specification_file:
+            happy_state_description['title'] = 'что-то пошло не так'
+            happy_state_description['description'] = 'проверье все поля или отправьте запрос на pro@cosmtech.ru, указав что получили ошибку при формировании тз'
+
+            return Response({'status': 'err', 'description': happy_state_description}, status=status.HTTP_200_OK)
+
+        return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 def get_tz_template(request):
@@ -1242,6 +1262,7 @@ def get_request_name(value):
     }
     return request_types.get(value)
 
+
 def get_time(date):
     result_str = ''
 
@@ -1271,5 +1292,51 @@ def get_time(date):
         result_str = result_str + str(time_obj['value'])
 
     return f"Время: {result_str}"
+
+def create_specification_file(data):
+    specification_info = dict()
+    specification_tmp_folder = f'{os.getcwd()}/download/company_files/specifications_tmp'
+
+    if not os.path.exists(specification_tmp_folder):
+        os.mkdir(specification_tmp_folder)
+
+    specification_filename = f'spec_{uuid.uuid4()}'
+    specification_order = generate_specification_nuber(specification_filename)
+    specification_format = '.docx'
+    specification_template_path = f'{os.getcwd()}/download/company_files/specification_template.docx'
+    specification_tmp_file_path = f'{specification_tmp_folder}/{specification_filename}{specification_format}'
+
+    if not specification_filename or not specification_order or not os.path.exists(specification_tmp_folder):
+        return False
+
+    document_file = DocxTemplate(specification_template_path)
+    specification_data = dict()
+    order_time = get_time(datetime.datetime.now())
+    specification_data['order_number'] = specification_order
+    specification_data['order_date'] = order_time
+
+    for key, value in data.items():
+        valid_key = ''.join('_' + char.lower() if char.isupper() else char.strip()for char in key).strip()
+        specification_data[valid_key] = value
+
+    document_file.render(specification_data)
+    document_file.save(specification_tmp_file_path)
+
+    specification_info['order_number'] = specification_data['order_number']
+    specification_info['tmp_file_path'] = specification_tmp_file_path
+    specification_info['order_date'] = specification_data['order_date']
+
+    return specification_tmp_file_path
+
+def generate_specification_nuber(filename):
+    pattern = r'^spec_[a-z|0-9|A-Z]{8}'
+    check_str = re.match(pattern, filename)
+    if check_str and check_str.group(0):
+        return check_str.group(0)
+    return False
+
+def send_production_spec_to_email(specification_data, secification_path):
+
+    pass
 
 favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
