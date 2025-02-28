@@ -850,13 +850,40 @@ class SpecForProductionView(APIView):
     def post(self, request):
         send_data = json.loads(request.body)
         happy_state_description = dict()
-        specification_file = create_specification_file(send_data)
 
-        if not specification_file:
-            happy_state_description['title'] = 'что-то пошло не так'
-            happy_state_description['description'] = 'проверье все поля или отправьте запрос на pro@cosmtech.ru, указав что получили ошибку при формировании тз'
+        specification_data = create_specification_file(send_data)
+        specification_data['client_email'] = send_data.get('customerEmail')
+        specification_data['client_name'] = send_data.get('customerName')
+        specification_data['client_phone'] = send_data.get('customerPhone')
+
+        specification_data['package_type'] = send_data.get('packageType')
+        specification_data['package_body'] = send_data.get('packageCategory')
+        specification_data['package_head'] = send_data.get('packageName')
+        specification_data['custom_package'] = send_data.get('packageForUser')
+
+        specification_data['product_type'] = send_data.get('productType')
+        specification_data['product_category'] = send_data.get('productCategory')
+        specification_data['product_name'] = send_data.get('productName')
+        specification_data['product_params'] = send_data.get('productParams')
+        specification_data['product_size'] = send_data.get('productSize')
+        specification_data['product_segment'] = send_data.get('productSegment')
+
+        specification_data['services'] = send_data.get('services')
+        specification_data['quantity'] = send_data.get('quantity')
+
+        specification_data['product_example_file'] = send_data.get('productExampleFile')
+        specification_data['product_example_url'] = send_data.get('productExampleUrl')
+        
+        send_production_spec_to_email(specification_data, specification_data.get('tmp_file_path'))
+
+        if not specification_data or not specification_data['tmp_file_path']:
+            happy_state_description['title'] = 'Что-то пошло не так'
+            happy_state_description['description'] = 'Проверье все поля или отправьте запрос на pro@cosmtech.ru, указав что получили ошибку при формировании тз'
 
             return Response({'status': 'err', 'description': happy_state_description}, status=status.HTTP_200_OK)
+        
+        happy_state_description['title'] = 'Спасибо, ваше ТЗ отправлено № xxxx'
+        happy_state_description['description'] = 'Менеджер свяжется с вами в ближайшее время для уточнения деталей.'
 
         return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_201_CREATED)
 
@@ -1293,8 +1320,18 @@ def get_time(date):
 
     return f"Время: {result_str}"
 
+def keys_form_camel_case_to_python_style(data):
+    result_dict = dict()
+
+    for key, value in data.items():
+        valid_key = ''.join('_' + char.lower() if char.isupper() else char.strip() for char in key).strip()
+        result_dict[valid_key] = value
+
+    return result_dict
+
 def create_specification_file(data):
     specification_info = dict()
+    specification_data = dict()
     specification_tmp_folder = f'{os.getcwd()}/download/company_files/specifications_tmp'
 
     if not os.path.exists(specification_tmp_folder):
@@ -1310,14 +1347,14 @@ def create_specification_file(data):
         return False
 
     document_file = DocxTemplate(specification_template_path)
-    specification_data = dict()
+
     order_time = get_time(datetime.datetime.now())
+    specification_data = keys_form_camel_case_to_python_style(data)
     specification_data['order_number'] = specification_order
     specification_data['order_date'] = order_time
 
-    for key, value in data.items():
-        valid_key = ''.join('_' + char.lower() if char.isupper() else char.strip()for char in key).strip()
-        specification_data[valid_key] = value
+    if specification_data.get('services') and len(specification_data['services']) > 0:
+        specification_data['services'] = ''.join(f'{i}, 'for i in specification_data['services'])
 
     document_file.render(specification_data)
     document_file.save(specification_tmp_file_path)
@@ -1326,7 +1363,7 @@ def create_specification_file(data):
     specification_info['tmp_file_path'] = specification_tmp_file_path
     specification_info['order_date'] = specification_data['order_date']
 
-    return specification_tmp_file_path
+    return specification_info
 
 def generate_specification_nuber(filename):
     pattern = r'^spec_[a-z|0-9|A-Z]{8}'
@@ -1335,8 +1372,49 @@ def generate_specification_nuber(filename):
         return check_str.group(0)
     return False
 
-def send_production_spec_to_email(specification_data, secification_path):
+def send_production_spec_to_email(data_to_email, secification_path):
+    product_file = data_to_email['product_example_file']
+    tz_file = data_to_email['tmp_file_path']
 
+    msg_mail = EmailMessage(
+        f"Новый запрос (Отправка ТЗ онлайн) с сайта cosmtech.ru", 
+        f"""
+            <h3>Запрпос ТЗ № {data_to_email['order_number']}</h3>
+
+
+            <h4>Информация о клиенте</h4>
+            <p>Имя {data_to_email['client_name']}</p>
+            <p>Телефон {data_to_email['client_phone']}</p>
+            <p>Email {data_to_email['client_phone']}</p>
+            <p><b>{data_to_email['order_date']}</b></p>
+            
+            <h4>Продукт</h4>
+            <p>Тип продукта: {data_to_email['product_type']}</p>
+            <p>Категория: {data_to_email['product_category']}</p>
+            <p>Название: {data_to_email['product_name']}</p>
+            <p>Сегмент: {data_to_email['product_segment']}</p>
+            <p>Характеристики продукта: {data_to_email['product_params']}</p>
+            <p>Объем: {data_to_email['product_size']}</p>
+            <p>Ссылка от клиента на пример продукта: <a href="{data_to_email['product_example_url']}">
+                {data_to_email['product_example_url']}</a>
+            </p>
+
+            <h4>Упаковка</h4>
+            <p>Упаковка для: {data_to_email['package_type']}</p>
+            <p>Тело: {data_to_email['package_body']}</p>
+            <p>Голова: {data_to_email['package_head']}</p>
+            
+            <h4>Дополнительные услуги</h4>
+            <p>{''.join(i for i in data_to_email['services'])}</p>
+
+            <p>Количество к производству {data_to_email['quantity']} шт</p>
+        """,
+        'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+    )
+    if tz_file:
+            msg_mail.attach_file(f'{tz_file}')
+    msg_mail.content_subtype = "html"
+    msg_mail.send()
     pass
 
 favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)
