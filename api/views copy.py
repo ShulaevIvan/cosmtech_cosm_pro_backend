@@ -755,7 +755,6 @@ class DecorativeCosmeticView(APIView):
 
     def post(self, request):
         send_data = json.loads(request.body)
-        pprint(send_data)
         client_name = send_data.get('name')
         client_phone = send_data.get('phone')
         client_email = send_data.get('email')
@@ -764,6 +763,8 @@ class DecorativeCosmeticView(APIView):
         request_type = send_data.get('reqType')
         client_data = dict()
         description = dict()
+        if not (client_phone or client_email):
+            return Response({'status': 'err', 'description': 'data is not valid'}, status=status.HTTP_200_OK)
         
         if request_type == 'consult':
             description['title'] = 'Спасибо! Ваш запрос отправлен!'
@@ -777,7 +778,7 @@ class DecorativeCosmeticView(APIView):
             
             send_other_order(client_data)
 
-            if client_email != '':
+            if client_email:
                 send_mail_to_client(client_data)
 
             return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
@@ -833,7 +834,7 @@ class DecorativeCosmeticView(APIView):
             }
             client_data['files'] = client_files
 
-            if client_email != '':
+            if client_email:
                 send_mail_to_client(client_data)
 
             send_order_mail(client_data)
@@ -850,8 +851,10 @@ class SpecForProductionView(APIView):
     def post(self, request):
         send_data = json.loads(request.body)
         happy_state_description = dict()
-        pprint(send_data)
+        pprint(send_data.get('customerCity'))
+
         specification_data = create_specification_file(send_data)
+
         specification_data['client_email'] = send_data.get('customerEmail')
         specification_data['client_name'] = send_data.get('customerName')
         specification_data['client_phone'] = send_data.get('customerPhone')
@@ -876,6 +879,7 @@ class SpecForProductionView(APIView):
             'file': send_data.get('productExampleFile').get('fileData'),
             'path': ''
         }
+
         if specification_data['product_example_file']['file'] and specification_data['product_example_file']['name']:
             specification_data['product_example_file']['path'] = create_file(
                 specification_data['product_example_file'], 
@@ -912,7 +916,8 @@ class SpecForProductionView(APIView):
             tz_file_path =  specification_data['tmp_file_path'],
             product_example_file = specification_data['product_example_file']['path']
         )
-        
+        if specification_data['client_email']:
+            send_production_spec_to_client(specification_data)
         send_production_spec_to_email(specification_data)
         
         happy_state_description['title'] = f"Спасибо, за обращене {specification_data['client_name']}!"
@@ -1375,7 +1380,10 @@ def create_specification_file(data):
     specification_format = '.docx'
     specification_template_path = f'{os.getcwd()}/download/company_files/specification_template.docx'
     specification_tmp_file_path = f'{specifications_folder}/{specification_filename}{specification_format}'
-    
+
+    if not specification_filename or not specification_order or not os.path.exists(specifications_folder):
+        return False
+
     document_file = DocxTemplate(specification_template_path)
 
     order_time = get_time(datetime.datetime.now())

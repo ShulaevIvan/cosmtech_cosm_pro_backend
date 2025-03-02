@@ -265,3 +265,42 @@ class ExcursionProductionRequest(models.Model):
     def __str__(self):
         return f"{self.client_name} {self.excursion_time} {str(self.excursion_date).replace('00:00:00', '')}"
     
+class SpecificationOrder(models.Model):
+    order_date = models.DateTimeField()
+    order_number = models.CharField(max_length=255)
+    client_name = models.CharField(max_length=100)
+    client_email = models.CharField(max_length=100, blank=True, null=True)
+    client_phone = models.CharField(max_length=100, blank=True, null=True)
+    client_city = models.CharField(max_length=255, blank=True, null=True)
+    product_type = models.CharField(max_length=255)
+    product_category = models.CharField(max_length=255)
+    product_name = models.CharField(max_length=255)
+    product_params = models.TextField(null=True, blank=True)
+    product_segment = models.CharField(max_length=255)
+    product_example_url = models.URLField(null=True, blank=True)
+    product_size = models.CharField(max_length=100)
+    package_type = models.CharField(max_length=100)
+    package_body = models.CharField(max_length=100, null=True, blank=True)
+    package_head = models.CharField(max_length=100, null=True, blank=True)
+    custom_package = models.CharField(max_length=255, null=True, blank=True)
+    services = models.TextField(null=True, blank=True)
+    delivery = models.CharField(max_length=255, null=True, blank=True)
+    quantity = models.IntegerField()
+    tz_file_path = models.FilePathField(max_length=255, null=True, blank=True)
+    product_example_file = models.FilePathField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        format_date = re.sub(r'\.\d+$', '', str(self.order_date))
+        return f"ТЗ от {self.client_name} №{self.order_number} {format_date}"
+    
+    def tz_file_link(self):
+        if self.tz_file_path:
+            return format_html(f"<a href='/api/admin_download/?file_path={self.tz_file_path}' target=blank>download file</a>")
+        else:
+            return "No attachment"
+        
+    def product_example_file_link(self):
+        if self.product_example_file:
+            return format_html(f"<a href='/api/admin_download/?file_path={self.product_example_file}' target=blank>download file</a>")
+        else:
+            return "No attachment"

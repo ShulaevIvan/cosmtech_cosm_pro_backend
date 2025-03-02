@@ -2,7 +2,7 @@ import re
 from django.contrib import admin
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, Vacancy, \
-    Supplier, SupplierType, ExcursionProductionRequest
+    Supplier, SupplierType, ExcursionProductionRequest, SpecificationOrder
 
 class AdminClientOrderInline(admin.TabularInline):
     model = ClientOrder
@@ -127,3 +127,18 @@ class AdminExcursionProductionRequest(admin.ModelAdmin):
 
     model=ExcursionProductionRequest
     fields=['excursion_number', 'client_name', 'client_phone', 'excursion_date', 'excursion_time']
+
+@admin.register(SpecificationOrder)
+class AdminSpecificationOrder(admin.ModelAdmin):
+
+    model = SpecificationOrder
+    fields=['order_date', 'order_number', 'client_name',
+        'client_email', 'client_phone', 'client_city',
+        'product_type', 'product_category', 'product_name', 
+        'product_params', 'product_segment', 'product_example_url', 
+        'product_size','package_type', 'package_body', 
+        'package_head', 'custom_package', 'services',  'delivery', 
+        'quantity', 'tz_file_link', 'product_example_file_link'
+    ]
+    readonly_fields = [ 'order_date', 'order_number','tz_file_path', 'product_example_file', 'tz_file_link', 'product_example_file_link']
+    
