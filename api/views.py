@@ -67,9 +67,10 @@ class CallbackRequestView(APIView):
             'time': req_body.get('time'),
             'type': req_body.get('type'),
         }
-        if email_data['phone']:
+
+        if email_data.get('phone'):
             CallbackRequests.objects.create(
-                phone = email_data['phone'],
+                phone = email_data.get('phone'),
                 name = '',
                 request_time = not_format_date
             ).save()

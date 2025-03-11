@@ -137,7 +137,7 @@ class AdminSpecificationOrder(admin.ModelAdmin):
         'product_type', 'product_category', 'product_name', 
         'product_params', 'product_segment', 'product_example_url', 
         'product_size','package_type', 'package_body', 
-        'package_head', 'custom_package', 'services',  'delivery', 
+        'package_head', 'custom_package', 'services', 'delivery', 
         'quantity', 'tz_file_link', 'product_example_file_link'
     ]
     readonly_fields = [ 'order_date', 'order_number','tz_file_path', 'product_example_file', 'tz_file_link', 'product_example_file_link']

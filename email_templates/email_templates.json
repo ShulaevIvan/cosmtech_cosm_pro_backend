@@ -1,0 +1,652 @@
+[
+    {
+        "id": 1,
+        "template_name": "callback_req",
+        "email_subject": "Заказ обратного звонка с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "phone",
+                "value": "Телефон"
+            },
+            {
+                "name": "time",
+                "value": "Время"
+            },
+            {
+                "name": "type",
+                "value": "Тип"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо! Вам перезвонят в течении 30 мин"
+    },
+    {
+        "id": 2,
+        "template_name": "consult_req",
+        "email_subject": "Запрос консультации с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "client_city",
+                "value": "Город клиента"
+            },
+            {
+                "name": "call_option",
+                "value": "Способ связи"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "client_comment",
+                "value": "Комментарий клиента"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо за обращение {client_data.get('client_name')}, с вами свяжутся в ближайшее время (30 - 60 мин)!"
+    },
+    {
+        "id": 3,
+        "template_name": "order_req",
+        "email_subject": "Запрос контраткного производства с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
+            },
+            {
+                "name": "call_option",
+                "value": "Способ связи"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "client_comment",
+                "value": "Комментарий клиента"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо! Запрос отправлен, Номер запроса: №{order['number']}"
+    },
+    {
+        "id": 4,
+        "template_name": "contacts_order_req",
+        "email_subject": "Запрос контраткного производства (страница контакты) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "client_city",
+                "value": "Город клиента"
+            },
+            {
+                "name": "call_option",
+                "value": "Способ связи"
+            },
+            {
+                "name": "client_comment",
+                "value": "Комментарий клиента"
+            },
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
+            },
+            {
+                "name": "order_type",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо! Запрос №{order['number']} зарегистрирован"
+    },
+    {
+        "id": 5,
+        "template_name": "contacts_coperation_req",
+        "email_subject": "Запрос сотрудничества (страница контакты) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "client_city",
+                "value": "Город клиента"
+            },
+            {
+                "name": "call_option",
+                "value": "Способ связи"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            },
+            {
+                "name": "client_comment",
+                "value": "Комментарий клиента"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо! Запрос №{order['number']} зарегистрирован"
+    },
+    {
+        "id": 6,
+        "template_name": "quiz_req",
+        "email_subject": "Запрос контраткного производства (калькулятор) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "order_type_name",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
+            },
+            {
+                "name": "order_date",
+                "value": "Дата заказа"
+            },
+            {
+                "name": "order_date",
+                "value": "Дата заказа"
+            },
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "client_budget",
+                "value": "Бюджет клиента"
+            },
+            {
+                "name": "order_deadline",
+                "value": "Желаемые сроки производства"
+            },
+            {
+                "name": "order_deadline",
+                "value": "Желаемые сроки"
+            },
+            {
+                "name": "order_production_date",
+                "value": "Сроки производства"
+            },
+            {
+                "name": "order_service",
+                "value": "Дополнительные услуги"
+            },
+            {
+                "name": "order_service_price",
+                "value": "Цены доп услуг"
+            },
+            {
+                "name": "order_product",
+                "value": "Производимый продукт"
+            },
+            {
+                "name": "order_product_quantity",
+                "value": "Колиество производимого продукта"
+            },
+            {
+                "name": "order_product_package",
+                "value": "Желаемая упаковка"
+            },
+            {
+                "name": "order_product_sum",
+                "value": "Цена заказанного продукта"
+            },
+            {
+                "name": "delivery_city_from",
+                "value": "Доставка из города"
+            },
+            {
+                "name": "delivery_city_to",
+                "value": "Доставка в город"
+            },
+            {
+                "name": "delivery_region",
+                "value": "Регион доставки"
+            },
+            {
+                "name": "delivery_range",
+                "value": "Расстояние в километрах до точки"
+            },
+            {
+                "name": "delivery_weight",
+                "value": "Приблизительный вес партии"
+            },
+            {
+                "name": "delivery_price_point",
+                "value": "Цена доставки за 1 км"
+            },
+            {
+                "name": "delivery_price",
+                "value": "Общая сумма доставки"
+            },
+            {
+                "name": "custom_tz_file",
+                "value": "Файл техзадания"
+            },
+            {
+                "name": "custom_package_file",
+                "value": "Файл упаковки"
+            }
+        ],
+        "response_title": "Спасибо за обращение",
+        "response_description": "Наш сотрудник пришлет рассчет/свяжется с вами в билижайшее время"
+    },
+    {
+        "id": 7,
+        "template_name": "question_req",
+        "email_subject": "Задать вопрос (Кальклятор главная стр) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
+            },
+            {
+                "name": "order_number",
+                "value": "Время заказа"
+            },
+            {
+                "name": "communication_type",
+                "value": "Желаемый тип связи"
+            },
+            {
+                "name": "client_question",
+                "value": "Вопрос клиента"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо! Запрос отправлен"
+    },
+    {
+        "id": 8,
+        "template_name": "tz_req",
+        "email_subject": "Контрактное производство ТЗ (Кальклятор главная стр) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email клиента"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            },
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
+            },
+            {
+                "name": "order_date",
+                "value": "Дата заказа"
+            },
+            {
+                "name": "tz_file",
+                "value": "Файл техзадания"
+            }
+        ],
+        "response_title": "Спасибо за обращение",
+        "response_description": "Наш сотрудник свяжется с вами в течении 30 минут"
+    },
+    {
+        "id": 9,
+        "template_name": "vacancy_req",
+        "email_subject": "Отправлен отклик на вакансию с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "resume_name",
+                "value": "Имя"
+            },
+            {
+                "name": "resume_phone",
+                "value": "Телефон"
+            },
+            {
+                "name": "resume_file",
+                "value": "Файл резюме"
+            },
+            {
+                "name": "vacancy_data",
+                "value": "Вакансия"
+            }
+        ],
+        "response_title": "Спасибо, Ваш отклик очень важен для нас!",
+        "response_description": "Специалисты свяжутся с вами по телефону в ближайшее время"
+    },
+    {
+        "id": 10,
+        "template_name": "for_clients_supl_req",
+        "email_subject": "Запрос на сотрудничество (поставщик) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "order_type",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            },
+            {
+                "name": "client_name",
+                "value": "Имя поставщика"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон поставщика"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо за ваше обращение  менеджер свяжется с вами в течении 30 мин."
+    },
+    {
+        "id": 11,
+        "template_name": "for_clients_prod_req",
+        "email_subject": "Запрос на сотрудничество производитель с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "order_type",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            },
+            {
+                "name": "client_name",
+                "value": "Имя"
+            },
+            {
+                "name": "client_email",
+                "value": "email"
+            },
+            {
+                "name": "comment",
+                "value": "комментарий"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо за ваше обращение  менеджер свяжется с вами в течении 30 мин."
+    },
+    {
+        "id": 12,
+        "template_name": "for_clients_req",
+        "email_subject": "Задать вопрос (стр клиентов) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "order_type",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            },
+            {
+                "name": "client_name",
+                "value": "Имя"
+            },
+            {
+                "name": "client_email",
+                "value": "email"
+            },
+            {
+                "name": "comment",
+                "value": "комментарий"
+            }
+        ],
+        "response_title": "",
+        "response_description": "Спасибо за ваше обращение  менеджер свяжется с вами в течении 30 мин."
+    },
+    {
+        "id": 13,
+        "template_name": "excursion_req",
+        "email_subject": "Запрос на (экскурсия на производство) от клиента с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
+            },
+            {
+                "name": "name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "excursion_data",
+                "value": "экскурсия на производство"
+            },
+            {
+                "name": "excursion_time",
+                "value": "Время экскурсии"
+            }
+        ],
+        "response_title": "Спасибо, Ваш запрос на экскурсию принят!",
+        "response_description": "Желаемая дата визита: {excursion_data} в {excursion_time}"
+    },
+    {
+        "id": 14,
+        "template_name": "decorative_cosm_req",
+        "email_subject": "Запрос на (Контрактное производство декоративной косметики) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email"
+            },
+            {
+                "name": "client_city",
+                "value": "Город клиента"
+            },
+            {
+                "name": "call_option",
+                "value": "Способ связи"
+            },
+            {
+                "name": "client_comment",
+                "value": "Комментарий клиента"
+            },
+            {
+                "name": "order_number",
+                "value": "Время заказа"
+            },
+            {
+                "name": "order_type",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
+            },
+            {
+                "name": "files",
+                "value": "файлы"
+            }
+        ],
+        "response_title": "Спасибо! Ваш запрос отправлен!",
+        "response_description": "Менеджер свяжется с вами в течении 30 минут."
+    },
+    {
+        "id": 15,
+        "template_name": "specification_req",
+        "email_subject": "Запрос (отпралено тз онлайн) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "email"
+            },
+            {
+                "name": "client_city",
+                "value": "Город клиента"
+            },
+            {
+                "name": "package_type",
+                "value": "Тип упаковки"
+            },
+            {
+                "name": "package_body",
+                "value": "Тело упаковки"
+            },
+            {
+                "name": "package_head",
+                "value": "Верх упаковки"
+            },
+            {
+                "name": "custom_package",
+                "value": "Своя упаковка"
+            },
+            {
+                "name": "product_type",
+                "value": "Тип продукта"
+            },
+            {
+                "name": "product_category",
+                "value": "Категория продукта"
+            },
+            {
+                "name": "product_name",
+                "value": "Имя продукта"
+            },
+            {
+                "name": "product_params",
+                "value": "Характеристики"
+            },
+            {
+                "name": "product_size",
+                "value": "Объем продукта"
+            },
+            {
+                "name": "product_segment",
+                "value": "Ценовой сегмент"
+            },
+            {
+                "name": "delivery",
+                "value": "Доставка"
+            },
+            {
+                "name": "quantity",
+                "value": "Количество единиц"
+            },
+            {
+                "name": "product_example_url",
+                "value": "Пример продукта"
+            },
+            {
+                "name": "product_example_file",
+                "value": "Пример продукта файл"
+            }
+        ],
+        "response_title": "Спасибо, за обращене {specification_data['client_name']}!",
+        "response_description": "Ваше ТЗ № {specification_data['order_number']} отправлено, мы выйдем на связь в ближайшее время."
+    }
+]
