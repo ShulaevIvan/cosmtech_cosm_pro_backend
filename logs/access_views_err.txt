@@ -1,0 +1,9 @@
+view_func: CallbackRequestView date: 2025-03-12 15:41:14 err_descr: 'bytes' object has no attribute 'read' 
+view_func: CallbackRequestView date: 2025-03-12 15:44:11 err_descr: 'bytes' object has no attribute 'read' 
+view_func: CallbackRequestView date: 2025-03-12 15:44:52 err_descr: 'bytes' object has no attribute 'read' 
+view_func: CallbackRequestView date: 2025-03-12 15:45:25 err_descr: 'bytes' object has no attribute 'read' 
+view_func: RequestOrderView date: 2025-03-12 22:25:15 err_descr: object of type 're.Match' has no len() 
+view_func: RequestOrderView date: 2025-03-12 22:26:25 err_descr: object of type 're.Match' has no len() 
+view_func: RequestOrderView date: 2025-03-12 22:27:54 err_descr: 'NoneType' object has no attribute 'group' 
+view_func: RequestOrderView date: 2025-03-12 22:28:33 err_descr: 'NoneType' object has no attribute 'group' 
+view_func: RequestOrderView date: 2025-03-12 22:29:00 err_descr: 'NoneType' object is not subscriptable 

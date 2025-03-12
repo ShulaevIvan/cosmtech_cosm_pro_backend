@@ -3,7 +3,7 @@
         "id": 1,
         "template_name": "callback_req",
         "email_subject": "Заказ обратного звонка с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_body_description": "Пришел запрос перезвонить клиенту(консультация)",
         "fields": [
             {
                 "name": "phone",
@@ -19,7 +19,7 @@
             }
         ],
         "response_title": "",
-        "response_description": "Спасибо! Вам перезвонят в течении 30 мин"
+        "response_description": "Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин."
     },
     {
         "id": 2,
@@ -62,8 +62,8 @@
     {
         "id": 3,
         "template_name": "order_req",
-        "email_subject": "Запрос контраткного производства с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Запрос расчета контрактного контраткного производства с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос на консультацию (рассчет строимости) по контрактному производству косметики.",
         "fields": [
             {
                 "name": "client_name",
@@ -95,7 +95,7 @@
             }
         ],
         "response_title": "",
-        "response_description": "Спасибо! Запрос отправлен, Номер запроса: №{order['number']}"
+        "response_description": "Спасибо за обращение! Ваш запрос отправлен, Номер запроса: №"
     },
     {
         "id": 4,
