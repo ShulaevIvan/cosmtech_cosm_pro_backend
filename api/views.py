@@ -103,64 +103,80 @@ class CallbackRequestView(APIView):
             
             return Response(
                 {'message': 'ok', 'description': err_description}, 
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_200_OK
             )
     
 class RequestConsultView(APIView):
 
     permission_classes = [IsAuthenticated, ]
+    order_type = 'consult_req'
 
     def post(self, request):
-        req_body = request.data
-        consult_data = {
-            'name': req_body.get('name'),
-            'phone': req_body.get('phone'),
-            'email': req_body.get('email'),
-            'city': req_body.get('city'),
-            'comment': req_body.get('comment'),
-        }
+        try:
+            req_body = json.loads(json.dumps(request.data))
+            email_template = select_email_template_by_order(self.order_type)
+            not_format_date = datetime.datetime.now()
+            time = get_time(not_format_date)
+            response_description = email_template.get('response_description')
+            consult_data = {
+                'name': req_body.get('name'),
+                'phone': req_body.get('phone'),
+                'email': req_body.get('email'),
+                'city': req_body.get('city'),
+                'comment': req_body.get('comment'),
+            }
 
-        if not consult_data['email'] and not consult_data['phone']:
-            return Response({'status': 'not found', 'description': 'email or phone not valid'}, status=status.HTTP_200_OK)
+            if not consult_data.get('email') and not consult_data.get('phone'):
+                return Response({'status': 'not found', 'description': 'email or phone not valid'}, status=status.HTTP_200_OK)
         
-        check_client = Client.objects.filter(Q(email=consult_data['email']) | Q(phone=consult_data['phone']))
+            check_client = Client.objects.filter(Q(email=consult_data['email']) | Q(phone=consult_data['phone']))
 
-        if not check_client.exists():
-            Client.objects.create(
-                name=consult_data['name'], 
-                phone=consult_data['phone'], 
-                email=consult_data['email'],
+            if not check_client.exists():
+                Client.objects.create(
+                    name=consult_data.get('name'), 
+                    phone=consult_data.get('phone'), 
+                    email=consult_data.get('email'),
+                ).save()
+
+            ConsultRequest.objects.create(
+                name=consult_data.get('name'), 
+                phone=consult_data.get('phone'), 
+                email=consult_data.get('email'),
+                city=consult_data.get('city'),
+                comment=consult_data.get('comment'),
+                request_time = not_format_date
             ).save()
 
-        ConsultRequest.objects.create(
-            name=consult_data['name'], 
-            phone=consult_data['phone'], 
-            email=consult_data['email'],
-            city=consult_data['city'],
-            comment=consult_data['comment'],
-            request_time = datetime.datetime.now()
-        ).save()
+            client_data = {
+                'client_name': consult_data.get('name'),
+                'client_phone': consult_data.get('phone'),
+                'client_email': consult_data.get('email'),
+                'client_city': consult_data.get('city'),
+                'call_option': '',
+                'order_type_name': 'Консультация',
+                'client_comment': consult_data.get('comment'),
+            }
+            email_template = select_email_template_by_order(self.order_type)
+            send_email = send_order_to_main_email(email_template, client_data, time)
 
-        client_data = {
-            'client_name': consult_data['name'],
-            'client_phone': consult_data['phone'],
-            'client_email': consult_data['email'],
-            'client_city': consult_data['city'],
-            'call_option': '',
-            'order_type_name': 'Консультация',
-            'client_comment': consult_data['comment'],
-        }
-        if client_data.get('email'):
-            send_mail_to_client(client_data)
+            if validate_email(client_data.get('client_email')):
+                print('test0')
+                # send_mail_to_client(client_data)
         
-        send_order_mail(client_data)
-        send_description = f"Спасибо за обращение {client_data.get('client_name')}, с вами свяжутся в ближайшее время (30 - 60 мин)!"
+            return Response(
+                {'message': 'ok', 'description': response_description}, 
+                status=status.HTTP_201_CREATED
+            )
         
-        
-        return Response(
-            {'status': 'ok', 'description': send_description}, 
-            status=status.HTTP_200_OK
-        )
+        except Exception as err:
+            write_access_view_err_log(err, 'RequestConsultView')
+            err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+
+            return Response(
+                {'message': 'ok', 'description': err_description}, 
+                status=status.HTTP_200_OK
+            )
+
 
 class RequestOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -209,22 +225,22 @@ class RequestOrderView(APIView):
                 ClientOrder.objects.create(
                     client_id=target_client.first(), 
                     order_id=Order.objects.filter(id=target_order.id).first(),
-                    order_number = order['number'], 
-                    order_date = order['date'],
-                    oreder_description = order_data['comment'],
-                    order_option = order_data['options']
+                    order_number = order.get('number'), 
+                    order_date = order.get('date'),
+                    oreder_description = order_data.get('comment'),
+                    order_option = order_data.get('options')
                 ).save()
 
                 not_format_date = datetime.datetime.now()
                 time = get_time(not_format_date)
                 client_data = {
-                    'client_name': order_data['name'],
-                    'client_phone': order_data['phone'],
-                    'client_email': order_data['email'],
-                    'order_number': order['number'],
+                    'client_name': order_data.get('name'),
+                    'client_phone': order_data.get('phone'),
+                    'client_email': order_data.get('email'),
+                    'order_number': order.get('number'),
                     'call_option': 'Любой',
-                    'order_type_name': order_data['options'],
-                    'client_comment': order_data['comment'],
+                    'order_type_name': order_data.get('options'),
+                    'client_comment': order_data.get('comment'),
                 }
                 send_email = send_order_to_main_email(email_template, client_data, time)
 
@@ -245,268 +261,308 @@ class RequestOrderView(APIView):
     
 class ContactsRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
+    order_type = 'contacts_order_req'
 
     def post(self, request):
-        req_body = request.data
-        order_types = ['contract', 'lab', 'pack', 'cert']
-        order_cooperations = ['trade', 'cooperation']
-        file_path = ''
-        contacts_data = {
-            'name': req_body.get('name'),
-            'email': req_body.get('email'),
-            'phone': req_body.get('phone'),
-            'orderType': req_body.get('orderType'),
-            'call_option': req_body.get('callOption'),
-            'city': req_body.get('city'),
-            'comment': req_body.get('comment'),
-            'file': req_body.get('file'),
-        }
-        client_data = {}
-        client_files = []
-        cooperation_files = []
-        
-        if contacts_data['orderType'] in order_types and contacts_data['orderType'] not in order_cooperations:
-            target_client = find_existing_client(contacts_data['phone'], contacts_data['email'])
-            if not target_client.exists():
-                Client.objects.create(
-                    name=contacts_data['name'], 
-                    phone=contacts_data['phone'], 
-                    email=contacts_data['email'],
-                ).save()
-                target_client = Client.objects.filter(name=contacts_data['name'], phone=contacts_data['phone'], email=contacts_data['email'])
-
-            order = generate_order_number(contacts_data['orderType'], target_client[0].id)
-            target_order, created = Order.objects.get_or_create(order_type=order['type'], order_date=order['date'])
-            target_order.save()
-            
-            ClientOrder.objects.create(
-                client_id=target_client.first(), 
-                order_id=Order.objects.filter(id=target_order.id).first(),
-                order_number = order['number'], 
-                order_date = order['date'],
-                oreder_description = contacts_data['comment'],
-                order_option = contacts_data['orderType'],
-                file = 'test'
-            ).save()
-
-            if contacts_data['file'] and len(contacts_data['file']) > 0:
-                files_list = contacts_data['file']
-                target_order = ClientOrder.objects.filter(order_number=order['number'])
-               
-                for file in files_list:
-                    file_path = create_file(file, settings.ORDER_FILES)
-                    ClientOrderFile.objects.create(client_order=ClientOrder.objects.get(id=target_order[0].id), file=file_path,).save()
-                    client_files.append(file_path)
-            
-            client_data = {
-                'client_name': contacts_data['name'],
-                'client_phone': contacts_data['phone'],
-                'client_email': contacts_data['email'],
-                'client_city': contacts_data['city'],
-                'call_option': get_request_name(contacts_data['call_option']),
-                'client_comment': contacts_data['comment'],
-                'order_number': order['number'],
-                'order_type': order['type'],
-                'order_type_name': get_request_name(contacts_data['orderType']),
+        try:
+            req_body = json.loads(json.dumps(request.data))
+            email_template = select_email_template_by_order(self.order_type)
+            not_format_date = datetime.datetime.now()
+            time = get_time(not_format_date)
+            order_types = ['contract', 'lab', 'pack', 'cert']
+            order_cooperations = ['trade', 'cooperation']
+            file_path = ''
+            contacts_data = {
+                'name': req_body.get('name'),
+                'email': req_body.get('email'),
+                'phone': req_body.get('phone'),
+                'orderType': req_body.get('orderType'),
+                'call_option': req_body.get('callOption'),
+                'city': req_body.get('city'),
+                'comment': req_body.get('comment'),
+                'file': req_body.get('file'),
             }
-            client_data['files'] = client_files
-
-            send_order_mail(client_data)
-            send_mail_to_client(client_data)
-
-            return Response(
-                    {'message': 'ok', 'description': f"Спасибо! Запрос №{order['number']} зарегистрирован"}, 
-                    status=status.HTTP_201_CREATED)
+            client_data = {}
+            client_files = []
+            cooperation_files = []
         
-        elif contacts_data['orderType'] in order_cooperations and contacts_data['orderType'] not in order_types:
-            if contacts_data['phone'] or contacts_data['email']:
-                cooperation_request, created = CoperationRequest.objects.get_or_create(
-                    name = contacts_data['name'],
-                    email = contacts_data['email'],
-                    phone = contacts_data['phone'],
-                    request_description = contacts_data['comment'],
-                    cooperation_type = contacts_data['orderType'],
-                )
+            if contacts_data.get('orderType') in order_types and contacts_data.get('orderType') not in order_cooperations:
+                target_client = find_existing_client(contacts_data.get('phone'), contacts_data.get('email'))
+                if not target_client.exists():
+                    Client.objects.create(
+                        name=contacts_data.get('name'), 
+                        phone=contacts_data.get('phone'), 
+                        email=contacts_data.get('email'),
+                    ).save()
+                    target_client = Client.objects.filter(
+                        name=contacts_data.get('name'), 
+                        phone=contacts_data.get('phone'), 
+                        email=contacts_data.get('email')
+                    )
+                order = generate_order_number(contacts_data.get('orderType'), target_client[0].id)
+                target_order, created = Order.objects.get_or_create(order_type=order.get('type'), order_date=order.get('date'))
+                target_order.save()
+            
+                ClientOrder.objects.create(
+                    client_id=target_client.first(), 
+                    order_id=Order.objects.filter(id=target_order.id).first(),
+                    order_number = order.get('number'), 
+                    order_date = order.get('date'),
+                    oreder_description = contacts_data.get('comment'),
+                    order_option = contacts_data.get('orderType'),
+                    file = 'test'
+                ).save()
 
-                if contacts_data['file'] and len(contacts_data['file']) > 0:
-                    files_list = contacts_data['file']
-                    target_cooperation = CoperationRequest.objects.filter(id=cooperation_request.id)
+                if contacts_data.get('file') and len(contacts_data.get('file')) > 0:
+                    files_list = contacts_data.get('file')
+                    target_order = ClientOrder.objects.filter(order_number=order.get('number'))
+               
                     for file in files_list:
-                        file_path = create_file(file, settings.COOPERATION_FILES)
-                        CoperationRequestFile.objects.create(
-                            cooperation_request_id=CoperationRequest.objects.get(id=target_cooperation[0].id), 
-                            file=file_path,
-                        ).save()
-                        cooperation_files.append(file_path)
-
+                        file_path = create_file(file, settings.ORDER_FILES)
+                        ClientOrderFile.objects.create(client_order=ClientOrder.objects.get(id=target_order[0].id), file=file_path,).save()
+                        client_files.append(file_path)
+            
                 client_data = {
-                    'client_name': contacts_data['name'],
-                    'client_phone': contacts_data['phone'],
-                    'client_email': contacts_data['email'],
-                    'client_city': contacts_data['city'],
-                    'call_option': get_request_name(contacts_data['call_option']),
-                    'order_type_name': get_request_name(contacts_data['orderType']),
-                    'client_comment': contacts_data['comment'],
+                    'client_name': contacts_data.get('name'),
+                    'client_phone': contacts_data.get('phone'),
+                    'client_email': contacts_data.get('email'),
+                    'client_city': contacts_data.get('city'),
+                    'call_option': get_request_name(contacts_data.get('call_option')),
+                    'client_comment': contacts_data.get('comment'),
+                    'order_number': order.get('number'),
+                    'order_type': order.get('type'),
+                    'order_type_name': get_request_name(contacts_data.get('orderType')),
                 }
                 client_data['files'] = client_files
-
-                send_order_mail(client_data)
-                send_mail_to_client(client_data)
+                response_description = email_template.get('response_description')
+                send_email = send_order_to_main_email(email_template, client_data, time)
+                # send_mail_to_client(client_data)
 
                 return Response(
-                    {'message': 'ok', 'description': f"Спасибо! Запрос отправлен"}, 
-                    status=status.HTTP_201_CREATED)
+                    {'message': 'ok', 'description': f"{response_description} {order.get('number')}"}, 
+                    status=status.HTTP_201_CREATED
+                )
         
-        return Response({'message': 'ok', 'description': f"err"}, status=status.HTTP_201_CREATED)
+            elif contacts_data.get('orderType') in order_cooperations and contacts_data.get('orderType') not in order_types:
+                email_template = select_email_template_by_order('contacts_coperation_req')
+                if contacts_data.get('phone') or contacts_data.get('email'):
+                    cooperation_request, created = CoperationRequest.objects.get_or_create(
+                        name = contacts_data.get('name'),
+                        email = contacts_data.get('email'),
+                        phone = contacts_data.get('phone'),
+                        request_description = contacts_data.get('comment'),
+                        cooperation_type = contacts_data.get('orderType'),
+                    )
+
+                    if contacts_data.get('file') and len(contacts_data.get('file')) > 0:
+                        files_list = contacts_data.get('file')
+                        target_cooperation = CoperationRequest.objects.filter(id=cooperation_request.id)
+                        for file in files_list:
+                            file_path = create_file(file, settings.COOPERATION_FILES)
+                            CoperationRequestFile.objects.create(
+                                cooperation_request_id=CoperationRequest.objects.get(id=target_cooperation[0].id), 
+                                file=file_path,
+                            ).save()
+                            cooperation_files.append(file_path)
+
+                    client_data = {
+                        'client_name': contacts_data.get('name'),
+                        'client_phone': contacts_data.get('phone'),
+                        'client_email': contacts_data.get('email'),
+                        'client_city': contacts_data.get('city'),
+                        'call_option': get_request_name(contacts_data.get('call_option')),
+                        'order_type_name': get_request_name(contacts_data.get('orderType')),
+                        'client_comment': contacts_data.get('comment'),
+                    }
+                    client_data['files'] = client_files
+                    response_description = email_template.get('response_description')
+                    send_email = send_order_to_main_email(email_template, client_data, time)
+
+                    if validate_email(client_data.get('client_email')):
+                        print('tset ok')
+                        # send_mail_to_client(client_data)
+
+                    # send_order_mail(client_data)
+
+                    return Response(
+                        {'message': 'ok', 'description': f"{response_description}"}, 
+                        status=status.HTTP_201_CREATED
+                    )
+        
+            return Response({'message': 'ok', 'description': f"err"}, status=status.HTTP_201_CREATED)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'ContactsRequestView')
+            err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+            
+            return Response({'message': 'ok', 'description': err_description}, status=status.HTTP_201_CREATED)
     
 class CityDataView(APIView):
 
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        params = request.query_params
-        city_param = params.get('city')
-        check_dach = re.search('-', city_param)
+        try:
+            params = request.query_params
+            city_param = params.get('city')
+            check_dach = re.search('-', city_param)
 
-        if not city_param:
-            target_city = CityData.objects.all().values()
-            return Response({'cities': target_city}, status=status.HTTP_200_OK)
-        format_city_name = f'{city_param[0].upper()}{city_param[1:len(city_param)]}'
+            if not city_param:
+                target_city = CityData.objects.all().values()
+                return Response({'cities': target_city}, status=status.HTTP_200_OK)
+            format_city_name = f'{city_param[0].upper()}{city_param[1:len(city_param)]}'
         
-        if check_dach:
-            name_part = city_param.split('-')
-            format_city_name = f'{name_part[0][0].upper()}{name_part[0][1:len(name_part[0])]}-{name_part[1][0].upper()}{name_part[1][1:len(name_part[1])]}'
+            if check_dach:
+                name_part = city_param.split('-')
+                format_city_name = f'{name_part[0][0].upper()}{name_part[0][1:len(name_part[0])]}-{name_part[1][0].upper()}{name_part[1][1:len(name_part[1])]}'
 
-        city_name = fr'^{format_city_name}|^{format_city_name}(\w*|.*)(.|\w)(\w+)$'
+            city_name = fr'^{format_city_name}|^{format_city_name}(\w*|.*)(.|\w)(\w+)$'
 
-        target_city = CityData.objects.filter(name__regex=city_name).values()
+            target_city = CityData.objects.filter(name__regex=city_name).values()
 
-        return Response({'cities': target_city}, status=status.HTTP_200_OK)
+            return Response({'cities': target_city}, status=status.HTTP_200_OK)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'CityDataView')
+            
+            return Response({'cities': {}, 'err': err}, status=status.HTTP_400_BAD_REQUEST)
 
 class QuizOrderView(APIView):
 
     permission_classes = [IsAuthenticated, ]
-
+    order_type = 'quiz_req'
+    
     def post(self, request):
-        
-        req_body = request.data
-        client_name = req_body.get('name').get('value')
-        client_phone = req_body.get('phone').get('value')
-        client_email = req_body.get('email').get('value')
-        send_data = req_body.get('sendData')
-        order_data = dict()
-        not_format_date = datetime.datetime.now()
-        upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
-        order_number = generate_quiz_order_number()
-        order_time = get_time(not_format_date)
-        order_folder_name = f'quiz_{order_number}'
-        order_folder_path = f'{upload_folder}{order_folder_name}/'
-        send_description = {
-            'title': f'Спасибо за обращение {client_name}',
-            'order': order_number,
-            'description': 'Наш сотрудник пришлет рассчет/свяжется с вами в билижайшее время'
-        }
-
-        if not client_email or not client_phone:
+        try:
+            req_body = json.loads(json.dumps(request.data))
+            email_template = select_email_template_by_order(self.order_type)
+            client_name = req_body.get('name').get('value')
+            client_phone = req_body.get('phone').get('value')
+            client_email = req_body.get('email').get('value')
+            send_data = req_body.get('sendData')
+            order_data = dict()
+            not_format_date = datetime.datetime.now()
+            upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
+            order_number = generate_quiz_order_number()
+            time = get_time(not_format_date)
+            order_folder_name = f'quiz_{order_number}'
+            order_folder_path = f'{upload_folder}{order_folder_name}/'
             send_description = {
                 'title': f'Спасибо за обращение {client_name}',
                 'order': order_number,
-                'description': 'Что-то пошло не так, пожалуйста продублируйте свой запрос на pro@cosmtech.ru '
+                'description': 'Наш сотрудник пришлет рассчет/свяжется с вами в билижайшее время'
             }
-            return Response({'status': 'err', 'created': False, 'message': ''}, status=status.HTTP_200_OK)
+
+            if not client_email or not client_phone:
+                send_description = {
+                    'title': f'Спасибо за обращение {client_name}',
+                    'order': order_number,
+                    'description': 'Что-то пошло не так, пожалуйста продублируйте свой запрос на pro@cosmtech.ru '
+                }
+                return Response({'status': 'err', 'created': False, 'message': ''}, status=status.HTTP_200_OK)
         
-        for key, value in send_data.items():
-            re_pattern = r'\*?([A-Z])'
-            start_index = list(re.finditer(re_pattern, key))[0].start()
-            end_index = list(re.finditer(re_pattern, key))[0].end()
+            for key, value in send_data.items():
+                re_pattern = r'\*?([A-Z])'
+                start_index = list(re.finditer(re_pattern, key))[0].start()
+                end_index = list(re.finditer(re_pattern, key))[0].end()
         
-            replace_key = key[:start_index] + '_' + key[end_index -1:]
-            order_data[replace_key.lower()] = value
+                replace_key = key[:start_index] + '_' + key[end_index -1:]
+                order_data[replace_key.lower()] = value
 
-        custom_delivery_city_to = ''
-        custom_delivery_city_from = 'Санкт-Петербург'
-        custom_delivery_range = 0
-        custom_delivery_subject = ''
-        custom_delivery_city_population = ''
+            custom_delivery_city_to = ''
+            custom_delivery_city_from = 'Санкт-Петербург'
+            custom_delivery_range = 0
+            custom_delivery_subject = ''
+            custom_delivery_city_population = ''
 
-        if order_data.get('custom_delivery') != 'empty':
-            custom_delivery_city_to = order_data['custom_delivery']['to']
-            custom_delivery_city_from = order_data['custom_delivery']['from']
-            custom_delivery_range = order_data['custom_delivery']['range']
-            custom_delivery_subject = order_data['custom_delivery']['subject']
-            custom_delivery_city_population = order_data['custom_delivery']['population']
+            if order_data.get('custom_delivery') != 'empty':
+                custom_delivery_city_to = order_data['custom_delivery']['to']
+                custom_delivery_city_from = order_data['custom_delivery']['from']
+                custom_delivery_range = order_data['custom_delivery']['range']
+                custom_delivery_subject = order_data['custom_delivery']['subject']
+                custom_delivery_city_population = order_data['custom_delivery']['population']
 
-        custom_tz_file = order_data.get('custom_tz')
-        custom_tz_file_url = ''
-        custom_package_file = order_data.get('custom_package')
-        custom_package_file_url = ''
+            custom_tz_file = order_data.get('custom_tz')
+            custom_tz_file_url = ''
+            custom_package_file = order_data.get('custom_package')
+            custom_package_file_url = ''
 
-        if (custom_tz_file != 'empty' or custom_package_file != 'empty') and not os.path.exists(f'{order_folder_path}'):
-            os.mkdir(order_folder_path)
+            if (custom_tz_file != 'empty' or custom_package_file != 'empty') and not os.path.exists(f'{order_folder_path}'):
+                os.mkdir(order_folder_path)
 
-        if custom_tz_file != 'empty':
-            custom_tz_file_url = create_file(custom_tz_file, order_folder_path)
+            if custom_tz_file != 'empty':
+                custom_tz_file_url = create_file(custom_tz_file, order_folder_path)
             
-        if custom_package_file != 'empty':
-            custom_package_file_url = create_file(custom_package_file, order_folder_path)
+            if custom_package_file != 'empty':
+                custom_package_file_url = create_file(custom_package_file, order_folder_path)
 
 
-        QuizOrder.objects.create(
-            order_number=order_number,
-            order_date=not_format_date,
-            client_name=client_name,
-            client_email=client_email,
-            client_phone=client_phone,
-            client_budget=order_data.get('client_budget'),
-            order_deadline=order_data.get('order_deadline'),
-            order_production_date=order_data.get('production_date'),
-            order_service = order_data.get('order_service'),
-            order_service_price=order_data.get('service_price'),
-            order_product=order_data.get('product_name'),
-            order_product_quantity=order_data.get('product_qnt'),
-            order_product_package=order_data.get('order_package'),
-            order_product_sum=int(order_data.get('calc_sum')),
-            delivery_city_from=custom_delivery_city_from,
-            delivery_city_to=custom_delivery_city_to,
-            delivery_region=custom_delivery_subject,
-            delivery_range=custom_delivery_range,
-            delivery_weight=order_data.get('delivery_weight'),
-            delivery_price_point=order_data.get('price_perpoint'),
-            delivery_price= order_data.get('delivery_price'),
-            custom_tz_file=custom_tz_file_url,
-            custom_package_file=custom_package_file_url
-        )
-        email_data = {
-            'order_type_name': 'Калькулятор производства',
-            'order_number': order_number,
-            'order_date':  get_time(not_format_date),
-            'client_name': client_name,
-            'client_email': client_email,
-            'client_phone': client_phone,
-            'client_budget': order_data.get('client_budget'),
-            'order_deadline': order_data.get('order_deadline'),
-            'order_production_date': order_data.get('production_date'),
-            'order_service': order_data.get('order_service'),
-            'order_service_price': order_data.get('service_price'),
-            'order_product': order_data.get('product_name'),
-            'order_product_quantity': order_data.get('product_qnt'),
-            'order_product_package': order_data.get('order_package'),
-            'order_product_sum': int(order_data.get('calc_sum')),
-            'delivery_city_from': custom_delivery_city_from,
-            'delivery_city_to': custom_delivery_city_to,
-            'delivery_region': custom_delivery_subject,
-            'delivery_range': custom_delivery_range,
-            'delivery_weight': order_data.get('delivery_weight'),
-            'delivery_price_point': order_data.get('price_perpoint'),
-            'delivery_price': order_data.get('delivery_price'),
-            'custom_tz_file': custom_tz_file_url,
-            'custom_package_file': custom_package_file_url
-        }
+            QuizOrder.objects.create(
+                order_number=order_number,
+                order_date=not_format_date,
+                client_name=client_name,
+                client_email=client_email,
+                client_phone=client_phone,
+                client_budget=order_data.get('client_budget'),
+                order_deadline=order_data.get('order_deadline'),
+                order_production_date=order_data.get('production_date'),
+                order_service = order_data.get('order_service'),
+                order_service_price=order_data.get('service_price'),
+                order_product=order_data.get('product_name'),
+                order_product_quantity=order_data.get('product_qnt'),
+                order_product_package=order_data.get('order_package'),
+                order_product_sum=int(order_data.get('calc_sum')),
+                delivery_city_from=custom_delivery_city_from,
+                delivery_city_to=custom_delivery_city_to,
+                delivery_region=custom_delivery_subject,
+                delivery_range=custom_delivery_range,
+                delivery_weight=order_data.get('delivery_weight'),
+                delivery_price_point=order_data.get('price_perpoint'),
+                delivery_price= order_data.get('delivery_price'),
+                custom_tz_file=custom_tz_file_url,
+                custom_package_file=custom_package_file_url
+            )
+            email_data = {
+                'order_type_name': 'Калькулятор производства',
+                'order_number': order_number,
+                'order_date':  get_time(not_format_date),
+                'client_name': client_name,
+                'client_email': client_email,
+                'client_phone': client_phone,
+                'client_budget': order_data.get('client_budget'),
+                'order_deadline': order_data.get('order_deadline'),
+                'order_production_date': order_data.get('production_date'),
+                'order_service': order_data.get('order_service'),
+                'order_service_price': order_data.get('service_price'),
+                'order_product': order_data.get('product_name'),
+                'order_product_quantity': order_data.get('product_qnt'),
+                'order_product_package': order_data.get('order_package'),
+                'order_product_sum': int(order_data.get('calc_sum')),
+                'delivery_city_from': custom_delivery_city_from,
+                'delivery_city_to': custom_delivery_city_to,
+                'delivery_region': custom_delivery_subject,
+                'delivery_range': custom_delivery_range,
+                'delivery_weight': order_data.get('delivery_weight'),
+                'delivery_price_point': order_data.get('price_perpoint'),
+                'delivery_price': order_data.get('delivery_price'),
+                'custom_tz_file': custom_tz_file_url,
+                'custom_package_file': custom_package_file_url
+            }
+            pprint(email_data)
+            send_email = send_order_to_main_email(email_template, email_data, time)
 
-        send_quiz_result_to_email(email_data, 'quiz')
-        send_quiz_to_client(email_data)
+            if validate_email(email_data.get('client_email')):
+                print('tset ok')
 
-        return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+            # send_quiz_result_to_email(email_data, 'quiz')
+            # send_quiz_to_client(email_data)
+
+            return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+        except Exception as err:
+            write_access_view_err_log(err, 'ContactsRequestView')
+            err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+            
+            return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
 
 class QuestionOrderView(APIView):
 

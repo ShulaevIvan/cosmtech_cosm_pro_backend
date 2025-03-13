@@ -102,6 +102,8 @@ def select_email_template_by_order(order_type):
 
 def send_order_to_main_email(email_template, email_data, time='', order_number=''):
     try:
+        has_multiple_files = email_data.get('files')
+        has_file = email_data.get('file')
         msg_mail = EmailMessage(
             f"{email_template.get('email_subject')}", 
             f"""
@@ -120,7 +122,13 @@ def send_order_to_main_email(email_template, email_data, time='', order_number='
             f'{settings.EMAIL_HOST_USER}', [f"{settings.EMAIL_ORDER_ADDRESS}"]
         )
         msg_mail.content_subtype = "html"
+        if has_multiple_files:
+            for file_path in email_data.get('files'):
+                msg_mail.attach_file(f'{file_path}')
+        elif has_file:
+            msg_mail.attach_file(f"{email_data.get('file')}")
         msg_mail.send()
+        
     except Exception as err:
         write_email_err_log(err, email_template.get('template_name'))
 

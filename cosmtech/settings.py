@@ -34,12 +34,12 @@ SECRET_KEY = 'django-insecure-1s&_h_5(_#wjadjfk0agy(^kg+ug--y_&mu*^9_%b47lvt^ra_
 DEBUG = True
 MAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.timeweb.ru'
-EMAIL_HOST_USER = 'django_mail@cosmtech.ru'
-EMAIL_HOST_PASSWORD = 'rembo151313'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 SECURE_CROSS_ORIGIN_OPENER_POLICY=None
-EMAIL_ORDER_ADDRESS = 'test@smprof.ru'
+EMAIL_ORDER_ADDRESS = ''
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 CORS_ALLOW_METHODS = ('GET','POST','PUT','PATCH','DELETE','OPTIONS',)

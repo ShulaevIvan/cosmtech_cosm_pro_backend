@@ -24,7 +24,7 @@
     {
         "id": 2,
         "template_name": "consult_req",
-        "email_subject": "Запрос консультации с сайта cosmtech.ru",
+        "email_subject": "Запрос консультации по услугам с сайта cosmtech.ru",
         "email_body_description": "",
         "fields": [
             {
@@ -57,7 +57,7 @@
             }
         ],
         "response_title": "",
-        "response_description": "Спасибо за обращение {client_data.get('client_name')}, с вами свяжутся в ближайшее время (30 - 60 мин)!"
+        "response_description": "Спасибо за обращение, с вами свяжутся в ближайшее время!"
     },
     {
         "id": 3,
@@ -100,8 +100,8 @@
     {
         "id": 4,
         "template_name": "contacts_order_req",
-        "email_subject": "Запрос контраткного производства (страница контакты) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Общий запрос со страницы контакты с сайта cosmtech.ru",
+        "email_body_description": "Новый общий запрос со страницы контакты.",
         "fields": [
             {
                 "name": "client_name",
@@ -141,7 +141,7 @@
             }
         ],
         "response_title": "",
-        "response_description": "Спасибо! Запрос №{order['number']} зарегистрирован"
+        "response_description": "Спасибо! ваш запрос зарегистрирован №"
     },
     {
         "id": 5,
@@ -179,41 +179,17 @@
             }
         ],
         "response_title": "",
-        "response_description": "Спасибо! Запрос №{order['number']} зарегистрирован"
+        "response_description": "Спасибо! Ваш запрос отправлен."
     },
     {
         "id": 6,
         "template_name": "quiz_req",
         "email_subject": "Запрос контраткного производства (калькулятор) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_body_description": "Пришел запрос с кальклятора производства. Он ппц какой неточный) Нужно забить данные, но ЕС пока их не дала)",
         "fields": [
-            {
-                "name": "order_type_name",
-                "value": "Тип запроса"
-            },
             {
                 "name": "order_number",
                 "value": "Номер заказа"
-            },
-            {
-                "name": "order_date",
-                "value": "Дата заказа"
-            },
-            {
-                "name": "order_date",
-                "value": "Дата заказа"
-            },
-            {
-                "name": "client_name",
-                "value": "Имя клиента"
-            },
-            {
-                "name": "client_phone",
-                "value": "Телефон клиента"
-            },
-            {
-                "name": "client_email",
-                "value": "email клиента"
             },
             {
                 "name": "client_budget",
@@ -221,39 +197,43 @@
             },
             {
                 "name": "order_deadline",
-                "value": "Желаемые сроки производства"
-            },
-            {
-                "name": "order_deadline",
                 "value": "Желаемые сроки"
-            },
-            {
-                "name": "order_production_date",
-                "value": "Сроки производства"
-            },
-            {
-                "name": "order_service",
-                "value": "Дополнительные услуги"
-            },
-            {
-                "name": "order_service_price",
-                "value": "Цены доп услуг"
             },
             {
                 "name": "order_product",
                 "value": "Производимый продукт"
             },
             {
-                "name": "order_product_quantity",
-                "value": "Колиество производимого продукта"
-            },
-            {
                 "name": "order_product_package",
-                "value": "Желаемая упаковка"
+                "value": "Упаковка продукта"
             },
             {
-                "name": "order_product_sum",
-                "value": "Цена заказанного продукта"
+                "name": "order_product_quantity",
+                "value": "Количество единиц в заказе"
+            },
+            {
+                "name": "order_production_date",
+                "value": "Желаемые сроки"
+            },
+            {
+                "name": "order_service",
+                "value": "Дополнительные услуги"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Время производства"
+            },
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_email",
+                "value": "Email клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
             },
             {
                 "name": "delivery_city_from",
@@ -264,32 +244,40 @@
                 "value": "Доставка в город"
             },
             {
+                "name": "delivery_price",
+                "value": "Цена доставки очень приблизительно"
+            },
+            {
+                "name": "delivery_price_point",
+                "value": "Цена доставки за 1 км очень приблизительно"
+            },
+            {
+                "name": "delivery_range",
+                "value": "Рассояние в км"
+            },
+            {
                 "name": "delivery_region",
                 "value": "Регион доставки"
             },
             {
-                "name": "delivery_range",
-                "value": "Расстояние в километрах до точки"
-            },
-            {
                 "name": "delivery_weight",
-                "value": "Приблизительный вес партии"
-            },
-            {
-                "name": "delivery_price_point",
-                "value": "Цена доставки за 1 км"
-            },
-            {
-                "name": "delivery_price",
-                "value": "Общая сумма доставки"
-            },
-            {
-                "name": "custom_tz_file",
-                "value": "Файл техзадания"
+                "value": "Вес партии приблизительно"
             },
             {
                 "name": "custom_package_file",
-                "value": "Файл упаковки"
+                "value": "Файл упаковки прикреплен (None значит нет)"
+            },
+            {
+                "name": "custom_tz_file",
+                "value": "Файл с тз прикреплен (None значит нет)"
+            },
+            {
+                "name": "order_service_price",
+                "value": "Сумма допуслуг"
+            },
+            {
+                "name": "order_product_sum",
+                "value": "Общая сумма заказа в рублях"
             }
         ],
         "response_title": "Спасибо за обращение",
