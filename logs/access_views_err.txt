@@ -7,3 +7,11 @@ view_func: RequestOrderView date: 2025-03-12 22:26:25 err_descr: object of type 
 view_func: RequestOrderView date: 2025-03-12 22:27:54 err_descr: 'NoneType' object has no attribute 'group' 
 view_func: RequestOrderView date: 2025-03-12 22:28:33 err_descr: 'NoneType' object has no attribute 'group' 
 view_func: RequestOrderView date: 2025-03-12 22:29:00 err_descr: 'NoneType' object is not subscriptable 
+view_func: QuizOrderView date: 2025-03-14 12:21:22 err_descr: 'str' object has no attribute 'read' 
+view_func: QuizOrderView date: 2025-03-14 12:25:15 err_descr: 'str' object has no attribute 'read' 
+view_func: QuizOrderView date: 2025-03-14 12:26:20 err_descr: 'str' object has no attribute 'read' 
+view_func: QuizOrderView date: 2025-03-14 12:26:34 err_descr: 'str' object has no attribute 'read' 
+view_func: QuestionOrderView date: 2025-03-14 12:45:04 err_descr: 'str' object has no attribute 'read' 
+view_func: QuestionOrderView date: 2025-03-14 13:14:05 err_descr: 'str' object has no attribute 'read' 
+view_func: QuestionOrderView date: 2025-03-14 14:30:55 err_descr: 'str' object has no attribute 'read' 
+view_func: TzOrderView date: 2025-03-14 15:06:58 err_descr: name 'jso' is not defined 

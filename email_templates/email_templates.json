@@ -286,8 +286,8 @@
     {
         "id": 7,
         "template_name": "question_req",
-        "email_subject": "Задать вопрос (Кальклятор главная стр) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Задать вопрос технологу (раздел калькулятор) с сайта cosmtech.ru",
+        "email_body_description": "Новызй запрос задать вопрос технологу",
         "fields": [
             {
                 "name": "client_name",
@@ -310,10 +310,6 @@
                 "value": "Номер заказа"
             },
             {
-                "name": "order_number",
-                "value": "Время заказа"
-            },
-            {
                 "name": "communication_type",
                 "value": "Желаемый тип связи"
             },
@@ -328,8 +324,8 @@
     {
         "id": 8,
         "template_name": "tz_req",
-        "email_subject": "Контрактное производство ТЗ (Кальклятор главная стр) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "ТЗ на контрактное производство (калькулятор) с сайта cosmtech.ru",
+        "email_body_description": "Отправлен файл с ТЗ на разработку косметики.",
         "fields": [
             {
                 "name": "client_name",
@@ -346,10 +342,6 @@
             {
                 "name": "order_type_name",
                 "value": "Имя запроса"
-            },
-            {
-                "name": "order_number",
-                "value": "Номер заказа"
             },
             {
                 "name": "order_date",
@@ -392,8 +384,8 @@
     {
         "id": 10,
         "template_name": "for_clients_supl_req",
-        "email_subject": "Запрос на сотрудничество (поставщик) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Запрос на помощь с поставщиками с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос на подбор поставщиков по дизайну или упаковке",
         "fields": [
             {
                 "name": "order_type",
@@ -405,11 +397,11 @@
             },
             {
                 "name": "client_name",
-                "value": "Имя поставщика"
+                "value": "Имя"
             },
             {
                 "name": "client_phone",
-                "value": "Телефон поставщика"
+                "value": "Телефон"
             }
         ],
         "response_title": "",
@@ -418,7 +410,7 @@
     {
         "id": 11,
         "template_name": "for_clients_prod_req",
-        "email_subject": "Запрос на сотрудничество производитель с сайта cosmtech.ru",
+        "email_subject": "Запрос на уточнить детали работы по контрактному производству с сайта cosmtech.ru",
         "email_body_description": "",
         "fields": [
             {

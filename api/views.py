@@ -22,7 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from docxtpl import DocxTemplate
 from .utils import write_access_view_err_log, validate_email
-from.utils import get_time, select_email_template_by_order, send_order_to_main_email
+from.utils import get_time, select_email_template_by_order, send_order_to_main_email, send_vacancy_request
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
@@ -455,8 +455,8 @@ class QuizOrderView(APIView):
 
             if not client_email or not client_phone:
                 send_description = {
-                    'title': f'Спасибо за обращение {client_name}',
-                    'order': order_number,
+                    'title': f'Спасибо за обращение!',
+                    'order': '',
                     'description': 'Что-то пошло не так, пожалуйста продублируйте свой запрос на pro@cosmtech.ru '
                 }
                 return Response({'status': 'err', 'created': False, 'message': ''}, status=status.HTTP_200_OK)
@@ -548,7 +548,9 @@ class QuizOrderView(APIView):
                 'custom_tz_file': custom_tz_file_url,
                 'custom_package_file': custom_package_file_url
             }
-            pprint(email_data)
+            if email_data.get('custom_tz_file') or email_data.get('custom_package_file'):
+                email_data['files'] = [email_data.get('custom_tz_file'), email_data.get('custom_package_file')]
+
             send_email = send_order_to_main_email(email_template, email_data, time)
 
             if validate_email(email_data.get('client_email')):
@@ -558,8 +560,9 @@ class QuizOrderView(APIView):
             # send_quiz_to_client(email_data)
 
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+        
         except Exception as err:
-            write_access_view_err_log(err, 'ContactsRequestView')
+            write_access_view_err_log(err, 'QuizOrderView')
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
             
             return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
@@ -567,197 +570,252 @@ class QuizOrderView(APIView):
 class QuestionOrderView(APIView):
 
     permission_classes = [IsAuthenticated, ]
+    order_type = 'question_req'
 
     def post(self, request):
-        req_body = request.data
-        order_number = generate_quiz_order_number()
-        not_format_date = datetime.datetime.now()
-        client_name = req_body.get('name')
-        client_phone = req_body.get('phone')
-        client_email = req_body.get('email')
-        client_question = req_body.get('comment')
-        client_communication_type = req_body.get('communicationType')
-        send_description = {
-            'title': f'Спасибо за обращение {client_name}',
-            'order': order_number,
-            'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
-        }
-
-        if not (client_phone or client_email):
+        try:
+            req_body = json.loads(json.dumps(request.data))
+            email_template = select_email_template_by_order(self.order_type)
+            order_number = generate_quiz_order_number()
+            not_format_date = datetime.datetime.now()
+            time = get_time(not_format_date)
+            client_name = req_body.get('name')
+            client_phone = req_body.get('phone')
+            client_email = req_body.get('email')
+            client_question = req_body.get('comment')
+            client_communication_type = req_body.get('communicationType')
             send_description = {
                 'title': f'Спасибо за обращение {client_name}',
-                'order': '',
-                'description': 'Произошла ошибка, попробуйте позднее, либо напишите запрос на pro@cosmtech.ru'
+                'order': order_number,
+                'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
             }
-            return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
-        
-        QuizQuestionOrder.objects.create(
-            order_number = order_number,
-            order_date = not_format_date,
-            client_name = client_name,
-            client_phone = client_phone,
-            client_email = client_email,
-            communication_type = client_communication_type,
-            client_question = client_question,
-        )
-        email_data = {
-            'order_type_name': 'Задать вопрос технологу',
-            'order_number': order_number,
-            'order_date':  get_time(not_format_date),
-            'client_name': client_name,
-            'client_phone': client_phone,
-            'client_email': client_email,
-            'communication_type': client_communication_type,
-            'client_question': client_question
-        }
-        send_quiz_result_to_email(email_data, 'question')
-        send_quiz_to_client(email_data)
 
-        return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+            if not (client_phone or client_email):
+                send_description = {
+                    'title': f'Спасибо за обращение {client_name}',
+                    'order': '',
+                    'description': 'Произошла ошибка, попробуйте позднее, либо напишите запрос на pro@cosmtech.ru'
+                }
+                return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
+        
+            QuizQuestionOrder.objects.create(
+                order_number = order_number,
+                order_date = not_format_date,
+                client_name = client_name,
+                client_phone = client_phone,
+                client_email = client_email,
+                communication_type = client_communication_type,
+                client_question = client_question,
+            )
+            email_data = {
+                'order_type_name': 'Задать вопрос технологу',
+                'order_number': order_number,
+                'order_date':  time,
+                'client_name': client_name,
+                'client_phone': client_phone,
+                'client_email': client_email,
+                'communication_type': client_communication_type,
+                'client_question': client_question
+            }
+            if validate_email(email_data.get('client_email')):
+                print('tset ok')
+                # send_quiz_to_client(email_data)
+            # send_quiz_result_to_email(email_data, 'question')
+            send_email = send_order_to_main_email(email_template, email_data, time)
+
+            return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'QuestionOrderView')
+            err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+
+            return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
+
     
 class TzOrderView(APIView):
 
     permission_classes = [IsAuthenticated, ]
+    order_type = 'tz_req'
 
     def post(self, request):
-        req_body = request.data
-        order_number = generate_quiz_order_number()
-        not_format_date = datetime.datetime.now()
-        order_time = get_time(not_format_date)
-        upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
-        order_folder_name = f'tz_{order_number}'
-        order_folder_full_path = f'{upload_folder}{order_folder_name}/'
-        client_name = req_body.get('name')
-        client_phone = req_body.get('phone')
-        client_email = req_body.get('email')
-        client_tz_file = req_body.get('file')
-        send_description = {
-            'title': f'Спасибо за обращение {client_name}',
-            'order': order_number,
-            'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
-        }
-
-        if not client_tz_file:
+        try:
+            req_body = json.loads(json.dumps(request.data))
+            email_template = select_email_template_by_order(self.order_type)
+            order_number = generate_quiz_order_number()
+            not_format_date = datetime.datetime.now()
+            order_time = get_time(not_format_date)
+            upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
+            order_folder_name = f'tz_{order_number}'
+            order_folder_full_path = f'{upload_folder}{order_folder_name}/'
+            client_name = req_body.get('name')
+            client_phone = req_body.get('phone')
+            client_email = req_body.get('email')
+            client_tz_file = req_body.get('file')
             send_description = {
                 'title': f'Спасибо за обращение {client_name}',
                 'order': order_number,
-                'description': 'Произошла ошибка, попробуйте позднее, либо отправьте тз на pro@cosmtech.ru'
+                'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
             }
-            return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
+
+            if not client_tz_file:
+                send_description = {
+                    'title': f'Спасибо за обращение {client_name}',
+                    'order': order_number,
+                    'description': 'Произошла ошибка, попробуйте позднее, либо отправьте тз на pro@cosmtech.ru'
+                }
+                return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
         
-        if not os.path.exists(f'{order_folder_full_path}'):
-            os.mkdir(f'{order_folder_full_path}')
-        tz_file_url = create_file(client_tz_file, f'{order_folder_full_path}')
+            if not os.path.exists(f'{order_folder_full_path}'):
+                os.mkdir(f'{order_folder_full_path}')
+            tz_file_url = create_file(client_tz_file, f'{order_folder_full_path}')
 
-        QuizTzOrder.objects.create(
-            order_number = order_number,
-            order_date = not_format_date,
-            client_name = client_name,
-            client_phone = client_phone,
-            client_email = client_email,
-            tz_file = tz_file_url,
-        )
-        email_data = {
-            'order_type_name': 'Техническое Задание',
-            'order_number': order_number,
-            'order_date': order_time,
-            'client_name': client_name,
-            'client_phone': client_phone,
-            'client_email': client_email,
-            'tz_file': tz_file_url,
-        }
-        send_quiz_result_to_email(email_data, 'tz')
-        send_quiz_to_client(email_data)
+            QuizTzOrder.objects.create(
+                order_number = order_number,
+                order_date = not_format_date,
+                client_name = client_name,
+                client_phone = client_phone,
+                client_email = client_email,
+                tz_file = tz_file_url,
+            )
+            email_data = {
+                'order_type_name': 'Техническое Задание',
+                'order_number': order_number,
+                'order_date': order_time,
+                'client_name': client_name,
+                'client_phone': client_phone,
+                'client_email': client_email,
+                'tz_file': tz_file_url,
+            }
+            email_data['file'] = email_data.get('tz_file')
+            if validate_email(email_data.get('client_email')):
+                print('tset ok')
+                # send_quiz_to_client(email_data)
+            send_email = send_order_to_main_email(email_template, email_data, order_time)
+            # send_quiz_result_to_email(email_data, 'tz')
 
-        return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'TzOrderView')
+            err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+
+            return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
     
 class VacancyView(APIView):
 
     permission_classes = [IsAuthenticated, ]
+    order_type = 'vacancy_req'
 
     def get(self, request):
-        data = [
-            { 
-                'id': vacancy_obj['id'],
-                'date':  get_time(vacancy_obj['open_date']),
-                'name': vacancy_obj['name'],
-                'departament': vacancy_obj['departament'],
-                'salary': vacancy_obj['salary'],
-                'phone': vacancy_obj['contact_phone'],
-                'requirements': filter(lambda item: (item != '') , vacancy_obj['requirements'].split(';')),
-                'conditions': filter(lambda item: (item != ''), vacancy_obj['conditions'].split(';')),
-                'dutys': filter(lambda item: (item != ''), vacancy_obj['dutys'].split(';')),
-            } 
-            for vacancy_obj in Vacancy.objects.all().values()
-        ]
-        return Response({'vacancy': data}, status=status.HTTP_200_OK)
+        try:
+            data = [
+                { 
+                    'id': vacancy_obj.get('id'),
+                    'date':  get_time(vacancy_obj.get('open_date')),
+                    'name': vacancy_obj.get('name'),
+                    'departament': vacancy_obj.get('departament'),
+                    'salary': vacancy_obj.get('salary'),
+                    'phone': vacancy_obj.get('contact_phone'),
+                    'requirements': filter(lambda item: (item != '') , vacancy_obj.get('requirements').split(';')),
+                    'conditions': filter(lambda item: (item != ''), vacancy_obj.get('conditions').split(';')),
+                    'dutys': filter(lambda item: (item != ''), vacancy_obj.get('dutys').split(';')),
+                } 
+                for vacancy_obj in Vacancy.objects.all().values()
+            ]
+            return Response({'vacancy': data}, status=status.HTTP_200_OK)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'TzOrderView')
+
+            return Response({'status': 'err', 'message': err}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
-        send_data = json.loads(request.body)
-        vacancy_data = {
-            'resume_name': send_data.get('name'),
-            'resume_phone': send_data.get('phone'),
-            'resume_file': send_data.get('file'),
-            'vacancy_data': send_data.get('vacancy')
-        }
+        try:
+            send_data = json.loads(json.dumps(request.data))
+            vacancy_data = {
+                'resume_name': send_data.get('name'),
+                'resume_phone': send_data.get('phone'),
+                'resume_file': send_data.get('file'),
+                'vacancy_data': send_data.get('vacancy')
+            }
 
-        if not vacancy_data['resume_phone']:
-            return Response({'status': 'err'})
+            if not vacancy_data.get('resume_phone'):
+                return Response({'status': 'err'})
         
-        resume_folder_name = f"{vacancy_data['resume_name']}_{vacancy_data['vacancy_data']}_{vacancy_data['resume_phone']}"
-        upload_folder = f'{os.getcwd()}/upload_files/resume_files/'
-        resume_folder_full_path = f'{upload_folder}{resume_folder_name}/'
-        file = ''
+            resume_folder_name = f"{vacancy_data.get('resume_name')}_{vacancy_data.get('vacancy_data')}_{vacancy_data.get('resume_phone')}"
+            upload_folder = f'{os.getcwd()}/upload_files/resume_files/'
+            resume_folder_full_path = f'{upload_folder}{resume_folder_name}/'
+            file = ''
 
-        if vacancy_data['resume_file']:
-            if not os.path.exists(resume_folder_full_path):
-                os.mkdir(resume_folder_full_path)
-            vacancy_data['resume_file'] = create_file(vacancy_data['resume_file'], resume_folder_full_path)
+            if vacancy_data.get('resume_file'):
+                if not os.path.exists(resume_folder_full_path):
+                    os.mkdir(resume_folder_full_path)
+                vacancy_data['resume_file'] = create_file(vacancy_data.get('resume_file'), resume_folder_full_path)
         
-        response_data = {
-            'title': f"Спасибо {vacancy_data['resume_name']}, Ваш отклик очень важен для нас!",
-            'description': 'Специалисты свяжутся с вами по телефону в ближайшее время'
-        }
+            response_data = {
+                'title': f"Спасибо {vacancy_data['resume_name']}, Ваш отклик очень важен для нас!",
+                'description': 'Специалисты свяжутся с вами по телефону в ближайшее время.'
+            }
 
-        send_vacancy_request(vacancy_data)
+            send_vacancy_request(vacancy_data)
 
-        return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'VacancyView')
+
+            return Response({'status': 'err', 'message': err}, status=status.HTTP_400_BAD_REQUEST)
     
 class SupplierView(APIView):
     permission_classes = [IsAuthenticated, ]
     
     def get(self, request):
-        query_suppliers = Supplier.objects.all()
-        supplier_data = [
-            {
-                "id": supplier_obj['id'],
-                "name": supplier_obj['name'],
-                "city": supplier_obj['city'],
-                "phone": supplier_obj['phone'],
-                "phonelink": "".join(i for i in supplier_obj['phone'] if  i.isdecimal()),
-                "url": supplier_obj['url'],
-                "type": [type_obj for type_obj in SupplierType.objects.filter(id=supplier_obj['type_id']).values('name')][0]['name']
+        try:
+            query_suppliers = Supplier.objects.all()
+            supplier_data = [
+                {
+                    "id": supplier_obj.get('id'),
+                    "name": supplier_obj.get('name'),
+                    "city": supplier_obj.get('city'),
+                    "phone": supplier_obj.get('phone'),
+                    "phonelink": "".join(i for i in supplier_obj.get('phone') if  i.isdecimal()),
+                    "url": supplier_obj.get('url'),
+                    "type": [type_obj for type_obj in SupplierType.objects.filter(id=supplier_obj.get('type_id')).values('name')][0].get('name')
 
-            } 
-            for supplier_obj in query_suppliers.values()
-        ]
+                } 
+                for supplier_obj in query_suppliers.values()
+            ]
 
-        return Response({'status': 'ok', 'data': supplier_data}, status=status.HTTP_200_OK)
+            return Response({'status': 'ok', 'data': supplier_data}, status=status.HTTP_200_OK)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'SupplierView')
+
+            return Response({'status': 'err', 'data': [], 'description': err }, status=status.HTTP_400_BAD_REQUEST)
 
 class SuppliersTypeView(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self, request):
-        query_suppliers_type = SupplierType.objects.all().values()
+        try:
+            query_suppliers_type = SupplierType.objects.all().values()
 
-        return Response({'status': 'ok', 'data': query_suppliers_type}, status=status.HTTP_200_OK)
+            return Response({'status': 'ok', 'data': query_suppliers_type}, status=status.HTTP_200_OK)
+        
+        except Exception as err:
+            write_access_view_err_log(err, 'SuppliersTypeView')
+
+            return Response({'status': 'err', 'data': [], 'description': err}, status=status.HTTP_200_OK)
     
 class ForClientsRequestView(APIView):
-    permission_classes = [IsAuthenticated, ]
+    # permission_classes = [IsAuthenticated, ]
+    order_type = 'for_clients_req'
 
     def post(self, request):
         req_data = json.loads(request.body)
         email_data = dict()
+        not_format_date = datetime.datetime.now()
+        order_time = get_time(not_format_date)
         description = f'спасибо ваш запрос зарегистрирован, менеджер свяжется с вами в ближайшее время'
         client_data = {
             "request_type": req_data.get('requestType'),
@@ -772,6 +830,7 @@ class ForClientsRequestView(APIView):
         
         
         if client_data['request_type'] and client_data['request_type'] == 'suplconsult':
+            self.order_type = 'for_clients_supl_req'
             email_data['order_type'] = client_data.get('request_type')
             email_data['order_type_name'] = 'Вопрос по поставщикам'
             email_data['client_name'] = client_data.get('name')
@@ -780,6 +839,7 @@ class ForClientsRequestView(APIView):
             email_data['description'] = description
 
         elif client_data['request_type'] and client_data['request_type'] == 'prodquestion':
+            self.order_type = 'for_clients_prod_req'
             email_data['order_type'] = client_data.get('request_type')
             email_data['order_type_name'] = 'Вопрос по работе производства'
             email_data['client_name'] = client_data.get('name')
@@ -796,7 +856,10 @@ class ForClientsRequestView(APIView):
                 'client_email': client_data.get('email'),
                 "comment": client_data.get('comment'),
             }
-        send_other_order(email_data)
+        email_template = select_email_template_by_order(self.order_type)
+        # send_email = send_order_to_main_email(email_template, email_data, order_time)
+        pprint(email_template)
+        # send_other_order(email_data)
 
         return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
     
@@ -1254,23 +1317,6 @@ def send_quiz_result_to_email(quiz_data, order_type='quiz'):
         msg_mail.content_subtype = "html"  
         msg_mail.send()
 
-def send_vacancy_request(send_data):
-    not_format_date = datetime.datetime.now()
-    time = get_time(not_format_date)
-    msg_mail = EmailMessage(
-            f"Новый отклик на вакансию {send_data['vacancy_data']} с сайта cosmtech.ru", 
-            f"""
-                <p>Вакансия({send_data['vacancy_data']})</p>
-                <p>Имя({send_data['resume_name']})</p>
-                <p>Телефон: {send_data['resume_phone']}
-                <p><b>{time}</b></p>
-            """,
-            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
-    )
-    msg_mail.content_subtype = "html"
-    if send_data['resume_file']:
-        msg_mail.attach_file(f'{send_data["resume_file"]}')
-    msg_mail.send()
 
 def send_other_order(send_data):
     not_format_date = datetime.datetime.now()

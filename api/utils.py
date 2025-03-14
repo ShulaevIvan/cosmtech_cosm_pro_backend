@@ -154,6 +154,24 @@ def write_access_view_err_log(err, view_name=''):
 def send_email_to_client(email_data, client_email):
     pass
 
+def send_vacancy_request(send_data):
+    not_format_date = datetime.datetime.now()
+    time = get_time(not_format_date)
+    msg_mail = EmailMessage(
+            f"Новый отклик на вакансию {send_data['vacancy_data']} с сайта cosmtech.ru", 
+            f"""
+                <p>Вакансия({send_data['vacancy_data']})</p>
+                <p>Имя({send_data['resume_name']})</p>
+                <p>Телефон: {send_data['resume_phone']}
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+    )
+    msg_mail.content_subtype = "html"
+    if send_data['resume_file']:
+        msg_mail.attach_file(f'{send_data["resume_file"]}')
+    msg_mail.send()
+
 def validate_email(email_str):
     email_pattern = r'\S*\@\S*\.\w{2,10}$'
     check_email_valid = re.match(email_pattern, email_str)
