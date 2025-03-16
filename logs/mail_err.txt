@@ -3,3 +3,6 @@ date: 2025-03-12 15:16:10 send_form: callback_req  err_descr: (535, b'Incorrect 
 order_num:  date: 2025-03-12 15:29:10 send_form: callback_req  err_descr: (535, b'Incorrect authentication data') 
 order_num:  date: 2025-03-13 17:52:48 send_form: contacts_order_req  err_descr: (535, b'Incorrect authentication data') 
 order_num:  date: 2025-03-14 12:52:46 send_form: quiz_req  err_descr: [Errno 21] Is a directory: '.' 
+order_num:  date: 2025-03-16 11:16:42 send_form: specification_req  err_descr: [Errno 21] Is a directory: '.' 
+order_num:  date: 2025-03-16 15:39:21 send_form: vacancy_req  err_descr: [Errno 21] Is a directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/resume_files/fgfhg_Лаборант_+7 (999) 999-99-99' 
+order_num:  date: 2025-03-16 15:41:11 send_form: vacancy_req  err_descr: [Errno 21] Is a directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/resume_files/hjkhkj_Лаборант_+7 (999) 999-99-99' 

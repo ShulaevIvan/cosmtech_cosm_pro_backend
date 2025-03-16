@@ -1,10 +1,17 @@
 import os
 import json
 import re
+import uuid
+import base64
+import random
 from datetime import datetime
 from pprint import pprint
 from django.core.mail import EmailMessage
 from django.conf import settings
+
+from .models import Order, Client
+
+from docxtpl import DocxTemplate
 
 def create_upload_folders():
     upload_files = f'{os.getcwd()}/upload_files/'
@@ -141,16 +148,15 @@ def write_email_err_log(err, template, order_num=''):
     with open(log_file_path, 'a+') as file:
         file.write(f'{err_description} \n')
 
-def write_access_view_err_log(err, view_name=''):
+def write_access_view_err_log(err, method, view_name=''):
     current_date = datetime.now().replace(microsecond=0)
-    err_description = f'view_func: {view_name} date: {current_date} err_descr: {err}'
+    err_description = f'view_func: {view_name} ({method}) date: {current_date} err_descr: {err}'
     log_file_path = f'{os.getcwd()}/logs/access_views_err.txt'
 
     with open(log_file_path, 'a+') as file:
         file.write(f'{err_description} \n')
     
     
-
 def send_email_to_client(email_data, client_email):
     pass
 
@@ -179,3 +185,120 @@ def validate_email(email_str):
         return True
     return False
 
+def generate_specification_number(filename):
+    pattern = r'^spec_[a-z|0-9|A-Z]{8}'
+    check_str = re.match(pattern, filename)
+    if check_str and check_str.group(0):
+        return check_str.group(0)
+    return False
+
+def keys_form_camel_case_to_python_style(data):
+    result_dict = dict()
+
+    for key, value in data.items():
+        valid_key = ''.join('_' + char.lower() if char.isupper() else char.strip() for char in key).strip()
+        result_dict[valid_key] = value
+
+    return result_dict
+
+def create_specification_file(data):
+    specification_info = dict()
+    specification_data = dict()
+    specifications_folder = f'{os.getcwd()}/download/company_files/specifications'
+
+    if not os.path.exists(specifications_folder):
+        os.mkdir(specifications_folder)
+
+    specification_filename = f'spec_{uuid.uuid4()}'
+    specification_order = generate_specification_number(specification_filename)
+    specification_format = '.docx'
+    specification_template_path = f'{os.getcwd()}/download/company_files/specification_template.docx'
+    specification_tmp_file_path = f'{specifications_folder}/{specification_filename}{specification_format}'
+    
+    document_file = DocxTemplate(specification_template_path)
+
+    order_time = get_time(datetime.now())
+    specification_data = keys_form_camel_case_to_python_style(data)
+    specification_data['order_number'] = specification_order
+    specification_data['order_date'] = order_time
+
+    if specification_data.get('services') and len(specification_data['services']) > 0:
+        specification_data['services'] = ''.join(f'{i}, 'for i in specification_data['services'])
+
+    document_file.render(specification_data)
+    document_file.save(specification_tmp_file_path)
+
+    specification_info['order_number'] = specification_data['order_number']
+    specification_info['tmp_file_path'] = specification_tmp_file_path
+    specification_info['order_date'] = specification_data['order_date']
+
+    return specification_info
+
+def create_file(file_obj, path):
+    ext = re.findall(r'.\w+$', file_obj['name'])[0]
+    full_name = f"{path}{uuid.uuid4()}{ext}"
+
+    with open(full_name, "wb") as file:
+        file.write(base64.b64decode(file_obj['file']))
+
+    return full_name
+
+def get_request_name(value):
+    request_types = {
+        'contract': 'Контрактное производство',
+        'lab': 'Услуги лаборатории',
+        'pack': 'Упаковка и сопровождение',
+        'cert': 'Сертификаиця продукции',
+        'trade': 'Торговое предложение',
+        'cooperation': 'Сотрудничество',
+        'decor': 'Декоративная косметика производство',
+        'msg': 'Мессанджеры',
+        'phone': 'Телефон',
+        'email': 'Email',
+
+    }
+    return request_types.get(value)
+
+def generate_simple_order_number(prefix):
+    order_modifer = []
+    for i in range(6):
+        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
+    order_modifer.append(prefix)
+    order_modifer = f''.join(map(str, order_modifer))
+
+    return order_modifer
+
+def generate_quiz_order_number():
+    order_modifer = []
+    for i in range(6):
+        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
+    order_modifer.append('_qz_oer')
+    order_modifer = f''.join(map(str, order_modifer))
+
+    return order_modifer
+
+
+def find_existing_client(phone='', email=''):
+    if phone and email:
+        target_client = Client.objects.filter(email=email, phone=phone)
+    elif email and not phone:
+        target_client = Client.objects.filter(email=email)
+    elif phone and not email:
+        target_client = Client.objects.filter(phone=phone)
+    return target_client
+
+def generate_order_number(order_type, client_id):
+    order_modifer = []
+    for i in range(4):
+        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
+
+    order_modifer = ''.join(map(str, order_modifer))
+
+    if not Order.objects.filter().exists():
+        last_id = 1
+        order_number = f'{client_id}-{order_modifer}-{last_id}'
+        order_name = f'{order_number}'
+    else:
+        last_id = Order.objects.filter().latest('id')
+        order_number = f'{client_id}-{order_modifer}-{last_id.id}'
+        order_name = f'{order_number}'

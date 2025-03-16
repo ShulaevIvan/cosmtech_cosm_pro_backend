@@ -550,7 +550,7 @@
     {
         "id": 15,
         "template_name": "specification_req",
-        "email_subject": "Запрос (отпралено тз онлайн) с сайта cosmtech.ru",
+        "email_subject": "Новый запрос (Отправка ТЗ онлайн) с сайта cosmtech.ru",
         "email_body_description": "",
         "fields": [
             {
