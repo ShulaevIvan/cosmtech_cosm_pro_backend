@@ -120,7 +120,7 @@ class RequestConsultView(APIView):
     async def post(self, request):
         try:
             req_body = json.loads(json.dumps(request.data))
-            email_template = await select_email_template_by_order(self.order_type)
+            email_template = await asyncio.create_task(select_email_template_by_order(self.order_type))
             not_format_date = datetime.now()
             time = get_time(not_format_date)
             response_description = email_template.get('response_description')
@@ -163,7 +163,7 @@ class RequestConsultView(APIView):
                 'order_type_name': 'Консультация',
                 'client_comment': consult_data.get('comment'),
             }
-            await send_order_to_main_email(email_template, client_data, time)
+            send_email = asyncio.create_task(send_order_to_main_email(email_template, client_data, time))
 
             if validate_email(client_data.get('client_email')):
                 print('test0')
@@ -191,7 +191,7 @@ class RequestOrderView(APIView):
     async def post(self, request):
         try:
             req_body = json.loads(json.dumps(request.data))
-            email_template = await select_email_template_by_order(self.order_type)
+            email_template = await asyncio.create_task(select_email_template_by_order(self.order_type))
             response_description = email_template.get('response_description')
             order_data = {
                 "name": req_body.get('name'),
@@ -203,66 +203,77 @@ class RequestOrderView(APIView):
         
             if not order_data.get('email') and not order_data.get('phone'):
                 return Response({'status': 'not found', 'description': 'email or phone not valid'}, status=status.HTTP_200_OK)
-            
+        
             if order_data.get('email') or order_data.get('phone'):
-                async for client in Client.objects.filter(Q(email=order_data.get('email')) | Q(phone=order_data.get('phone'))):
-                    target_client = client
-            else:
-                await Client.objects.acreate(
-                    name = order_data.get('name'),
-                    email = order_data.get('email'),
-                    phone = order_data.get('phone'),
+                if order_data.get('phone') and order_data.get('email'):
+                    async for client in Client.objects.filter(email=order_data['email'], phone=order_data['phone']):
+                        target_client = client
+                elif order_data.get('email') and not order_data.get('phone'):
+                    async for client in Client.objects.filter(email=order_data['email']):
+                        target_client = client
+                elif order_data.get('phone') and not order_data.get('email'):
+                    async for client in Client.objects.filter(phone=order_data['phone']):
+                        target_client = client
+                
+                pprint(target_client)
+                if not target_client.id:
+                    Client.objects.acreate(
+                        name=order_data.get('name'), 
+                        phone=order_data.get('phone'), 
+                        email=order_data.get('email'),
+                    )
+                    async for client in Client.objects.filter(name=order_data.get('name'), phone=order_data.get('phone'), email=order_data.get('email')):
+                        target_client = client
+                else:
+                    target_client = await Client.objects.aget(
+                        name=order_data.get('name'), 
+                        phone=order_data.get('phone'), 
+                        email=order_data.get('email'),
+                    )
+            
+                if not order_data.get('options'):
+                    order_data['options'] = 'Расчет контрактного производства'
+
+                order = await generate_order_number('contract', target_client.id)
+                order_obj = await Order.objects.acreate(
+                    order_type=order.get('order_number'), 
+                    order_date=order.get('not_format_date')
                 )
-                target_client = await Client.objects.aget(
-                    name = order_data.get('name'),
-                    email = order_data.get('email'),
-                    phone = order_data.get('phone'),
+
+                await ClientOrder.objects.acreate(
+                    client_id=target_client.id, 
+                    order_id=order_obj.id,
+                    order_number = order.get('number'), 
+                    order_date = order.get('date'),
+                    oreder_description = order_data.get('comment'),
+                    order_option = order_data.get('options')
                 )
 
+                # not_format_date = datetime.now()
+                # time = get_time(not_format_date)
+                # client_data = {
+                #     'client_name': order_data.get('name'),
+                #     'client_phone': order_data.get('phone'),
+                #     'client_email': order_data.get('email'),
+                #     'order_number': order.get('number'),
+                #     'call_option': 'Любой',
+                #     'order_type_name': order_data.get('options'),
+                #     'client_comment': order_data.get('comment'),
+                # }
+                # send_email = await send_order_to_main_email(email_template, client_data, time)
 
-            if not order_data.get('options'):
-                order_data['options'] = 'Расчет контрактного производства'
+                # if validate_email(client_data.get('client_email')):
+                #     print('tset ok')
+                #     # send_mail_to_client(client_data)
 
-            order = await generate_order_number('contract', target_client.id)
-            order_obj = await Order.objects.acreate(
-                order_type=order.get('order_number'), 
-                order_date=order.get('not_format_date')
-            )
-
-            await ClientOrder.objects.acreate(
-                client_id=target_client, 
-                order_id=order_obj,
-                order_number = order.get('order_number'), 
-                order_date = order.get('date'),
-                oreder_description = order_data.get('comment'),
-                order_option = order_data.get('options')
-            )
-
-            not_format_date = datetime.now()
-            time = get_time(not_format_date)
-            client_data = {
-                'client_name': order_data.get('name'),
-                'client_phone': order_data.get('phone'),
-                'client_email': order_data.get('email'),
-                'order_number': order.get('number'),
-                'call_option': 'Любой',
-                'order_type_name': order_data.get('options'),
-                'client_comment': order_data.get('comment'),
-            }
-            await send_order_to_main_email(email_template, client_data, time)
-
-
-            # if validate_email(client_data.get('client_email')):
-            #     print('tset ok')
-            #     # send_mail_to_client(client_data)
-
-            return Response(
-                {'message': 'ok', 'description': f"{response_description} {client_data.get('order_number')}"}, 
-                status=status.HTTP_201_CREATED
-            )
+                return Response(
+                    {'message': 'ok', 'description': f"{response_description} {client_data.get('order_number')}"}, 
+                    status=status.HTTP_201_CREATED
+                )
             
         except Exception as err:
             method = request.method
+            pprint(err)
             await write_access_view_err_log(err, method, 'RequestOrderView')
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
             

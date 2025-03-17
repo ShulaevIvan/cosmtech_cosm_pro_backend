@@ -8,6 +8,7 @@ from datetime import datetime
 from pprint import pprint
 from django.core.mail import EmailMessage
 from django.conf import settings
+from asgiref.sync import sync_to_async
 
 from .models import Order, Client
 
@@ -94,7 +95,7 @@ def get_time(date):
     return f"Время: {result_str}"
 
 
-def select_email_template_by_order(order_type):
+async def select_email_template_by_order(order_type):
     json_path = f'{os.getcwd()}/email_templates/email_templates.json'
 
     with open(json_path, 'r') as json_file:
@@ -107,7 +108,7 @@ def select_email_template_by_order(order_type):
     return target_template
 
 
-def send_order_to_main_email(email_template, email_data, time='', order_number=''):
+async def send_order_to_main_email(email_template, email_data, time='', order_number=''):
     try:
         has_multiple_files = email_data.get('files')
         has_file = email_data.get('file')
@@ -137,10 +138,10 @@ def send_order_to_main_email(email_template, email_data, time='', order_number='
         msg_mail.send()
         
     except Exception as err:
-        write_email_err_log(err, email_template.get('template_name'))
+        await write_email_err_log(err, email_template.get('template_name'))
 
 
-def write_email_err_log(err, template, order_num=''):
+async def write_email_err_log(err, template, order_num=''):
     current_date = datetime.now().replace(microsecond=0)
     err_description = f'order_num: {order_num} date: {current_date} send_form: {template}  err_descr: {err}'
     log_file_path = f'{os.getcwd()}/logs/mail_err.txt'
@@ -148,13 +149,14 @@ def write_email_err_log(err, template, order_num=''):
     with open(log_file_path, 'a+') as file:
         file.write(f'{err_description} \n')
 
-def write_access_view_err_log(err, method, view_name=''):
+async def write_access_view_err_log(err, method, view_name=''):
     current_date = datetime.now().replace(microsecond=0)
     err_description = f'view_func: {view_name} ({method}) date: {current_date} err_descr: {err}'
     log_file_path = f'{os.getcwd()}/logs/access_views_err.txt'
 
     with open(log_file_path, 'a+') as file:
         file.write(f'{err_description} \n')
+    
     
     
 def send_email_to_client(email_data, client_email):
@@ -287,18 +289,21 @@ def find_existing_client(phone='', email=''):
         target_client = Client.objects.filter(phone=phone)
     return target_client
 
-def generate_order_number(order_type, client_id):
-    order_modifer = []
-    for i in range(4):
+async def generate_order_number(order_type, client_id=1):
+    not_format_date = datetime.now()
+    time = get_time(not_format_date)
+    order_type_arr = [
+        {'name': 'contract', 'length': 6, 'prefix': 'cprod'},
+        {'name': 'contract_decorative', 'length': 3, 'prefix': 'cprod_dec'},
+        {'name': 'cooperation', 'length': 4, 'prefix': 'coop'},
+        {'name': 'tz_cosm', 'length': 4, 'prefix': 'tz_cprod'},
+        {'name': 'tz_decor', 'length': 4, 'prefix': 'tz_dprod'},
+    ]
+    target_order_type = list(filter(lambda x: x.get('name') == order_type, order_type_arr))
+    order_modifer = list()
+
+    for i in range(target_order_type[0].get('length')):
         order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
+    order_modifer = f"{target_order_type[0].get('prefix')}_" + ''.join(map(str, order_modifer)) + f'_{client_id}'
 
-    order_modifer = ''.join(map(str, order_modifer))
-
-    if not Order.objects.filter().exists():
-        last_id = 1
-        order_number = f'{client_id}-{order_modifer}-{last_id}'
-        order_name = f'{order_number}'
-    else:
-        last_id = Order.objects.filter().latest('id')
-        order_number = f'{client_id}-{order_modifer}-{last_id.id}'
-        order_name = f'{order_number}'
+    return {'order_number': order_modifer, 'not_format_date': not_format_date, 'order_date': time}

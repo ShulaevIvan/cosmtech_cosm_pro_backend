@@ -50,3 +50,126 @@ view_func: VacancyView date: 2025-03-16 15:36:00 err_descr: module 'datetime' ha
 view_func: (POST) VacancyView date: 2025-03-16 15:49:46 err_descr: module 'json' has no attribute 'lads' 
 view_func: (POST) VacancyView date: 2025-03-16 15:52:20 err_descr: module 'json' has no attribute 'lods' 
 view_func: (POST) VacancyView date: 2025-03-16 15:52:30 err_descr: module 'json' has no attribute 'lods' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:34:18 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:38:19 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:54:19 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:56:04 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:56:49 err_descr: 'dict' object is not callable 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:58:42 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:59:23 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 15:59:51 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:01:00 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:01:36 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:02:05 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:02:40 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:03:11 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:03:41 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:03:51 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:07:48 err_descr: a coroutine was expected, got None 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:12:38 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:13:06 err_descr: asyncio.run() cannot be called from a running event loop 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:14:42 err_descr: name 'jon' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:15:39 err_descr: name 'jon' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:16:04 err_descr: name 'jon' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:18:45 err_descr: a coroutine was expected, got {'id': 1, 'template_name': 'callback_req', 'email_subject': 'Заказ обратного звонка с сайта cosmtech.ru', 'email_body_description': 'Пришел запрос перезвонить клиенту(консультация)', 'fields': [{'name': 'phone', 'value': 'Телефон'}, {'name': 'time', 'value': 'Время'}, {'name': 'type', 'value': 'Тип'}], 'response_title': '', 'response_description': 'Спасибо за обращение! Менеджер перезвонят  вам в течении 30 мин.'} 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:20:42 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:21:20 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:21:38 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:23:40 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 16:24:06 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:19:46 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:20:24 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:23:58 err_descr: name 'jsn' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:24:29 err_descr: name 'jsn' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:25:48 err_descr: name 'jsn' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:26:34 err_descr: name 'jsn' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:26:38 err_descr: name 'jsn' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:28:13 err_descr: name 'jsn' is not defined 
+view_func: CallbackRequestView (POST) date: 2025-03-17 17:30:33 err_descr: '_asyncio.Task' object has no attribute 'get' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:39:27 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:41:37 err_descr: sync_to_async can only be applied to sync functions. 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:42:02 err_descr: object QuerySet can't be used in 'await' expression 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:44:22 err_descr: Cannot resolve keyword 'status' into field. Choices are: client_order, email, id, name, orders, phone 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:44:45 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:45:19 err_descr: 'Manager' object has no attribute 'afilter' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:53:38 err_descr: 'Client' object has no attribute 'books' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:54:01 err_descr: Manager isn't accessible via Client instances 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:54:41 err_descr: 'str' object has no attribute 'afirst' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:54:57 err_descr: 'Client' object has no attribute 'afirst' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:55:12 err_descr: 'Client' object has no attribute 'first' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:55:44 err_descr: 'Client' object has no attribute 'first' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:56:08 err_descr: object Client can't be used in 'await' expression 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:57:07 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:58:34 err_descr: 'Client' object has no attribute 'afirst' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:58:47 err_descr: 'Client' object has no attribute 'first' 
+view_func: RequestConsultView (POST) date: 2025-03-17 17:59:25 err_descr: 'Client' object has no attribute 'exists' 
+view_func: RequestConsultView (POST) date: 2025-03-17 18:08:42 err_descr: object Client can't be used in 'await' expression 
+view_func: RequestConsultView (POST) date: 2025-03-17 18:11:14 err_descr: 'QuerySet' object has no attribute 'name' 
+view_func: RequestConsultView (POST) date: 2025-03-17 18:11:41 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestConsultView (POST) date: 2025-03-17 18:13:04 err_descr: name 'jsn' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:03:49 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:05:28 err_descr: 'Client' object has no attribute 'exists' 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:05:58 err_descr: 'Client' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:06:38 err_descr: 'Client' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:07:16 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:08:00 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:09:11 err_descr: 'Client' object has no attribute 'exists' 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:09:27 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:10:14 err_descr: 'Client' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:10:32 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:11:14 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:12:14 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:12:40 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:13:04 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:13:27 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:13:43 err_descr: 'str' object has no attribute 'get' 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:16:08 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:16:27 err_descr: 'NoneType' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:49:29 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:49:47 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:50:11 err_descr: '_asyncio.Task' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:50:45 err_descr: list index out of range 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:51:16 err_descr: list index out of range 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:51:41 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 19:52:33 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:12:56 err_descr: string indices must be integers 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:13:19 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:13:53 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:14:18 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:14:29 err_descr: 'coroutine' object is not subscriptable 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:15:11 err_descr: string indices must be integers 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:18:48 err_descr: string indices must be integers 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:19:11 err_descr: 'str' object has no attribute 'get' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:19:32 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:19:51 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:20:07 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:21:32 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:25:23 err_descr: 'Client' object has no attribute 'afirst' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:25:53 err_descr: 'Client' object has no attribute 'afirst' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:26:12 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:26:52 err_descr: 'Client' object has no attribute 'afirst' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:27:11 err_descr: 'Client' object has no attribute 'afirst' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:27:31 err_descr: Cannot assign "16": "ClientOrder.client_id" must be a "Client" instance. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:28:11 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:29:01 err_descr: 'coroutine' object has no attribute 'id' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:29:41 err_descr: Client matching query does not exist. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:30:18 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:39:05 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:39:28 err_descr: get() returned more than one Client -- it returned 2! 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:40:42 err_descr: Client matching query does not exist. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:40:55 err_descr: get() returned more than one Client -- it returned 9! 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:41:30 err_descr: 'coroutine' object has no attribute 'afirst' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:42:43 err_descr: get() returned more than one Client -- it returned 9! 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:44:20 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:44:43 err_descr: name 'client_data' is not defined 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:46:14 err_descr: Cannot assign "17": "ClientOrder.client_id" must be a "Client" instance. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:46:43 err_descr: Cannot assign "135": "ClientOrder.order_id" must be a "Order" instance. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:47:13 err_descr: null value in column "order_number" of relation "api_clientorder" violates not-null constraint
+DETAIL:  Failing row contains (132, null, 2025-03-17 20:47:13.88915+03, Расчет контрактного производства, , , 17, 136).
+ 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:49:54 err_descr: Cannot assign "<Task pending name='Task-3' coro=<QuerySet.acreate() running at /home/adminpy/.local/lib/python3.10/site-packages/django/db/models/query.py:662> wait_for=<Future pending cb=[_chain_future.<locals>._call_check_cancel() at /usr/lib/python3.10/asyncio/futures.py:385, Task.task_wakeup()]>>": "ClientOrder.order_id" must be a "Order" instance. 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:51:24 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:54:06 err_descr: local variable 'target_client' referenced before assignment 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:54:22 err_descr: 'coroutine' object has no attribute 'id' 
+view_func: RequestOrderView (POST) date: 2025-03-17 20:55:22 err_descr: 'coroutine' object has no attribute 'id' 
+view_func: RequestOrderView (POST) date: 2025-03-17 21:00:12 err_descr: asyncio.run() cannot be called from a running event loop 
