@@ -8,6 +8,7 @@ from datetime import datetime
 from pprint import pprint
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.db.models import Q
 from asgiref.sync import sync_to_async
 
 from .models import Order, Client
@@ -280,14 +281,26 @@ def generate_quiz_order_number():
     return order_modifer
 
 
-def find_existing_client(phone='', email=''):
+async def find_existing_client(phone='', email=''):
     if phone and email:
-        target_client = Client.objects.filter(email=email, phone=phone)
-    elif email and not phone:
-        target_client = Client.objects.filter(email=email)
-    elif phone and not email:
-        target_client = Client.objects.filter(phone=phone)
+        async for client in Client.objects.filter(Q(email=email) | Q(phone=phone)):
+            target_client = client
+
     return target_client
+
+async def find_existing_data_by_contact(model, phone='', email=''):
+    if phone and email:
+        async for data in model.objects.filter(Q(email=email) | Q(phone=phone)):
+            target_data = data
+            
+    return target_data
+
+async def get_all_city_data(model):
+    all_city = []
+    async for city in model.objects.all().values():
+        all_city.append(city)
+
+    return all_city
 
 async def generate_order_number(order_type, client_id=1):
     not_format_date = datetime.now()
@@ -296,6 +309,8 @@ async def generate_order_number(order_type, client_id=1):
         {'name': 'contract', 'length': 6, 'prefix': 'cprod'},
         {'name': 'contract_decorative', 'length': 3, 'prefix': 'cprod_dec'},
         {'name': 'cooperation', 'length': 4, 'prefix': 'coop'},
+        {'name': 'quiz', 'length': 4, 'prefix': 'quiz'},
+        {'name': 'quiz_consult', 'length': 4, 'prefix': 'qzcut'},
         {'name': 'tz_cosm', 'length': 4, 'prefix': 'tz_cprod'},
         {'name': 'tz_decor', 'length': 4, 'prefix': 'tz_dprod'},
     ]

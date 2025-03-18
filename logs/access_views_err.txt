@@ -173,3 +173,83 @@ view_func: RequestOrderView (POST) date: 2025-03-17 20:54:06 err_descr: local va
 view_func: RequestOrderView (POST) date: 2025-03-17 20:54:22 err_descr: 'coroutine' object has no attribute 'id' 
 view_func: RequestOrderView (POST) date: 2025-03-17 20:55:22 err_descr: 'coroutine' object has no attribute 'id' 
 view_func: RequestOrderView (POST) date: 2025-03-17 21:00:12 err_descr: asyncio.run() cannot be called from a running event loop 
+view_func: ContactsRequestView (POST) date: 2025-03-18 12:49:54 err_descr: ClientOrder matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 12:50:43 err_descr: ClientOrder matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 12:53:55 err_descr: local variable 'target_client' referenced before assignment 
+view_func: ContactsRequestView (POST) date: 2025-03-18 12:55:11 err_descr: local variable 'target_client' referenced before assignment 
+view_func: ContactsRequestView (POST) date: 2025-03-18 12:55:57 err_descr: Client matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 12:57:57 err_descr: local variable 'target_client' referenced before assignment 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:37:45 err_descr: Cannot assign "<coroutine object QuerySet.aget at 0x7d32adbb6490>": "CoperationRequestFile.cooperation_request_id" must be a "CoperationRequest" instance. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:38:28 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:39:24 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:40:33 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:41:04 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:41:56 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:42:29 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:43:37 err_descr: Cannot assign "20": "CoperationRequestFile.cooperation_request_id" must be a "CoperationRequest" instance. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:45:02 err_descr: Cannot assign "20": "CoperationRequestFile.cooperation_request_id" must be a "CoperationRequest" instance. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:45:38 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:47:37 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:48:26 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:53:03 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:54:32 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 14:55:10 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 15:03:34 err_descr: CoperationRequest matching query does not exist. 
+view_func: ContactsRequestView (POST) date: 2025-03-18 15:06:44 err_descr: 'CoperationRequest' object has no attribute 'result' 
+view_func: CityDataView (GET) date: 2025-03-18 15:21:29 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:21:47 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:27:56 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:28:07 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:28:20 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:28:32 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:28:57 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:29:21 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:35:48 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:37:17 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:37:35 err_descr: expected string or bytes-like object 
+view_func: CityDataView (GET) date: 2025-03-18 15:38:25 err_descr: 'Manager' object has no attribute 'aall' 
+view_func: CityDataView (GET) date: 2025-03-18 15:38:34 err_descr: object QuerySet can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:40:46 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 15:40:51 err_descr: 'CityData' object has no attribute 'values_list' 
+view_func: CityDataView (GET) date: 2025-03-18 15:41:26 err_descr: object NoneType can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:42:27 err_descr: 'dict' object has no attribute 'afirst' 
+view_func: CityDataView (GET) date: 2025-03-18 15:42:36 err_descr: 'CityData' object has no attribute 'afirst' 
+view_func: CityDataView (GET) date: 2025-03-18 15:42:42 err_descr: 'CityData' object has no attribute 'afirst' 
+view_func: CityDataView (GET) date: 2025-03-18 15:42:49 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 15:42:58 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 15:44:57 err_descr: object NoneType can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:45:13 err_descr: object NoneType can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:45:22 err_descr: object NoneType can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:45:41 err_descr: object NoneType can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:46:00 err_descr: object list can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:46:07 err_descr: object list can't be used in 'await' expression 
+view_func: CityDataView (GET) date: 2025-03-18 15:46:39 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 15:46:52 err_descr: 'CityData' object has no attribute 'values_list' 
+view_func: CityDataView (GET) date: 2025-03-18 15:50:07 err_descr: 'coroutine' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 15:50:47 err_descr: 'CityData' object has no attribute 'result' 
+view_func: CityDataView (GET) date: 2025-03-18 15:51:30 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 15:58:58 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:07:07 err_descr: 'CityData' object has no attribute 'result' 
+view_func: CityDataView (GET) date: 2025-03-18 16:08:04 err_descr: CityData matching query does not exist. 
+view_func: CityDataView (GET) date: 2025-03-18 16:08:17 err_descr: CityData matching query does not exist. 
+view_func: CityDataView (GET) date: 2025-03-18 16:09:02 err_descr: 'CityData' object has no attribute 'result' 
+view_func: CityDataView (GET) date: 2025-03-18 16:09:25 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: CityDataView (GET) date: 2025-03-18 16:09:35 err_descr: You cannot call this from an async context - use a thread or sync_to_async. 
+view_func: CityDataView (GET) date: 2025-03-18 16:11:19 err_descr: 'coroutine' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:11:55 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:20:24 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:20:25 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:20:25 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:20:53 err_descr: the JSON object must be str, bytes or bytearray, not CityData 
+view_func: CityDataView (GET) date: 2025-03-18 16:21:01 err_descr: 'CityData' object has no attribute 'read' 
+view_func: CityDataView (GET) date: 2025-03-18 16:21:42 err_descr: 'CityData' object has no attribute 'result' 
+view_func: CityDataView (GET) date: 2025-03-18 16:22:09 err_descr: 'CityData' object is not a mapping 
+view_func: CityDataView (GET) date: 2025-03-18 16:22:19 err_descr: 'CityData' object is not iterable 
+view_func: CityDataView (GET) date: 2025-03-18 16:23:32 err_descr: django.db.models.functions.comparison.JSONObject() argument after ** must be a mapping, not CityData 
+view_func: CityDataView (GET) date: 2025-03-18 16:25:16 err_descr: 'CityData' object has no attribute 'values_list' 
+view_func: CityDataView (GET) date: 2025-03-18 16:25:45 err_descr: 'CityData' object is not iterable 
+view_func: CityDataView (GET) date: 2025-03-18 16:26:02 err_descr: 'CityData' object has no attribute 'values' 
+view_func: CityDataView (GET) date: 2025-03-18 16:28:26 err_descr: dict() argument after ** must be a mapping, not CityData 
+view_func: CityDataView (GET) date: 2025-03-18 16:28:35 err_descr: dict() argument after * must be an iterable, not CityData 
+view_func: CityDataView (GET) date: 2025-03-18 16:30:10 err_descr: 'coroutine' object has no attribute '_meta' 
+view_func: CityDataView (GET) date: 2025-03-18 16:30:11 err_descr: 'coroutine' object has no attribute '_meta' 

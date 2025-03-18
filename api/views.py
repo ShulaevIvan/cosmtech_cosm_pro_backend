@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from django.shortcuts import HttpResponse
 from django.db.models import Q
+from django.forms.models import model_to_dict
 from django.http import FileResponse
 from rest_framework import status
 from rest_framework.response import Response
@@ -19,7 +20,7 @@ from asgiref.sync import sync_to_async
 from adrf.views import APIView
 from .utils import validate_email, create_specification_file, \
 create_file, get_request_name, generate_simple_order_number, generate_quiz_order_number, \
-find_existing_client, generate_order_number, get_time
+find_existing_client, generate_order_number, get_time, find_existing_data_by_contact, get_all_city_data
 
 from.utils import write_access_view_err_log, select_email_template_by_order, send_order_to_main_email, send_vacancy_request
 
@@ -205,8 +206,7 @@ class RequestOrderView(APIView):
                 return Response({'status': 'not found', 'description': 'email or phone not valid'}, status=status.HTTP_200_OK)
             
             if order_data.get('email') or order_data.get('phone'):
-                async for client in Client.objects.filter(Q(email=order_data.get('email')) | Q(phone=order_data.get('phone'))):
-                    target_client = client
+                target_client = await find_existing_data_by_contact(Client, order_data.get('phone'), order_data.get('email'))
             else:
                 await Client.objects.acreate(
                     name = order_data.get('name'),
@@ -218,7 +218,6 @@ class RequestOrderView(APIView):
                     email = order_data.get('email'),
                     phone = order_data.get('phone'),
                 )
-
 
             if not order_data.get('options'):
                 order_data['options'] = 'Расчет контрактного производства'
@@ -244,7 +243,7 @@ class RequestOrderView(APIView):
                 'client_name': order_data.get('name'),
                 'client_phone': order_data.get('phone'),
                 'client_email': order_data.get('email'),
-                'order_number': order.get('number'),
+                'order_number': order.get('order_number'),
                 'call_option': 'Любой',
                 'order_type_name': order_data.get('options'),
                 'client_comment': order_data.get('comment'),
@@ -272,10 +271,10 @@ class ContactsRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'contacts_order_req'
 
-    def post(self, request):
+    async def post(self, request):
         try:
             req_body = json.loads(json.dumps(request.data))
-            email_template = select_email_template_by_order(self.order_type)
+            email_template = await select_email_template_by_order(self.order_type)
             not_format_date = datetime.now()
             time = get_time(not_format_date)
             order_types = ['contract', 'lab', 'pack', 'cert']
@@ -296,39 +295,42 @@ class ContactsRequestView(APIView):
             cooperation_files = []
         
             if contacts_data.get('orderType') in order_types and contacts_data.get('orderType') not in order_cooperations:
-                target_client = find_existing_client(contacts_data.get('phone'), contacts_data.get('email'))
-                if not target_client.exists():
-                    Client.objects.create(
+                target_client = await find_existing_data_by_contact(Client, contacts_data.get('phone'), contacts_data.get('email'))
+                
+                if not target_client:
+                    Client.objects.acreate(
                         name=contacts_data.get('name'), 
                         phone=contacts_data.get('phone'), 
                         email=contacts_data.get('email'),
-                    ).save()
-                    target_client = Client.objects.filter(
+                    )
+                    target_client = Client.objects.aget(
                         name=contacts_data.get('name'), 
                         phone=contacts_data.get('phone'), 
                         email=contacts_data.get('email')
                     )
-                order = generate_order_number(contacts_data.get('orderType'), target_client[0].id)
-                target_order, created = Order.objects.get_or_create(order_type=order.get('type'), order_date=order.get('date'))
-                target_order.save()
-            
-                ClientOrder.objects.create(
-                    client_id=target_client.first(), 
-                    order_id=Order.objects.filter(id=target_order.id).first(),
-                    order_number = order.get('number'), 
+
+                order = await generate_order_number('contract', target_client.id)
+                order_obj = await Order.objects.acreate(
+                    order_type=order.get('order_number'), 
+                    order_date=order.get('not_format_date')
+                )
+
+                await ClientOrder.objects.acreate(
+                    client_id=target_client, 
+                    order_id=order_obj,
+                    order_number = order.get('order_number'), 
                     order_date = order.get('date'),
                     oreder_description = contacts_data.get('comment'),
                     order_option = contacts_data.get('orderType'),
-                    file = 'test'
-                ).save()
+                )
 
                 if contacts_data.get('file') and len(contacts_data.get('file')) > 0:
                     files_list = contacts_data.get('file')
-                    target_order = ClientOrder.objects.filter(order_number=order.get('number'))
+                    target_order = await ClientOrder.objects.aget(order_number=order.get('order_number'))
                
                     for file in files_list:
                         file_path = create_file(file, settings.ORDER_FILES)
-                        ClientOrderFile.objects.create(client_order=ClientOrder.objects.get(id=target_order[0].id), file=file_path,).save()
+                        await ClientOrderFile.objects.acreate(client_order=target_order, file=file_path,)
                         client_files.append(file_path)
             
                 client_data = {
@@ -338,40 +340,44 @@ class ContactsRequestView(APIView):
                     'client_city': contacts_data.get('city'),
                     'call_option': get_request_name(contacts_data.get('call_option')),
                     'client_comment': contacts_data.get('comment'),
-                    'order_number': order.get('number'),
+                    'order_number': order.get('order_number'),
                     'order_type': order.get('type'),
                     'order_type_name': get_request_name(contacts_data.get('orderType')),
                 }
                 client_data['files'] = client_files
                 response_description = email_template.get('response_description')
-                send_email = send_order_to_main_email(email_template, client_data, time)
+                send_email = await send_order_to_main_email(email_template, client_data, time)
                 # send_mail_to_client(client_data)
 
                 return Response(
-                    {'message': 'ok', 'description': f"{response_description} {order.get('number')}"}, 
+                    {'message': 'ok', 'description': f"{response_description} {order.get('order_number')}"}, 
                     status=status.HTTP_201_CREATED
                 )
         
             elif contacts_data.get('orderType') in order_cooperations and contacts_data.get('orderType') not in order_types:
-                email_template = select_email_template_by_order('contacts_coperation_req')
+                email_template = await select_email_template_by_order('contacts_coperation_req')
                 if contacts_data.get('phone') or contacts_data.get('email'):
-                    cooperation_request, created = CoperationRequest.objects.get_or_create(
-                        name = contacts_data.get('name'),
-                        email = contacts_data.get('email'),
-                        phone = contacts_data.get('phone'),
-                        request_description = contacts_data.get('comment'),
-                        cooperation_type = contacts_data.get('orderType'),
-                    )
+                    cooperation_request = await find_existing_data_by_contact(CoperationRequest, contacts_data.get('phone'), contacts_data.get('email'))
+
+                    if not cooperation_request.id:
+                        cooperation_request = await CoperationRequest.objects.acreate(
+                            name = contacts_data.get('name'),
+                            email = contacts_data.get('email'),
+                            phone = contacts_data.get('phone'),
+                            request_description = contacts_data.get('comment'),
+                            cooperation_type = contacts_data.get('orderType'),
+                        )
 
                     if contacts_data.get('file') and len(contacts_data.get('file')) > 0:
                         files_list = contacts_data.get('file')
-                        target_cooperation = CoperationRequest.objects.filter(id=cooperation_request.id)
+                        target_cooperation = await CoperationRequest.objects.aget(id=cooperation_request.id)
+
                         for file in files_list:
                             file_path = create_file(file, settings.COOPERATION_FILES)
-                            CoperationRequestFile.objects.create(
-                                cooperation_request_id=CoperationRequest.objects.get(id=target_cooperation[0].id), 
+                            await CoperationRequestFile.objects.acreate(
+                                cooperation_request_id=target_cooperation, 
                                 file=file_path,
-                            ).save()
+                            )
                             cooperation_files.append(file_path)
 
                     client_data = {
@@ -383,58 +389,59 @@ class ContactsRequestView(APIView):
                         'order_type_name': get_request_name(contacts_data.get('orderType')),
                         'client_comment': contacts_data.get('comment'),
                     }
-                    client_data['files'] = client_files
+                    client_data['files'] = cooperation_files
                     response_description = email_template.get('response_description')
-                    send_email = send_order_to_main_email(email_template, client_data, time)
+                    send_email = await send_order_to_main_email(email_template, client_data, time)
 
                     if validate_email(client_data.get('client_email')):
                         print('tset ok')
                         # send_mail_to_client(client_data)
 
-                    # send_order_mail(client_data)
-
                     return Response(
                         {'message': 'ok', 'description': f"{response_description}"}, 
                         status=status.HTTP_201_CREATED
                     )
-        
-            return Response({'message': 'ok', 'description': f"err"}, status=status.HTTP_201_CREATED)
+            err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+
+            return Response({'message': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
         
         except Exception as err:
             method = request.method
-            write_access_view_err_log(err, method, 'ContactsRequestView')
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
+            await write_access_view_err_log(err, method, 'ContactsRequestView')
+          
             
-            return Response({'message': 'ok', 'description': err_description}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
     
 class CityDataView(APIView):
 
     permission_classes = [IsAuthenticated, ]
 
-    def get(self, request):
+    async def get(self, request):
         try:
             params = request.query_params
             city_param = params.get('city')
-            check_dach = re.search('-', city_param)
 
             if not city_param:
-                target_city = CityData.objects.all().values()
-                return Response({'cities': target_city}, status=status.HTTP_200_OK)
+                all_cities = await get_all_city_data(CityData)
+
+                return Response({'cities': all_cities}, status=status.HTTP_200_OK)
+
+            check_dach = re.search('-', city_param)
             format_city_name = f'{city_param[0].upper()}{city_param[1:len(city_param)]}'
         
             if check_dach:
                 name_part = city_param.split('-')
                 format_city_name = f'{name_part[0][0].upper()}{name_part[0][1:len(name_part[0])]}-{name_part[1][0].upper()}{name_part[1][1:len(name_part[1])]}'
 
-            city_name = fr'^{format_city_name}|^{format_city_name}(\w*|.*)(.|\w)(\w+)$'
+            # city_name = fr'^{format_city_name}|^{format_city_name}(\w*|.*)(.|\w)(\w+)$'
+            target_city = await CityData.objects.aget(name=format_city_name)
 
-            target_city = CityData.objects.filter(name__regex=city_name).values()
-
-            return Response({'cities': target_city}, status=status.HTTP_200_OK)
+            return Response({'cities': model_to_dict(target_city)}, status=status.HTTP_200_OK)
         
         except Exception as err:
             method = request.method
-            write_access_view_err_log(err, method, 'CityDataView')
+            await write_access_view_err_log(err, method, 'CityDataView')
             
             return Response({'cities': {}, 'err': err}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -443,24 +450,23 @@ class QuizOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'quiz_req'
     
-    def post(self, request):
+    async def post(self, request):
         try:
             req_body = json.loads(json.dumps(request.data))
-            email_template = select_email_template_by_order(self.order_type)
+            email_template = await select_email_template_by_order(self.order_type)
             client_name = req_body.get('name').get('value')
             client_phone = req_body.get('phone').get('value')
             client_email = req_body.get('email').get('value')
             send_data = req_body.get('sendData')
             order_data = dict()
-            not_format_date = datetime.now()
             upload_folder = f'{os.getcwd()}/upload_files/quiz_files/'
-            order_number = generate_quiz_order_number()
-            time = get_time(not_format_date)
-            order_folder_name = f'quiz_{order_number}'
+            order = await generate_order_number('quiz', 1)
+            time =  order.get('order_date')
+            order_folder_name = f"quiz_{order.get('order_number')}"
             order_folder_path = f'{upload_folder}{order_folder_name}/'
             send_description = {
                 'title': f'Спасибо за обращение {client_name}',
-                'order': order_number,
+                'order': order.get('order_number'),
                 'description': 'Наш сотрудник пришлет рассчет/свяжется с вами в билижайшее время'
             }
 
@@ -508,9 +514,9 @@ class QuizOrderView(APIView):
                 custom_package_file_url = create_file(custom_package_file, order_folder_path)
 
 
-            QuizOrder.objects.create(
-                order_number=order_number,
-                order_date=not_format_date,
+            await QuizOrder.objects.acreate(
+                order_number=order.get('order_number'),
+                order_date=order.get('not_format_date'),
                 client_name=client_name,
                 client_email=client_email,
                 client_phone=client_phone,
@@ -535,8 +541,8 @@ class QuizOrderView(APIView):
             )
             email_data = {
                 'order_type_name': 'Калькулятор производства',
-                'order_number': order_number,
-                'order_date':  get_time(not_format_date),
+                'order_number': order.get('order_number'),
+                'order_date':  time,
                 'client_name': client_name,
                 'client_email': client_email,
                 'client_phone': client_phone,
@@ -562,7 +568,7 @@ class QuizOrderView(APIView):
             if email_data.get('custom_tz_file') or email_data.get('custom_package_file'):
                 email_data['files'] = [email_data.get('custom_tz_file'), email_data.get('custom_package_file')]
 
-            send_email = send_order_to_main_email(email_template, email_data, time)
+            send_email = await send_order_to_main_email(email_template, email_data, time)
 
             if validate_email(email_data.get('client_email')):
                 print('tset ok')
@@ -574,7 +580,7 @@ class QuizOrderView(APIView):
         
         except Exception as err:
             method = request.method
-            write_access_view_err_log(err, method, 'QuizOrderView')
+            await write_access_view_err_log(err, method, 'QuizOrderView')
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
             
             return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
@@ -584,13 +590,12 @@ class QuestionOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'question_req'
 
-    def post(self, request):
+    async def post(self, request):
         try:
             req_body = json.loads(json.dumps(request.data))
-            email_template = select_email_template_by_order(self.order_type)
-            order_number = generate_quiz_order_number()
-            not_format_date = datetime.now()
-            time = get_time(not_format_date)
+            email_template = await select_email_template_by_order(self.order_type)
+            order = await generate_order_number('quiz_consult', 1)
+            time = order.get('order_date')
             client_name = req_body.get('name')
             client_phone = req_body.get('phone')
             client_email = req_body.get('email')
@@ -598,7 +603,7 @@ class QuestionOrderView(APIView):
             client_communication_type = req_body.get('communicationType')
             send_description = {
                 'title': f'Спасибо за обращение {client_name}',
-                'order': order_number,
+                'order': order.get('order_number'),
                 'description': 'Наш сотрудник свяжется с вами в течении 30 минут'
             }
 
@@ -610,9 +615,9 @@ class QuestionOrderView(APIView):
                 }
                 return Response({'status': 'err', 'created': False, 'message': send_description}, status=status.HTTP_200_OK)
         
-            QuizQuestionOrder.objects.create(
-                order_number = order_number,
-                order_date = not_format_date,
+            QuizQuestionOrder.objects.acreate(
+                order_number = order.get('order_number'),
+                order_date = order.get('not_format_date'),
                 client_name = client_name,
                 client_phone = client_phone,
                 client_email = client_email,
@@ -621,7 +626,7 @@ class QuestionOrderView(APIView):
             )
             email_data = {
                 'order_type_name': 'Задать вопрос технологу',
-                'order_number': order_number,
+                'order_number': order.get('order_number'),
                 'order_date':  time,
                 'client_name': client_name,
                 'client_phone': client_phone,
@@ -633,13 +638,13 @@ class QuestionOrderView(APIView):
                 print('tset ok')
                 # send_quiz_to_client(email_data)
             # send_quiz_result_to_email(email_data, 'question')
-            send_email = send_order_to_main_email(email_template, email_data, time)
+            send_email = await send_order_to_main_email(email_template, email_data, time)
 
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
         except Exception as err:
             method = request.method
-            write_access_view_err_log(err, method, 'QuestionOrderView')
+            await write_access_view_err_log(err, method, 'QuestionOrderView')
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
