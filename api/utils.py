@@ -4,6 +4,8 @@ import re
 import uuid
 import base64
 import random
+import asyncio
+import aiofiles
 from datetime import datetime
 from pprint import pprint
 from django.core.mail import EmailMessage
@@ -147,16 +149,16 @@ async def write_email_err_log(err, template, order_num=''):
     err_description = f'order_num: {order_num} date: {current_date} send_form: {template}  err_descr: {err}'
     log_file_path = f'{os.getcwd()}/logs/mail_err.txt'
     
-    with open(log_file_path, 'a+') as file:
-        file.write(f'{err_description} \n')
+    async with aiofiles.open(log_file_path, 'a+') as file:
+        await file.write(f'{err_description} \n')
 
 async def write_access_view_err_log(err, method, view_name=''):
     current_date = datetime.now().replace(microsecond=0)
     err_description = f'view_func: {view_name} ({method}) date: {current_date} err_descr: {err}'
     log_file_path = f'{os.getcwd()}/logs/access_views_err.txt'
 
-    with open(log_file_path, 'a+') as file:
-        file.write(f'{err_description} \n')
+    async with aiofiles.open(log_file_path, 'a+') as file:
+        await file.write(f'{err_description} \n')
     
     
     
@@ -204,7 +206,7 @@ def keys_form_camel_case_to_python_style(data):
 
     return result_dict
 
-def create_specification_file(data):
+async def create_specification_file(data):
     specification_info = dict()
     specification_data = dict()
     specifications_folder = f'{os.getcwd()}/download/company_files/specifications'
@@ -217,8 +219,6 @@ def create_specification_file(data):
     specification_format = '.docx'
     specification_template_path = f'{os.getcwd()}/download/company_files/specification_template.docx'
     specification_tmp_file_path = f'{specifications_folder}/{specification_filename}{specification_format}'
-    
-    document_file = DocxTemplate(specification_template_path)
 
     order_time = get_time(datetime.now())
     specification_data = keys_form_camel_case_to_python_style(data)
@@ -227,9 +227,8 @@ def create_specification_file(data):
 
     if specification_data.get('services') and len(specification_data['services']) > 0:
         specification_data['services'] = ''.join(f'{i}, 'for i in specification_data['services'])
-
-    document_file.render(specification_data)
-    document_file.save(specification_tmp_file_path)
+    
+    await create_word_template(specification_template_path, specification_data, specification_tmp_file_path)
 
     specification_info['order_number'] = specification_data['order_number']
     specification_info['tmp_file_path'] = specification_tmp_file_path
@@ -237,12 +236,20 @@ def create_specification_file(data):
 
     return specification_info
 
-def create_file(file_obj, path):
+async def create_word_template(template_path, data_to_template, file_path):
+
+    document_file = DocxTemplate(template_path)
+    document_file.render(data_to_template)
+    document_file.save(file_path)
+
+    return document_file
+
+async def create_file(file_obj, path):
     ext = re.findall(r'.\w+$', file_obj['name'])[0]
     full_name = f"{path}{uuid.uuid4()}{ext}"
 
-    with open(full_name, "wb") as file:
-        file.write(base64.b64decode(file_obj['file']))
+    async with aiofiles.open(full_name, "wb") as file:
+        await file.write(base64.b64decode(file_obj['file']))
 
     return full_name
 
@@ -282,25 +289,25 @@ def generate_quiz_order_number():
 
 
 async def find_existing_client(phone='', email=''):
-    if phone and email:
+    if phone or email:
         async for client in Client.objects.filter(Q(email=email) | Q(phone=phone)):
             target_client = client
 
     return target_client
 
 async def find_existing_data_by_contact(model, phone='', email=''):
-    if phone and email:
+    if phone or email:
         async for data in model.objects.filter(Q(email=email) | Q(phone=phone)):
             target_data = data
             
     return target_data
 
-async def get_all_city_data(model):
-    all_city = []
-    async for city in model.objects.all().values():
-        all_city.append(city)
+async def get_all_data_from_model(model):
+    model_data = []
+    async for data in model.objects.all().values():
+        model_data.append(data)
 
-    return all_city
+    return model_data
 
 async def generate_order_number(order_type, client_id=1):
     not_format_date = datetime.now()
@@ -311,6 +318,10 @@ async def generate_order_number(order_type, client_id=1):
         {'name': 'cooperation', 'length': 4, 'prefix': 'coop'},
         {'name': 'quiz', 'length': 4, 'prefix': 'quiz'},
         {'name': 'quiz_consult', 'length': 4, 'prefix': 'qzcut'},
+        {'name': 'quiz_tz', 'length': 4, 'prefix': 'qztz'},
+        {'name': 'vacancy_req', 'length': 4, 'prefix': 'vyrq'},
+        {'name': 'supl_consult', 'length': 4, 'prefix': 'sup_ct'},
+        {'name': 'excursion_req', 'length': 4, 'prefix': 'ex_rq'},
         {'name': 'tz_cosm', 'length': 4, 'prefix': 'tz_cprod'},
         {'name': 'tz_decor', 'length': 4, 'prefix': 'tz_dprod'},
     ]

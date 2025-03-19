@@ -253,3 +253,47 @@ view_func: CityDataView (GET) date: 2025-03-18 16:28:26 err_descr: dict() argume
 view_func: CityDataView (GET) date: 2025-03-18 16:28:35 err_descr: dict() argument after * must be an iterable, not CityData 
 view_func: CityDataView (GET) date: 2025-03-18 16:30:10 err_descr: 'coroutine' object has no attribute '_meta' 
 view_func: CityDataView (GET) date: 2025-03-18 16:30:11 err_descr: 'coroutine' object has no attribute '_meta' 
+view_func: TzOrderView (POST) date: 2025-03-19 14:29:07 err_descr: list index out of range 
+view_func: TzOrderView (POST) date: 2025-03-19 14:30:17 err_descr: list index out of range 
+view_func: TzOrderView (POST) date: 2025-03-19 14:37:16 err_descr: list index out of range 
+view_func: TzOrderView (POST) date: 2025-03-19 14:38:01 err_descr: list index out of range 
+view_func: TzOrderView (POST) date: 2025-03-19 14:38:37 err_descr: list index out of range 
+view_func: TzOrderView (POST) date: 2025-03-19 14:39:28 err_descr: list index out of range 
+view_func: TzOrderView (POST) date: 2025-03-19 14:43:44 err_descr: 'coroutine' object has no attribute '_committed' 
+view_func: ContactsRequestView (POST) date: 2025-03-19 14:55:08 err_descr: 'coroutine' object has no attribute '_committed' 
+view_func: ExcursionProductionView (POST) date: 2025-03-19 16:36:56 err_descr: list index out of range 
+view_func: ExcursionProductionView (POST) date: 2025-03-19 16:37:28 err_descr: type object 'datetime.datetime' has no attribute 'datetime' 
+view_func: ExcursionProductionView (POST) date: 2025-03-19 16:39:09 err_descr: descriptor 'time' for 'datetime.datetime' objects doesn't apply to a 'int' object 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:03:51 err_descr: 'coroutine' object has no attribute 'exists' 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:04:26 err_descr: 'coroutine' object has no attribute 'exists' 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:04:50 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:05:23 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:05:59 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:06:30 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:06:53 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:07:38 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:08:11 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:09:05 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:09:58 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:10:18 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:10:41 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:11:07 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:12:57 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:13:14 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:14:18 err_descr: local variable 'target_client' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:15:38 err_descr: local variable 'target_data' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:17:51 err_descr: local variable 'target_data' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:18:33 err_descr: local variable 'target_data' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:19:12 err_descr: local variable 'target_data' referenced before assignment 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 19:27:40 err_descr: list index out of range 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 20:15:49 err_descr: name 'order_obj' is not defined 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 20:16:40 err_descr: list index out of range 
+view_func: DecorativeCosmeticView (POST) date: 2025-03-19 20:19:24 err_descr: ClientOrder matching query does not exist. 
+view_func: SpecForProductionView (POST) date: 2025-03-19 22:55:36 err_descr: object NoneType can't be used in 'await' expression 
+view_func: SpecForProductionView (POST) date: 2025-03-19 22:56:33 err_descr: object NoneType can't be used in 'await' expression 
+view_func: SpecForProductionView (POST) date: 2025-03-19 22:57:19 err_descr: object dict can't be used in 'await' expression 
+view_func: SpecForProductionView (POST) date: 2025-03-19 23:00:07 err_descr: object NoneType can't be used in 'await' expression 
+view_func: SpecForProductionView (POST) date: 2025-03-19 23:04:47 err_descr: a coroutine was expected, got <docxtpl.template.DocxTemplate object at 0x70d27cd34610> 
+view_func: SpecForProductionView (POST) date: 2025-03-19 23:07:52 err_descr: a coroutine was expected, got None 
+view_func: SpecForProductionView (POST) date: 2025-03-19 23:09:21 err_descr: a coroutine was expected, got <docxtpl.template.DocxTemplate object at 0x71eb95334940> 
+view_func: SpecForProductionView (POST) date: 2025-03-19 23:13:07 err_descr: object DocxTemplate can't be used in 'await' expression 

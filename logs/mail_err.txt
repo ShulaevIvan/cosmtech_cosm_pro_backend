@@ -7,3 +7,5 @@ order_num:  date: 2025-03-16 11:16:42 send_form: specification_req  err_descr: [
 order_num:  date: 2025-03-16 15:39:21 send_form: vacancy_req  err_descr: [Errno 21] Is a directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/resume_files/fgfhg_Лаборант_+7 (999) 999-99-99' 
 order_num:  date: 2025-03-16 15:41:11 send_form: vacancy_req  err_descr: [Errno 21] Is a directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/resume_files/hjkhkj_Лаборант_+7 (999) 999-99-99' 
 order_num:  date: 2025-03-17 16:07:48 send_form: callback_req  err_descr: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1007) 
+order_num:  date: 2025-03-19 23:15:30 send_form: specification_req  err_descr: [Errno 2] No such file or directory: '<coroutine object create_file at 0x7d1932eba110>' 
+order_num:  date: 2025-03-19 23:16:40 send_form: specification_req  err_descr: [Errno 2] No such file or directory: '<coroutine object create_file at 0x7d1932e276f0>' 
