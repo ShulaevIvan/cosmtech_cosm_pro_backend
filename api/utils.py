@@ -4,7 +4,6 @@ import re
 import uuid
 import base64
 import random
-import asyncio
 import aiofiles
 from datetime import datetime
 from pprint import pprint
@@ -17,89 +16,21 @@ from .models import Order, Client
 
 from docxtpl import DocxTemplate
 
-def create_upload_folders():
-    upload_files = f'{os.getcwd()}/upload_files/'
-    order_files = f'{upload_files}/order_files/'
-    cooperation_files = f'{upload_files}/cooperation_files/'
-    download_files = f'{os.getcwd()}/download/'
-    company_files = f'{download_files}/company_files/'
-    quiz_files = f'{upload_files}/quiz_files/'
-    resume_files = f'{upload_files}/resume_files/'
-    log_folder = f'{os.getcwd()}/logs/'
-
-    if not os.path.exists(f'{upload_files}'):
-        os.mkdir(f'{upload_files}')
-    if not os.path.exists(f'{order_files}'):
-        os.mkdir(f'{order_files}')
-    if not os.path.exists(f'{cooperation_files}'):
-        os.mkdir(f'{cooperation_files}')
-    if not os.path.exists(f'{download_files}'):
-        os.mkdir(f'{download_files}')
-    if not os.path.exists(f'{company_files}'):
-        os.mkdir(f'{company_files}')
-    if not os.path.exists(f'{quiz_files}'):
-        os.mkdir(f'{quiz_files}')
-    if not os.path.exists(f'{resume_files}'):
-        os.mkdir(f'{resume_files}')
-    if not os.path.exists(f'{log_folder}'):
-        os.mkdir(log_folder)
-
-def rebuild_json():
-    result_data = []
-    i = 0
-    with open (f'{os.getcwd()}/download/fixtures_city.json', 'r') as file:
-        data = json.load(file)
-        for obj in data:
-            i = i + 1
-            result_data.append({
-                "pk": i,
-                "model": "api.CityData",
-                "fields": {
-                    "name": f'{obj["name"]}',
-                    "subject": f'{obj["subject"]}',
-                    "population": int(f'{obj["population"]}'),
-                    "range": int(obj["range"]),
-                    "lat": float(obj["coords"]["lat"]),
-                    "lon": float(obj["coords"]["lon"])
-                }
-            })
-        with open(f'{os.getcwd()}/download/fixtures_city2.json', 'w') as file:
-            json.dump(result_data, file, ensure_ascii=False, indent=4)
-
-
-def get_time(date):
-    result_str = ''
-
-    def add_zero_to_time(value):
-        if value < 10:
-            return f'0{value}'
-        return value
-    
-    time_arr = [
-        {"name": "hour", "value": date.hour},
-        {"name": "minute", "value": date.minute},
-        {"name": "second", "value": date.second},
-        {"name": "day", "value": date.day},
-        {"name": "month", "value": date.month},
-        {"name": "year", "value": date.year},
-    ]
-    
-    for time_obj in time_arr:
-        time_obj['value'] = add_zero_to_time(time_obj['value'])
-        if time_obj['name'] == 'hour' or time_obj['name'] == 'minute':
-            time_obj['value'] = f"{time_obj['value']}:"
-        elif time_obj['name'] == 'second':
-            time_obj['value'] = f"{time_obj['value']} Дата: "
-        elif time_obj['name'] == 'day' or time_obj['name'] == 'month':
-            time_obj['value'] = f"{time_obj['value']}/"
-        
-        result_str = result_str + str(time_obj['value'])
-
-    return f"Время: {result_str}"
-
 
 async def select_email_template_by_order(order_type):
     json_path = f'{os.getcwd()}/email_templates/email_templates.json'
+
+    with open(json_path, 'r') as json_file:
+        template_data = json.load(json_file)
+    
+    target_template = list(filter(lambda item: item.get('template_name') == order_type, template_data))
+    if len(target_template) > 0:
+        return target_template[0]
+    
+    return target_template
+
+async def select_client_email_template_by_order(order_type):
+    json_path = f'{os.getcwd()}/email_templates/client_email_templates.json'
 
     with open(json_path, 'r') as json_file:
         template_data = json.load(json_file)
@@ -162,49 +93,44 @@ async def write_access_view_err_log(err, method, view_name=''):
     
     
     
-def send_email_to_client(email_data, client_email):
-    pass
+async def send_email_to_client(email_template, client_name, client_email, order):
+    try:
+        if not client_name:
+            client_name = 'Аноним'
+        order_number = order.get('order_number')
+        order_time = order.get('order_date')
 
-def send_vacancy_request(send_data):
-    not_format_date = datetime.datetime.now()
-    time = get_time(not_format_date)
-    msg_mail = EmailMessage(
-            f"Новый отклик на вакансию {send_data['vacancy_data']} с сайта cosmtech.ru", 
+        pre_description = f'Ваш номер заявки {order_number}.'
+        email_template['email_subject'] = email_template.get('email_subject')
+        organization_contacts = email_template.get('organization_contacts')
+
+        msg_mail = EmailMessage(
+            f"{email_template.get('email_subject')}", 
             f"""
-                <p>Вакансия({send_data['vacancy_data']})</p>
-                <p>Имя({send_data['resume_name']})</p>
-                <p>Телефон: {send_data['resume_phone']}
-                <p><b>{time}</b></p>
+                <h4>Описание:</h4>
+                <p>Здравствуйте {client_name}!</p>
+                <p>{email_template.get('email_body_description')}</p>
+
+
+                <p>№ запроса: <strong>{order_number}</strong></p>
+                <p><strong>{order_time}</strong></p>
+
+                <h4>Контакты ООО Космотех</h4>
+                <ul>
+                    {''.join(f"<li>{item.get('name')} : <a href='{item.get('link')}'>{''.join(item['value'])}</a></li>" for item in organization_contacts)}
+                </ul>
+
             """,
-            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
-    )
-    msg_mail.content_subtype = "html"
-    if send_data['resume_file']:
-        msg_mail.attach_file(f'{send_data["resume_file"]}')
-    msg_mail.send()
+            f'{settings.EMAIL_HOST_USER}', [f"{settings.EMAIL_ORDER_ADDRESS}"]
+        )
+        msg_mail.content_subtype = "html"
+        msg_mail.send()
 
-def validate_email(email_str):
-    email_pattern = r'\S*\@\S*\.\w{2,10}$'
-    check_email_valid = re.match(email_pattern, email_str)
-    if check_email_valid and len(check_email_valid.group(0)) > 0:
-        return True
-    return False
+    except Exception as err:
+        await write_email_err_log(err, email_template.get('template_name'), order_number)
 
-def generate_specification_number(filename):
-    pattern = r'^spec_[a-z|0-9|A-Z]{8}'
-    check_str = re.match(pattern, filename)
-    if check_str and check_str.group(0):
-        return check_str.group(0)
-    return False
 
-def keys_form_camel_case_to_python_style(data):
-    result_dict = dict()
-
-    for key, value in data.items():
-        valid_key = ''.join('_' + char.lower() if char.isupper() else char.strip() for char in key).strip()
-        result_dict[valid_key] = value
-
-    return result_dict
+    
 
 async def create_specification_file(data):
     specification_info = dict()
@@ -253,40 +179,6 @@ async def create_file(file_obj, path):
 
     return full_name
 
-def get_request_name(value):
-    request_types = {
-        'contract': 'Контрактное производство',
-        'lab': 'Услуги лаборатории',
-        'pack': 'Упаковка и сопровождение',
-        'cert': 'Сертификаиця продукции',
-        'trade': 'Торговое предложение',
-        'cooperation': 'Сотрудничество',
-        'decor': 'Декоративная косметика производство',
-        'msg': 'Мессанджеры',
-        'phone': 'Телефон',
-        'email': 'Email',
-
-    }
-    return request_types.get(value)
-
-def generate_simple_order_number(prefix):
-    order_modifer = []
-    for i in range(6):
-        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
-    order_modifer.append(prefix)
-    order_modifer = f''.join(map(str, order_modifer))
-
-    return order_modifer
-
-def generate_quiz_order_number():
-    order_modifer = []
-    for i in range(6):
-        order_modifer.append(chr(random.randint(ord('A'), ord('Z'))))
-    order_modifer.append('_qz_oer')
-    order_modifer = f''.join(map(str, order_modifer))
-
-    return order_modifer
-
 
 async def find_existing_client(phone='', email=''):
     if phone or email:
@@ -313,6 +205,7 @@ async def generate_order_number(order_type, client_id=1):
     not_format_date = datetime.now()
     time = get_time(not_format_date)
     order_type_arr = [
+        {'name': 'consult', 'length': 4, 'prefix': 'ct_rq'},
         {'name': 'contract', 'length': 6, 'prefix': 'cprod'},
         {'name': 'contract_decorative', 'length': 3, 'prefix': 'cprod_dec'},
         {'name': 'cooperation', 'length': 4, 'prefix': 'coop'},
@@ -333,3 +226,142 @@ async def generate_order_number(order_type, client_id=1):
     order_modifer = f"{target_order_type[0].get('prefix')}_" + ''.join(map(str, order_modifer)) + f'_{client_id}'
 
     return {'order_number': order_modifer, 'not_format_date': not_format_date, 'order_date': time}
+
+
+def create_upload_folders():
+    upload_files = f'{os.getcwd()}/upload_files/'
+    order_files = f'{upload_files}/order_files/'
+    cooperation_files = f'{upload_files}/cooperation_files/'
+    download_files = f'{os.getcwd()}/download/'
+    company_files = f'{download_files}/company_files/'
+    quiz_files = f'{upload_files}/quiz_files/'
+    resume_files = f'{upload_files}/resume_files/'
+    log_folder = f'{os.getcwd()}/logs/'
+
+    if not os.path.exists(f'{upload_files}'):
+        os.mkdir(f'{upload_files}')
+    if not os.path.exists(f'{order_files}'):
+        os.mkdir(f'{order_files}')
+    if not os.path.exists(f'{cooperation_files}'):
+        os.mkdir(f'{cooperation_files}')
+    if not os.path.exists(f'{download_files}'):
+        os.mkdir(f'{download_files}')
+    if not os.path.exists(f'{company_files}'):
+        os.mkdir(f'{company_files}')
+    if not os.path.exists(f'{quiz_files}'):
+        os.mkdir(f'{quiz_files}')
+    if not os.path.exists(f'{resume_files}'):
+        os.mkdir(f'{resume_files}')
+    if not os.path.exists(f'{log_folder}'):
+        os.mkdir(log_folder)
+
+def rebuild_json():
+    result_data = []
+    i = 0
+    with open (f'{os.getcwd()}/download/fixtures_city.json', 'r') as file:
+        data = json.load(file)
+        for obj in data:
+            i = i + 1
+            result_data.append({
+                "pk": i,
+                "model": "api.CityData",
+                "fields": {
+                    "name": f'{obj["name"]}',
+                    "subject": f'{obj["subject"]}',
+                    "population": int(f'{obj["population"]}'),
+                    "range": int(obj["range"]),
+                    "lat": float(obj["coords"]["lat"]),
+                    "lon": float(obj["coords"]["lon"])
+                }
+            })
+        with open(f'{os.getcwd()}/download/fixtures_city2.json', 'w') as file:
+            json.dump(result_data, file, ensure_ascii=False, indent=4)
+
+def get_time(date):
+    result_str = ''
+
+    def add_zero_to_time(value):
+        if value < 10:
+            return f'0{value}'
+        return value
+    
+    time_arr = [
+        {"name": "hour", "value": date.hour},
+        {"name": "minute", "value": date.minute},
+        {"name": "second", "value": date.second},
+        {"name": "day", "value": date.day},
+        {"name": "month", "value": date.month},
+        {"name": "year", "value": date.year},
+    ]
+    
+    for time_obj in time_arr:
+        time_obj['value'] = add_zero_to_time(time_obj['value'])
+        if time_obj['name'] == 'hour' or time_obj['name'] == 'minute':
+            time_obj['value'] = f"{time_obj['value']}:"
+        elif time_obj['name'] == 'second':
+            time_obj['value'] = f"{time_obj['value']} Дата: "
+        elif time_obj['name'] == 'day' or time_obj['name'] == 'month':
+            time_obj['value'] = f"{time_obj['value']}/"
+        
+        result_str = result_str + str(time_obj['value'])
+
+    return f"Время: {result_str}"
+
+
+def get_request_name(value):
+    request_types = {
+        'contract': 'Контрактное производство',
+        'lab': 'Услуги лаборатории',
+        'pack': 'Упаковка и сопровождение',
+        'cert': 'Сертификаиця продукции',
+        'trade': 'Торговое предложение',
+        'cooperation': 'Сотрудничество',
+        'decor': 'Декоративная косметика производство',
+        'msg': 'Мессанджеры',
+        'phone': 'Телефон',
+        'email': 'Email',
+
+    }
+    return request_types.get(value)
+
+
+def send_vacancy_request(send_data):
+    not_format_date = datetime.datetime.now()
+    time = get_time(not_format_date)
+    msg_mail = EmailMessage(
+            f"Новый отклик на вакансию {send_data['vacancy_data']} с сайта cosmtech.ru", 
+            f"""
+                <p>Вакансия({send_data['vacancy_data']})</p>
+                <p>Имя({send_data['resume_name']})</p>
+                <p>Телефон: {send_data['resume_phone']}
+                <p><b>{time}</b></p>
+            """,
+            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
+    )
+    msg_mail.content_subtype = "html"
+    if send_data['resume_file']:
+        msg_mail.attach_file(f'{send_data["resume_file"]}')
+    msg_mail.send()
+
+def validate_email(email_str):
+    email_pattern = r'\S*\@\S*\.\w{2,10}$'
+    check_email_valid = re.match(email_pattern, email_str)
+    if check_email_valid and len(check_email_valid.group(0)) > 0:
+        return True
+    return False
+
+def generate_specification_number(filename):
+    pattern = r'^spec_[a-z|0-9|A-Z]{8}'
+    check_str = re.match(pattern, filename)
+    if check_str and check_str.group(0):
+        return check_str.group(0)
+    return False
+
+def keys_form_camel_case_to_python_style(data):
+    result_dict = dict()
+
+    for key, value in data.items():
+        valid_key = ''.join('_' + char.lower() if char.isupper() else char.strip() for char in key).strip()
+        result_dict[valid_key] = value
+
+    return result_dict

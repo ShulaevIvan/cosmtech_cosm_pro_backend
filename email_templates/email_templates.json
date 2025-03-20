@@ -3,19 +3,11 @@
         "id": 1,
         "template_name": "callback_req",
         "email_subject": "Заказ обратного звонка с сайта cosmtech.ru",
-        "email_body_description": "Пришел запрос перезвонить клиенту(консультация)",
+        "email_body_description": "Пришел запрос перезвонить клиенту(консультация).",
         "fields": [
             {
                 "name": "phone",
                 "value": "Телефон"
-            },
-            {
-                "name": "time",
-                "value": "Время"
-            },
-            {
-                "name": "type",
-                "value": "Тип"
             }
         ],
         "response_title": "",

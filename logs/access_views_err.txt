@@ -297,3 +297,10 @@ view_func: SpecForProductionView (POST) date: 2025-03-19 23:04:47 err_descr: a c
 view_func: SpecForProductionView (POST) date: 2025-03-19 23:07:52 err_descr: a coroutine was expected, got None 
 view_func: SpecForProductionView (POST) date: 2025-03-19 23:09:21 err_descr: a coroutine was expected, got <docxtpl.template.DocxTemplate object at 0x71eb95334940> 
 view_func: SpecForProductionView (POST) date: 2025-03-19 23:13:07 err_descr: object DocxTemplate can't be used in 'await' expression 
+view_func: CallbackRequestView (POST) date: 2025-03-20 14:14:17 err_descr: the JSON object must be str, bytes or bytearray, not coroutine 
+view_func: CallbackRequestView (POST) date: 2025-03-20 14:14:27 err_descr: the JSON object must be str, bytes or bytearray, not coroutine 
+view_func: CallbackRequestView (POST) date: 2025-03-20 14:14:35 err_descr: the JSON object must be str, bytes or bytearray, not coroutine 
+view_func: RequestOrderView (POST) date: 2025-03-20 15:20:19 err_descr: select_client_email_template_by_order() missing 1 required positional argument: 'client_data' 
+view_func: RequestOrderView (POST) date: 2025-03-20 15:26:28 err_descr: send_email_to_client() missing 1 required positional argument: 'order' 
+view_func: CallbackRequestView (POST) date: 2025-03-20 18:18:50 err_descr: list index out of range 
+view_func: CallbackRequestView (POST) date: 2025-03-20 18:19:12 err_descr: list index out of range 

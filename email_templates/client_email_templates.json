@@ -1,0 +1,213 @@
+[
+    {
+        "id": 1,
+        "template_name": "consult_req",
+        "email_subject": "Запрос консультации по услугам контрактного производстваcosmtech.ru",
+        "email_body_description": "Запрос консультации по услугам контрактного производства принят!",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 2,
+        "template_name": "order_req",
+        "email_subject": "Ваш запрос на расчет стоимости контрактного производства принят!",
+        "email_body_description": "Вы оставили заявку на расчет стоимости контрактного производства. \n Менеджеры свяжутся с сами в ближайшее время по email/телефону который вы указали в заявке.",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 3,
+        "template_name": "contacts_order_req",
+        "email_subject": "Общий запрос со страницы контакты с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+        
+    },
+    {
+        "id": 4,
+        "template_name": "contacts_coperation_req",
+        "email_subject": "Запрос сотрудничества (страница контакты) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 5,
+        "template_name": "quiz_req",
+        "email_subject": "Запрос контраткного производства (калькулятор) с сайта cosmtech.ru",
+        "email_body_description": "Пришел запрос с кальклятора производства. Он ппц какой неточный) Нужно забить данные, но ЕС пока их не дала)",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 6,
+        "template_name": "question_req",
+        "email_subject": "Задать вопрос технологу (раздел калькулятор) с сайта cosmtech.ru",
+        "email_body_description": "Новызй запрос задать вопрос технологу",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 7,
+        "template_name": "tz_req",
+        "email_subject": "ТЗ на контрактное производство (калькулятор) с сайта cosmtech.ru",
+        "email_body_description": "Отправлен файл с ТЗ на разработку косметики.",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 8,
+        "template_name": "vacancy_req",
+        "email_subject": "Отправлен отклик на вакансию с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 9,
+        "template_name": "for_clients_supl_req",
+        "email_subject": "Запрос на помощь с поставщиками с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос на подбор поставщиков по дизайну или упаковке",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 10,
+        "template_name": "for_clients_prod_req",
+        "email_subject": "Запрос на уточнить детали работы по контрактному производству с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 11,
+        "template_name": "for_clients_req",
+        "email_subject": "Задать вопрос (стр клиентов) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 12,
+        "template_name": "excursion_req",
+        "email_subject": "Запрос на (экскурсия на производство) от клиента с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 13,
+        "template_name": "decorative_cosm_req",
+        "email_subject": "Запрос на (Контрактное производство декоративной косметики) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 14,
+        "template_name": "specification_req",
+        "email_subject": "Новый запрос (Отправка ТЗ онлайн) с сайта cosmtech.ru",
+        "email_body_description": "",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    }
+]

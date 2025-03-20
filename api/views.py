@@ -2,6 +2,7 @@ import re
 import os
 import json
 import asyncio
+import aiofiles
 from datetime import datetime
 import datetime as dt
 from pprint import pprint
@@ -15,15 +16,14 @@ from django.http import FileResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from asgiref.sync import sync_to_async
 from adrf.views import APIView
-from .utils import validate_email, create_specification_file, \
-create_file, get_request_name, generate_simple_order_number, generate_quiz_order_number, \
-find_existing_client, generate_order_number, get_time, find_existing_data_by_contact, get_all_data_from_model
+from .utils import validate_email, create_specification_file, create_file, get_request_name, \
+    generate_order_number, get_time, find_existing_data_by_contact, get_all_data_from_model
 
-from.utils import write_access_view_err_log, select_email_template_by_order, send_order_to_main_email, send_vacancy_request
+from.utils import write_access_view_err_log, select_email_template_by_order, select_client_email_template_by_order, \
+    send_order_to_main_email, send_email_to_client
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
@@ -63,17 +63,17 @@ class CallbackRequestView(APIView):
             pass
         except Exception as err:
             method = request.method
-            access_log = asyncio.create_task(write_access_view_err_log(err, method, 'CallbackRequestView'))
-            await asyncio.run(access_log)
+            await write_access_view_err_log(err, method, 'CallbackRequestView')
         
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
     
     async def post(self, request):
         try:
             req_body = json.loads(request.body)
-
-            not_format_date = datetime.now()
-            time = get_time(not_format_date)
+            order = await generate_order_number('consult', 1)
+            not_format_date = order.get('not_format_date')
+            time = order.get('order_date')
+            order_number = order.get('order_number')
             email_data = {
                 'phone': req_body.get('phone'),
                 'time': req_body.get('time'),
@@ -81,17 +81,15 @@ class CallbackRequestView(APIView):
             }
 
             if email_data.get('phone'):
-                email_template = await asyncio.create_task(select_email_template_by_order(self.order_type))
-                send_email = asyncio.create_task(send_order_to_main_email(email_template, email_data, time))
+                email_template = await select_email_template_by_order(self.order_type)
                 response_description = email_template.get('response_description')
-
+                
                 await CallbackRequests.objects.acreate(
                     phone = email_data.get('phone'),
                     name = '',
                     request_time = not_format_date
                 )
-                
-                await send_email
+                await send_order_to_main_email(email_template, email_data, time, order_number)
 
                 return Response(
                     {'message': 'ok', 'description': response_description}, 
@@ -104,7 +102,7 @@ class CallbackRequestView(APIView):
 
         except Exception as err:
             method = request.method
-            create_err_log = asyncio.create_task(write_access_view_err_log(err, method, 'CallbackRequestView'))
+            create_err_log = await write_access_view_err_log(err, method, 'CallbackRequestView')
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             await create_err_log
@@ -123,8 +121,10 @@ class RequestConsultView(APIView):
         try:
             req_body = json.loads(json.dumps(request.data))
             email_template = await select_email_template_by_order(self.order_type)
-            not_format_date = datetime.now()
-            time = get_time(not_format_date)
+            order = await generate_order_number('consult', 1)
+            not_format_date = order.get('not_format_date')
+            time = order.get('order_date')
+            order_number = order.get('order_number')
             response_description = email_template.get('response_description')
             consult_data = {
                 'name': req_body.get('name'),
@@ -165,11 +165,12 @@ class RequestConsultView(APIView):
                 'order_type_name': 'Консультация',
                 'client_comment': consult_data.get('comment'),
             }
-            await send_order_to_main_email(email_template, client_data, time)
+            await send_order_to_main_email(email_template, client_data, time, order_number)
 
-            if validate_email(client_data.get('client_email')):
-                print('test0')
-                # send_mail_to_client(client_data)
+            # if validate_email(client_data.get('client_email')):
+            #     client_template = await select_email_template_by_order(self.order_type, True)
+            #     send_email_to_client(self.order_type, client_template)
+            #     send_mail_to_client(client_data)
         
             return Response(
                 {'message': 'ok', 'description': response_description}, 
@@ -251,10 +252,14 @@ class RequestOrderView(APIView):
             }
             await send_order_to_main_email(email_template, client_data, time)
 
-
-            # if validate_email(client_data.get('client_email')):
-            #     print('tset ok')
-            #     # send_mail_to_client(client_data)
+            if validate_email(client_data.get('client_email')):
+                client_email_template = await select_client_email_template_by_order(self.order_type)
+                await send_email_to_client(
+                    client_email_template, 
+                    client_data.get('client_name'),
+                    client_data.get('client_email'),  
+                    order
+                )
 
             return Response(
                 {'message': 'ok', 'description': f"{response_description} {client_data.get('order_number')}"}, 
@@ -347,8 +352,14 @@ class ContactsRequestView(APIView):
                 }
                 client_data['files'] = client_files
                 response_description = email_template.get('response_description')
-                send_email = await send_order_to_main_email(email_template, client_data, time)
-                # send_mail_to_client(client_data)
+
+                await send_order_to_main_email(email_template, client_data, time)
+
+                # if validate_email(client_data.get('client_email')):
+                #     pprint('test22')
+                #     client_template = await select_email_template_by_order(self.order_type, True)
+                #     await send_email_to_client(self.order_type, client_template)
+
 
                 return Response(
                     {'message': 'ok', 'description': f"{response_description} {order.get('order_number')}"}, 
@@ -1154,7 +1165,7 @@ class SpecForProductionView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
-
+@sync_to_async
 @api_view(['GET'])
 def get_tz_template(request):
     try:
@@ -1179,6 +1190,7 @@ def get_tz_template(request):
 
         return Response({'status': 'err', 'description': err}, status=status.HTTP_400_BAD_REQUEST)
     
+@sync_to_async
 @api_view(['GET'])
 def get_presentation(request):
     try:
@@ -1201,7 +1213,8 @@ def get_presentation(request):
         write_access_view_err_log(err, method, 'get_presentation')
 
         return Response({'status': 'err', 'description': err}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+@sync_to_async 
 @permission_classes([IsAuthenticated,]) 
 @api_view(['GET'])
 def download_admin_file(request):
