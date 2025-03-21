@@ -32,8 +32,8 @@
     {
         "id": 3,
         "template_name": "contacts_order_req",
-        "email_subject": "Общий запрос со страницы контакты с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Ваш запрос c сайта cosmtech.ru",
+        "email_body_description": "Вы оставили заявку на расчет стоимости контрактного производства. \n Менеджеры свяжутся с сами в ближайшее время по email/телефону который вы указали в заявке.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -48,8 +48,8 @@
     {
         "id": 4,
         "template_name": "contacts_coperation_req",
-        "email_subject": "Запрос сотрудничества (страница контакты) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Ваш запрос сотрудничества с сайта cosmtech.ru",
+        "email_body_description": "Ваша заявка на сотрудничество принята, менеджер перезвонит/напишет в ближайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -63,8 +63,8 @@
     {
         "id": 5,
         "template_name": "quiz_req",
-        "email_subject": "Запрос контраткного производства (калькулятор) с сайта cosmtech.ru",
-        "email_body_description": "Пришел запрос с кальклятора производства. Он ппц какой неточный) Нужно забить данные, но ЕС пока их не дала)",
+        "email_subject": "Ваш запрос на производство с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос на производство принят. Менеджер свяжется с вами в ближайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -78,8 +78,8 @@
     {
         "id": 6,
         "template_name": "question_req",
-        "email_subject": "Задать вопрос технологу (раздел калькулятор) с сайта cosmtech.ru",
-        "email_body_description": "Новызй запрос задать вопрос технологу",
+        "email_subject": "Задать вопрос технологу с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос принят! менеджер/технолог свяжется с вами в ближайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -93,8 +93,8 @@
     {
         "id": 7,
         "template_name": "tz_req",
-        "email_subject": "ТЗ на контрактное производство (калькулятор) с сайта cosmtech.ru",
-        "email_body_description": "Отправлен файл с ТЗ на разработку косметики.",
+        "email_subject": "Ваше техзадание с сайта cosmtech.ru",
+        "email_body_description": "Ваш файл с тз отправлен. Менеджер свяжется с вами в ближайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -109,7 +109,7 @@
         "id": 8,
         "template_name": "vacancy_req",
         "email_subject": "Отправлен отклик на вакансию с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_body_description": "Спасибо! Мы получили ваш отклик. Специалист сваяжется с вами в ближайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -123,8 +123,8 @@
     {
         "id": 9,
         "template_name": "for_clients_supl_req",
-        "email_subject": "Запрос на помощь с поставщиками с сайта cosmtech.ru",
-        "email_body_description": "Новый запрос на подбор поставщиков по дизайну или упаковке",
+        "email_subject": "Ваш запрос по поставщикам с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос по поставщикам принят. Менеджер свяжется с вами в билжайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -138,8 +138,8 @@
     {
         "id": 10,
         "template_name": "for_clients_prod_req",
-        "email_subject": "Запрос на уточнить детали работы по контрактному производству с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Ваш запрос по контрактному производству с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос по уточнить детали сотрудничества принят. Менеджер свяжется с вами в билжайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -168,8 +168,8 @@
     {
         "id": 12,
         "template_name": "excursion_req",
-        "email_subject": "Запрос на (экскурсия на производство) от клиента с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Ваш запрос экскурсия на производство с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос на экскурсию принят. Менеджер свяжется с вами в билжайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -183,8 +183,8 @@
     {
         "id": 13,
         "template_name": "decorative_cosm_req",
-        "email_subject": "Запрос на (Контрактное производство декоративной косметики) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Ваш запрос консультации по производству декоративной косметики с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос на контрактное производство декоративной косметики принят. Менеджер свяжется с вами в ближайшее время.",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
@@ -197,9 +197,24 @@
     },
     {
         "id": 14,
+        "template_name": "decorative_cosm_req_order",
+        "email_subject": "Ваш запрос на контрактное производство декоративной косметики с сайта cosmtech.ru",
+        "email_body_description": "Ваш запрос на контрактное производство декоративной косметики принят. Менеджер свяжется с вами в ближайшее время.",
+        "organization_contacts": [
+            {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
+            {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},
+            {"name": "Telegram:", "value": "+7 (964)-363-72-72", "link": "https://t.me/+79643637272"},
+            {"name": "Whatsapp:", "value": "+7 (964)-363-72-72", "link": "https://wa.me/+79643637272"},
+            {"name": "Группа Вконтакте", "value": "https://vk.com/cosmtech", "link": "https://vk.com/cosmtech"},
+            {"name": "Адрес производства", "value": "город Санкт-Петербург, ул Салова 27 АБ", "link": "https://yandex.ru/maps/?rtext=~59.895998,30.374016"},
+            {"name": "Режим работы:", "value": "Режим работы офиса: пн-пт с 10:00 до 18:00", "link": ""}
+        ]
+    },
+    {
+        "id": 15,
         "template_name": "specification_req",
-        "email_subject": "Новый запрос (Отправка ТЗ онлайн) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_subject": "Ваше техзадание успешно отправлено с сайта cosmtech.ru",
+        "email_body_description": "Ваше техзадание успешно отправлено. Менеджер свяжется с вами в ближайшее время",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},
             {"name": "Email", "value": "pro@cosmtech.ru", "link": "mailto:pro@cosmtech.ru"},

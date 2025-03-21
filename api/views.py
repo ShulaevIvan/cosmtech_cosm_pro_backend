@@ -1,8 +1,6 @@
 import re
 import os
 import json
-import asyncio
-import aiofiles
 from datetime import datetime
 import datetime as dt
 from pprint import pprint
@@ -167,10 +165,9 @@ class RequestConsultView(APIView):
             }
             await send_order_to_main_email(email_template, client_data, time, order_number)
 
-            # if validate_email(client_data.get('client_email')):
-            #     client_template = await select_email_template_by_order(self.order_type, True)
-            #     send_email_to_client(self.order_type, client_template)
-            #     send_mail_to_client(client_data)
+            if validate_email(client_data.get('client_email')):
+                client_template = await select_email_template_by_order(self.order_type, True)
+                send_email_to_client(self.order_type, client_template)
         
             return Response(
                 {'message': 'ok', 'description': response_description}, 
@@ -281,8 +278,6 @@ class ContactsRequestView(APIView):
         try:
             req_body = json.loads(json.dumps(request.data))
             email_template = await select_email_template_by_order(self.order_type)
-            not_format_date = datetime.now()
-            time = get_time(not_format_date)
             order_types = ['contract', 'lab', 'pack', 'cert']
             order_cooperations = ['trade', 'cooperation']
             file_path = ''
@@ -302,6 +297,8 @@ class ContactsRequestView(APIView):
         
             if contacts_data.get('orderType') in order_types and contacts_data.get('orderType') not in order_cooperations:
                 target_client = await find_existing_data_by_contact(Client, contacts_data.get('phone'), contacts_data.get('email'))
+                order = await generate_order_number('contract', target_client.id)
+                time = order.get('order_date')
                 
                 if not target_client:
                     Client.objects.acreate(
@@ -315,7 +312,6 @@ class ContactsRequestView(APIView):
                         email=contacts_data.get('email')
                     )
 
-                order = await generate_order_number('contract', target_client.id)
                 order_obj = await Order.objects.acreate(
                     order_type=order.get('order_number'), 
                     order_date=order.get('not_format_date')
@@ -355,11 +351,14 @@ class ContactsRequestView(APIView):
 
                 await send_order_to_main_email(email_template, client_data, time)
 
-                # if validate_email(client_data.get('client_email')):
-                #     pprint('test22')
-                #     client_template = await select_email_template_by_order(self.order_type, True)
-                #     await send_email_to_client(self.order_type, client_template)
-
+                if validate_email(client_data.get('client_email')):
+                        client_email_template = await select_client_email_template_by_order(self.order_type)
+                        await send_email_to_client(
+                            client_email_template, 
+                            client_data.get('client_name'),
+                            client_data.get('client_email'),  
+                            order
+                        )
 
                 return Response(
                     {'message': 'ok', 'description': f"{response_description} {order.get('order_number')}"}, 
@@ -367,7 +366,11 @@ class ContactsRequestView(APIView):
                 )
         
             elif contacts_data.get('orderType') in order_cooperations and contacts_data.get('orderType') not in order_types:
-                email_template = await select_email_template_by_order('contacts_coperation_req')
+                self.order_type = 'contacts_coperation_req'
+                email_template = await select_email_template_by_order(self.order_type)
+                order = await generate_order_number('cooperation', 1)
+                time = order.get('order_date')
+
                 if contacts_data.get('phone') or contacts_data.get('email'):
                     cooperation_request = await find_existing_data_by_contact(CoperationRequest, contacts_data.get('phone'), contacts_data.get('email'))
 
@@ -403,12 +406,17 @@ class ContactsRequestView(APIView):
                     }
                     client_data['files'] = cooperation_files
                     response_description = email_template.get('response_description')
-                    send_email = await send_order_to_main_email(email_template, client_data, time)
+
+                    await send_order_to_main_email(email_template, client_data, time)
 
                     if validate_email(client_data.get('client_email')):
-                        print('tset ok')
-                        # send_mail_to_client(client_data)
-
+                        client_email_template = await select_client_email_template_by_order(self.order_type)
+                        await send_email_to_client(
+                            client_email_template, 
+                            client_data.get('client_name'),
+                            client_data.get('client_email'),  
+                            order
+                        )
                     return Response(
                         {'message': 'ok', 'description': f"{response_description}"}, 
                         status=status.HTTP_201_CREATED
@@ -580,13 +588,16 @@ class QuizOrderView(APIView):
             if email_data.get('custom_tz_file') or email_data.get('custom_package_file'):
                 email_data['files'] = [email_data.get('custom_tz_file'), email_data.get('custom_package_file')]
 
-            send_email = await send_order_to_main_email(email_template, email_data, time)
+            await send_order_to_main_email(email_template, email_data, time)
 
             if validate_email(email_data.get('client_email')):
-                print('tset ok')
-
-            # send_quiz_result_to_email(email_data, 'quiz')
-            # send_quiz_to_client(email_data)
+                client_email_template = await select_client_email_template_by_order(self.order_type)
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
 
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
@@ -646,11 +657,16 @@ class QuestionOrderView(APIView):
                 'communication_type': client_communication_type,
                 'client_question': client_question
             }
+            await send_order_to_main_email(email_template, email_data, time)
+
             if validate_email(email_data.get('client_email')):
-                print('tset ok')
-                # send_quiz_to_client(email_data)
-            # send_quiz_result_to_email(email_data, 'question')
-            send_email = await send_order_to_main_email(email_template, email_data, time)
+                client_email_template = await select_client_email_template_by_order(self.order_type)
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
 
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
@@ -718,12 +734,17 @@ class TzOrderView(APIView):
             }
 
             email_data['file'] = email_data.get('tz_file')
-            if validate_email(email_data.get('client_email')):
-                print('tset ok')
-                # send_quiz_to_client(email_data)
-            send_email = await send_order_to_main_email(email_template, email_data, order_time)
-            # send_quiz_result_to_email(email_data, 'tz')
+            await send_order_to_main_email(email_template, email_data, order_time)
 
+            if validate_email(email_data.get('client_email')):
+                client_email_template = await select_client_email_template_by_order(self.order_type)
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
+            
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
         except Exception as err:
@@ -769,7 +790,6 @@ class VacancyView(APIView):
             send_data = json.loads(json.dumps(request.data))
             email_template = await select_email_template_by_order(self.order_type)
             order = await generate_order_number('vacancy_req', 1)
-            not_format_date = order.get('not_format_date')
             order_time = order.get('order_date')
             vacancy_data = {
                 'resume_name': send_data.get('name'),
@@ -798,8 +818,7 @@ class VacancyView(APIView):
             if vacancy_data.get('resume_file'):
                 vacancy_data['files'] = [vacancy_data.get('resume_file')]
             
-            send_email = await send_order_to_main_email(email_template, vacancy_data, order_time)
-            # send_vacancy_request(vacancy_data)
+            send_order_to_main_email(email_template, vacancy_data, order_time)
 
             return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
         
@@ -869,8 +888,8 @@ class ForClientsRequestView(APIView):
             if not client_data.get('phone') and not client_data.get('email'):
                 return Response({'status': 'err', 'message': 'phone or email not found'}, status=status.HTTP_200_OK)
         
-        
-            if client_data.get('request_type') and client_data.get == 'suplconsult':
+           
+            if client_data.get('request_type') and client_data.get('request_type') == 'suplconsult':
                 self.order_type = 'for_clients_supl_req'
                 email_data['order_type'] = client_data.get('request_type')
                 email_data['order_type_name'] = 'Вопрос по поставщикам'
@@ -879,7 +898,7 @@ class ForClientsRequestView(APIView):
                 description = f'Спасибо за ваше обращение {"".join(str(email_data["client_name"]))} менеджер свяжется с вами в течении 30 мин.'
                 email_data['description'] = description
 
-            elif client_data['request_type'] and client_data['request_type'] == 'prodquestion':
+            elif client_data.get('request_type') and client_data.get('request_type') == 'prodquestion':
                 self.order_type = 'for_clients_prod_req'
                 email_data['order_type'] = client_data.get('request_type')
                 email_data['order_type_name'] = 'Вопрос по работе производства'
@@ -898,7 +917,17 @@ class ForClientsRequestView(APIView):
                     'comment': client_data.get('comment'),
                 }
             email_template = await select_email_template_by_order(self.order_type)
-            send_email = await send_order_to_main_email(email_template, email_data, order_time)
+            await send_order_to_main_email(email_template, email_data, order_time)
+
+            if validate_email(email_data.get('client_email')):
+                client_email_template = await select_client_email_template_by_order(self.order_type)
+
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
 
             return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
         
@@ -955,8 +984,7 @@ class ExcursionProductionView(APIView):
             client_data['excursion_data'] = excursion_data
             client_data['excursion_time'] = excursion_time
 
-            send_email = await send_order_to_main_email(email_template, client_data, order_time)
-            # send_excursion_to_email(client_data)
+            await send_order_to_main_email(email_template, client_data, order_time)
 
             return Response({'status': 'ok', 'description': send_description}, status=status.HTTP_201_CREATED)
         
@@ -998,7 +1026,16 @@ class DecorativeCosmeticView(APIView):
                 client_data['order_type'] = 'decorative_consult'
                 client_data['order_type_name'] = 'Декоративная косметика консультация'
             
-                send_email = await send_order_to_main_email(email_template, client_data, order_time)
+                await send_order_to_main_email(email_template, client_data, order_time)
+
+                if validate_email(client_data.get('client_email')):
+                    client_email_template = await select_client_email_template_by_order(self.order_type)
+                    await send_email_to_client(
+                        client_email_template, 
+                        client_data.get('client_name'),
+                        client_data.get('client_email'),
+                        order
+                    )
 
                 return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
         
@@ -1053,11 +1090,17 @@ class DecorativeCosmeticView(APIView):
                     'order_type_name': get_request_name('decor'),
                 }
                 client_data['files'] = client_files
-                
-                if validate_email(client_email):
-                    pass
 
-                send_email = await send_order_to_main_email(email_template, client_data, order_time)
+                await send_order_to_main_email(email_template, client_data, order_time)
+
+                if validate_email(client_data.get('client_email')):
+                    client_email_template = await select_client_email_template_by_order('decorative_cosm_req_order')
+                    await send_email_to_client(
+                        client_email_template, 
+                        client_data.get('client_name'),
+                        client_data.get('client_email'),
+                        order
+                    )
                 
                 return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
             
@@ -1080,8 +1123,8 @@ class SpecForProductionView(APIView):
             send_data = json.loads(json.dumps(request.data))
             happy_state_description = dict()
             email_template = await select_email_template_by_order(self.order_type)
-            not_format_date = datetime.now()
-            order_time = get_time(not_format_date)
+            order = await generate_order_number('tz_cosm', 1)
+            order_time = order.get('order_date')
 
             specification_data = await create_specification_file(send_data)
             specification_data['client_email'] = send_data.get('customerEmail')
@@ -1150,8 +1193,16 @@ class SpecForProductionView(APIView):
             if specification_data['product_example_file']['path']:
                 specification_data['files'].append(specification_data['product_example_file']['path'])
 
-            send_email = await send_order_to_main_email(email_template, specification_data, order_time)
-            # send_production_spec_to_email(specification_data)
+            await send_order_to_main_email(email_template, specification_data, order_time)
+
+            if validate_email(specification_data.get('client_email')):
+                client_email_template = await select_client_email_template_by_order(self.order_type)
+                await send_email_to_client(
+                    client_email_template, 
+                    specification_data.get('client_name'),
+                    specification_data.get('client_email'),
+                    order
+                )
             
         
             happy_state_description['title'] = f"Спасибо, за обращене {specification_data['client_name']}!"

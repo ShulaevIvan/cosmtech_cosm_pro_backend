@@ -344,6 +344,8 @@ def send_vacancy_request(send_data):
     msg_mail.send()
 
 def validate_email(email_str):
+    if not email_str:
+        return False
     email_pattern = r'\S*\@\S*\.\w{2,10}$'
     check_email_valid = re.match(email_pattern, email_str)
     if check_email_valid and len(check_email_valid.group(0)) > 0:

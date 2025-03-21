@@ -452,6 +452,10 @@
                 "value": "email"
             },
             {
+                "name": "client_phone",
+                "value": "Имя"
+            },
+            {
                 "name": "comment",
                 "value": "комментарий"
             }
@@ -493,7 +497,7 @@
         "id": 14,
         "template_name": "decorative_cosm_req",
         "email_subject": "Запрос на (Контрактное производство декоративной косметики) с сайта cosmtech.ru",
-        "email_body_description": "",
+        "email_body_description": "Пришел запрос на контрактное производство дек. косметики.",
         "fields": [
             {
                 "name": "client_name",

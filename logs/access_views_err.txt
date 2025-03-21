@@ -304,3 +304,18 @@ view_func: RequestOrderView (POST) date: 2025-03-20 15:20:19 err_descr: select_c
 view_func: RequestOrderView (POST) date: 2025-03-20 15:26:28 err_descr: send_email_to_client() missing 1 required positional argument: 'order' 
 view_func: CallbackRequestView (POST) date: 2025-03-20 18:18:50 err_descr: list index out of range 
 view_func: CallbackRequestView (POST) date: 2025-03-20 18:19:12 err_descr: list index out of range 
+view_func: ContactsRequestView (POST) date: 2025-03-21 16:17:40 err_descr: local variable 'order' referenced before assignment 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 17:19:48 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 17:21:17 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 17:24:21 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 17:25:14 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 17:58:42 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 17:59:40 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:01:26 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:02:05 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:02:37 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:15:44 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:16:09 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:16:29 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:16:54 err_descr: expected string or bytes-like object 
+view_func: ForClientsRequestView (POST) date: 2025-03-21 18:18:18 err_descr: expected string or bytes-like object 
