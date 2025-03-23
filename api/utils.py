@@ -6,13 +6,12 @@ import base64
 import random
 import aiofiles
 from datetime import datetime
-from pprint import pprint
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.db.models import Q
 from asgiref.sync import sync_to_async
 
-from .models import Order, Client
+from .models import Client
 
 from docxtpl import DocxTemplate
 
@@ -121,7 +120,7 @@ async def send_email_to_client(email_template, client_name, client_email, order)
                 </ul>
 
             """,
-            f'{settings.EMAIL_HOST_USER}', [f"{settings.EMAIL_ORDER_ADDRESS}"]
+            f'{settings.EMAIL_HOST_USER}', [f"{client_email}"]
         )
         msg_mail.content_subtype = "html"
         msg_mail.send()
@@ -237,23 +236,15 @@ def create_upload_folders():
     quiz_files = f'{upload_files}/quiz_files/'
     resume_files = f'{upload_files}/resume_files/'
     log_folder = f'{os.getcwd()}/logs/'
-
-    if not os.path.exists(f'{upload_files}'):
-        os.mkdir(f'{upload_files}')
-    if not os.path.exists(f'{order_files}'):
-        os.mkdir(f'{order_files}')
-    if not os.path.exists(f'{cooperation_files}'):
-        os.mkdir(f'{cooperation_files}')
-    if not os.path.exists(f'{download_files}'):
-        os.mkdir(f'{download_files}')
-    if not os.path.exists(f'{company_files}'):
-        os.mkdir(f'{company_files}')
-    if not os.path.exists(f'{quiz_files}'):
-        os.mkdir(f'{quiz_files}')
-    if not os.path.exists(f'{resume_files}'):
-        os.mkdir(f'{resume_files}')
-    if not os.path.exists(f'{log_folder}'):
-        os.mkdir(log_folder)
+    email_templates = f'{os.getcwd()}/email_templates'
+    path_arr = [
+        upload_files,order_files,cooperation_files,
+        download_files, company_files, resume_files,
+        log_folder, quiz_files
+    ]
+    for path in path_arr:
+        if not os.path.exists(path):
+            os.mkdir(path)
 
 def rebuild_json():
     result_data = []
@@ -323,25 +314,6 @@ def get_request_name(value):
 
     }
     return request_types.get(value)
-
-
-def send_vacancy_request(send_data):
-    not_format_date = datetime.datetime.now()
-    time = get_time(not_format_date)
-    msg_mail = EmailMessage(
-            f"Новый отклик на вакансию {send_data['vacancy_data']} с сайта cosmtech.ru", 
-            f"""
-                <p>Вакансия({send_data['vacancy_data']})</p>
-                <p>Имя({send_data['resume_name']})</p>
-                <p>Телефон: {send_data['resume_phone']}
-                <p><b>{time}</b></p>
-            """,
-            'django_mail@cosmtech.ru', [f"{settings.ORDER_MAIL}"]
-    )
-    msg_mail.content_subtype = "html"
-    if send_data['resume_file']:
-        msg_mail.attach_file(f'{send_data["resume_file"]}')
-    msg_mail.send()
 
 def validate_email(email_str):
     if not email_str:

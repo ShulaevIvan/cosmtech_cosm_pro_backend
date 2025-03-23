@@ -55,6 +55,8 @@ def default(request):
 class CallbackRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'callback_req'
+    send_order_status = False
+    send_client_status = False
 
     async def get(self, request):
         try:
@@ -87,8 +89,8 @@ class CallbackRequestView(APIView):
                     name = '',
                     request_time = not_format_date
                 )
-                await send_order_to_main_email(email_template, email_data, time, order_number)
-
+                self.send_order_status = True
+                
                 return Response(
                     {'message': 'ok', 'description': response_description}, 
                     status=status.HTTP_201_CREATED
@@ -109,11 +111,16 @@ class CallbackRequestView(APIView):
                 {'message': 'ok', 'description': err_description}, 
                 status=status.HTTP_200_OK
             )
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, email_data, time, order_number)
     
 class RequestConsultView(APIView):
 
     permission_classes = [IsAuthenticated, ]
     order_type = 'consult_req'
+    send_order_status = False
+    send_client_status = False
 
     async def post(self, request):
         try:
@@ -163,11 +170,11 @@ class RequestConsultView(APIView):
                 'order_type_name': 'Консультация',
                 'client_comment': consult_data.get('comment'),
             }
-            await send_order_to_main_email(email_template, client_data, time, order_number)
+            self.send_order_status = True
 
             if validate_email(client_data.get('client_email')):
-                client_template = await select_email_template_by_order(self.order_type, True)
-                send_email_to_client(self.order_type, client_template)
+                self.send_client_status = True
+                client_template = await select_client_email_template_by_order(self.order_type)
         
             return Response(
                 {'message': 'ok', 'description': response_description}, 
@@ -183,10 +190,23 @@ class RequestConsultView(APIView):
                 {'message': 'ok', 'description': err_description}, 
                 status=status.HTTP_200_OK
             )
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, client_data, time, order_number)
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_template,
+                    client_data.get('client_name'),  
+                    client_data.get('client_email'), 
+                    order
+                )
 
 class RequestOrderView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'order_req'
+    send_order_status = False
+    send_client_status = False
     
     async def post(self, request):
         try:
@@ -247,16 +267,11 @@ class RequestOrderView(APIView):
                 'order_type_name': order_data.get('options'),
                 'client_comment': order_data.get('comment'),
             }
-            await send_order_to_main_email(email_template, client_data, time)
+            self.send_order_status = True
 
             if validate_email(client_data.get('client_email')):
+                self.send_client_status = True
                 client_email_template = await select_client_email_template_by_order(self.order_type)
-                await send_email_to_client(
-                    client_email_template, 
-                    client_data.get('client_name'),
-                    client_data.get('client_email'),  
-                    order
-                )
 
             return Response(
                 {'message': 'ok', 'description': f"{response_description} {client_data.get('order_number')}"}, 
@@ -269,10 +284,23 @@ class RequestOrderView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
             
             return Response({'message': 'ok', 'description': err_description}, status=status.HTTP_201_CREATED)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, client_data, time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    client_data.get('client_name'),
+                    client_data.get('client_email'),  
+                    order
+                )
     
 class ContactsRequestView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'contacts_order_req'
+    send_order_status = False
+    send_client_status = False
 
     async def post(self, request):
         try:
@@ -348,17 +376,11 @@ class ContactsRequestView(APIView):
                 }
                 client_data['files'] = client_files
                 response_description = email_template.get('response_description')
-
-                await send_order_to_main_email(email_template, client_data, time)
+                self.send_order_status = True
 
                 if validate_email(client_data.get('client_email')):
+                        self.send_client_status = True
                         client_email_template = await select_client_email_template_by_order(self.order_type)
-                        await send_email_to_client(
-                            client_email_template, 
-                            client_data.get('client_name'),
-                            client_data.get('client_email'),  
-                            order
-                        )
 
                 return Response(
                     {'message': 'ok', 'description': f"{response_description} {order.get('order_number')}"}, 
@@ -386,8 +408,7 @@ class ContactsRequestView(APIView):
                     if contacts_data.get('file') and len(contacts_data.get('file')) > 0:
                         files_list = contacts_data.get('file')
                         target_cooperation = await CoperationRequest.objects.aget(id=cooperation_request.id)
-
-                        async for file in files_list:
+                        for file in files_list:
                             file_path = await create_file(file, settings.COOPERATION_FILES)
                             await CoperationRequestFile.objects.acreate(
                                 cooperation_request_id=target_cooperation, 
@@ -406,17 +427,12 @@ class ContactsRequestView(APIView):
                     }
                     client_data['files'] = cooperation_files
                     response_description = email_template.get('response_description')
-
-                    await send_order_to_main_email(email_template, client_data, time)
+                    self.send_order_status = True
 
                     if validate_email(client_data.get('client_email')):
+                        self.send_client_status = True
                         client_email_template = await select_client_email_template_by_order(self.order_type)
-                        await send_email_to_client(
-                            client_email_template, 
-                            client_data.get('client_name'),
-                            client_data.get('client_email'),  
-                            order
-                        )
+
                     return Response(
                         {'message': 'ok', 'description': f"{response_description}"}, 
                         status=status.HTTP_201_CREATED
@@ -432,7 +448,18 @@ class ContactsRequestView(APIView):
           
             
             return Response({'message': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
-    
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, client_data, time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    client_data.get('client_name'),
+                    client_data.get('client_email'),  
+                    order
+                )
+
 class CityDataView(APIView):
 
     permission_classes = [IsAuthenticated, ]
@@ -469,6 +496,8 @@ class QuizOrderView(APIView):
 
     permission_classes = [IsAuthenticated, ]
     order_type = 'quiz_req'
+    send_order_status = False
+    send_client_status = False
     
     async def post(self, request):
         try:
@@ -587,17 +616,11 @@ class QuizOrderView(APIView):
             }
             if email_data.get('custom_tz_file') or email_data.get('custom_package_file'):
                 email_data['files'] = [email_data.get('custom_tz_file'), email_data.get('custom_package_file')]
-
-            await send_order_to_main_email(email_template, email_data, time)
+            self.send_order_status = True
 
             if validate_email(email_data.get('client_email')):
+                self.send_client_status = True
                 client_email_template = await select_client_email_template_by_order(self.order_type)
-                await send_email_to_client(
-                    client_email_template, 
-                    email_data.get('client_name'),
-                    email_data.get('client_email'),
-                    order
-                )
 
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
@@ -607,11 +630,24 @@ class QuizOrderView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
             
             return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, email_data, time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
 
 class QuestionOrderView(APIView):
 
     permission_classes = [IsAuthenticated, ]
     order_type = 'question_req'
+    send_order_status = False
+    send_client_status = False
 
     async def post(self, request):
         try:
@@ -657,16 +693,11 @@ class QuestionOrderView(APIView):
                 'communication_type': client_communication_type,
                 'client_question': client_question
             }
-            await send_order_to_main_email(email_template, email_data, time)
+            self.send_order_status = True
 
             if validate_email(email_data.get('client_email')):
+                self.send_client_status = True
                 client_email_template = await select_client_email_template_by_order(self.order_type)
-                await send_email_to_client(
-                    client_email_template, 
-                    email_data.get('client_name'),
-                    email_data.get('client_email'),
-                    order
-                )
 
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
@@ -676,12 +707,24 @@ class QuestionOrderView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
-
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, email_data, time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
     
 class TzOrderView(APIView):
 
     permission_classes = [IsAuthenticated, ]
     order_type = 'tz_req'
+    send_order_status = False
+    send_client_status = False
 
     async def post(self, request):
         try:
@@ -734,16 +777,11 @@ class TzOrderView(APIView):
             }
 
             email_data['file'] = email_data.get('tz_file')
-            await send_order_to_main_email(email_template, email_data, order_time)
+            self.send_order_status = True
 
             if validate_email(email_data.get('client_email')):
+                self.send_client_status = True
                 client_email_template = await select_client_email_template_by_order(self.order_type)
-                await send_email_to_client(
-                    client_email_template, 
-                    email_data.get('client_name'),
-                    email_data.get('client_email'),
-                    order
-                )
             
             return Response({'status': 'ok', 'created': True, 'message': send_description}, status=status.HTTP_201_CREATED)
         
@@ -753,11 +791,24 @@ class TzOrderView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'created': True, 'message': err_description}, status=status.HTTP_200_OK)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
     
 class VacancyView(APIView):
 
     permission_classes = [IsAuthenticated, ]
     order_type = 'vacancy_req'
+    send_order_status = False
+    send_client_status = False
 
     async def get(self, request):
         try:
@@ -817,8 +868,7 @@ class VacancyView(APIView):
             }
             if vacancy_data.get('resume_file'):
                 vacancy_data['files'] = [vacancy_data.get('resume_file')]
-            
-            send_order_to_main_email(email_template, vacancy_data, order_time)
+            self.send_order_status = True
 
             return Response({'status': 'ok', 'data': response_data}, status=status.HTTP_201_CREATED)
         
@@ -831,6 +881,11 @@ class VacancyView(APIView):
             await write_access_view_err_log(err, method, 'VacancyView')
 
             return Response({'status': 'err', 'message': err, 'data': response_data}, status=status.HTTP_400_BAD_REQUEST)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, vacancy_data, order_time, order.get('order_number'))
+
     
 class SupplierView(APIView):
     permission_classes = [IsAuthenticated, ]
@@ -867,8 +922,10 @@ class SuppliersTypeView(APIView):
             return Response({'status': 'err', 'data': [], 'description': err}, status=status.HTTP_200_OK)
     
 class ForClientsRequestView(APIView):
-    # permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, ]
     order_type = 'for_clients_req'
+    send_order_status = False
+    send_client_status = False
 
     async def post(self, request):
         try:
@@ -917,17 +974,11 @@ class ForClientsRequestView(APIView):
                     'comment': client_data.get('comment'),
                 }
             email_template = await select_email_template_by_order(self.order_type)
-            await send_order_to_main_email(email_template, email_data, order_time)
+            self.send_order_status = True
 
             if validate_email(email_data.get('client_email')):
+                self.send_client_status = True
                 client_email_template = await select_client_email_template_by_order(self.order_type)
-
-                await send_email_to_client(
-                    client_email_template, 
-                    email_data.get('client_name'),
-                    email_data.get('client_email'),
-                    order
-                )
 
             return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
         
@@ -937,10 +988,23 @@ class ForClientsRequestView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    email_data.get('client_name'),
+                    email_data.get('client_email'),
+                    order
+                )
     
 class ExcursionProductionView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'excursion_req'
+    send_order_status = False
+    send_client_status = False
 
     async def get(self, request):
 
@@ -984,7 +1048,7 @@ class ExcursionProductionView(APIView):
             client_data['excursion_data'] = excursion_data
             client_data['excursion_time'] = excursion_time
 
-            await send_order_to_main_email(email_template, client_data, order_time)
+            self.send_order_status = True
 
             return Response({'status': 'ok', 'description': send_description}, status=status.HTTP_201_CREATED)
         
@@ -994,11 +1058,17 @@ class ExcursionProductionView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, client_data, order_time, order.get('order_number'))
 
     
 class DecorativeCosmeticView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'decorative_cosm_req'
+    send_order_status = False
+    send_client_status = False
 
     async def post(self, request):
         try:
@@ -1025,17 +1095,11 @@ class DecorativeCosmeticView(APIView):
 
                 client_data['order_type'] = 'decorative_consult'
                 client_data['order_type_name'] = 'Декоративная косметика консультация'
-            
-                await send_order_to_main_email(email_template, client_data, order_time)
+                self.send_order_status = True
 
                 if validate_email(client_data.get('client_email')):
+                    self.send_client_status = True
                     client_email_template = await select_client_email_template_by_order(self.order_type)
-                    await send_email_to_client(
-                        client_email_template, 
-                        client_data.get('client_name'),
-                        client_data.get('client_email'),
-                        order
-                    )
 
                 return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
         
@@ -1090,17 +1154,11 @@ class DecorativeCosmeticView(APIView):
                     'order_type_name': get_request_name('decor'),
                 }
                 client_data['files'] = client_files
-
-                await send_order_to_main_email(email_template, client_data, order_time)
+                self.send_order_status = True
 
                 if validate_email(client_data.get('client_email')):
+                    self.send_client_status = True
                     client_email_template = await select_client_email_template_by_order('decorative_cosm_req_order')
-                    await send_email_to_client(
-                        client_email_template, 
-                        client_data.get('client_name'),
-                        client_data.get('client_email'),
-                        order
-                    )
                 
                 return Response({'status': 'ok', 'description': description}, status=status.HTTP_201_CREATED)
             
@@ -1110,10 +1168,23 @@ class DecorativeCosmeticView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, client_data, order_time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    client_data.get('client_name'),
+                    client_data.get('client_email'),
+                    order
+                )
 
 class SpecForProductionView(APIView):
     permission_classes = [IsAuthenticated, ]
     order_type = 'specification_req'
+    send_order_status = False
+    send_client_status = False
 
     async def get(self, request):
         return Response({'status': 'ok'}, status=status.HTTP_200_OK)
@@ -1192,18 +1263,11 @@ class SpecForProductionView(APIView):
 
             if specification_data['product_example_file']['path']:
                 specification_data['files'].append(specification_data['product_example_file']['path'])
-
-            await send_order_to_main_email(email_template, specification_data, order_time)
+            self.send_order_status = True
 
             if validate_email(specification_data.get('client_email')):
+                self.send_client_status = True
                 client_email_template = await select_client_email_template_by_order(self.order_type)
-                await send_email_to_client(
-                    client_email_template, 
-                    specification_data.get('client_name'),
-                    specification_data.get('client_email'),
-                    order
-                )
-            
         
             happy_state_description['title'] = f"Спасибо, за обращене {specification_data['client_name']}!"
             happy_state_description['description'] = f"Ваше ТЗ № {specification_data['order_number']} отправлено, мы выйдем на связь в ближайшее время."
@@ -1216,6 +1280,17 @@ class SpecForProductionView(APIView):
             err_description = 'Очень жаль, но что-то пошло не так, отправьте запрос вручную на pro@cosmtech.ru'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
+        
+        finally:
+            if self.send_order_status:
+                await send_order_to_main_email(email_template, specification_data, order_time, order.get('order_number'))
+            if self.send_client_status:
+                await send_email_to_client(
+                    client_email_template, 
+                    specification_data.get('client_name'),
+                    specification_data.get('client_email'),
+                    order
+                )
 @sync_to_async
 @api_view(['GET'])
 def get_tz_template(request):

@@ -319,3 +319,22 @@ view_func: ForClientsRequestView (POST) date: 2025-03-21 18:16:09 err_descr: exp
 view_func: ForClientsRequestView (POST) date: 2025-03-21 18:16:29 err_descr: expected string or bytes-like object 
 view_func: ForClientsRequestView (POST) date: 2025-03-21 18:16:54 err_descr: expected string or bytes-like object 
 view_func: ForClientsRequestView (POST) date: 2025-03-21 18:18:18 err_descr: expected string or bytes-like object 
+view_func: RequestConsultView (POST) date: 2025-03-23 13:52:39 err_descr: select_email_template_by_order() takes 1 positional argument but 2 were given 
+view_func: RequestConsultView (POST) date: 2025-03-23 13:53:07 err_descr: select_email_template_by_order() takes 1 positional argument but 2 were given 
+view_func: RequestConsultView (POST) date: 2025-03-23 13:54:06 err_descr: select_email_template_by_order() takes 1 positional argument but 2 were given 
+view_func: RequestConsultView (POST) date: 2025-03-23 14:10:20 err_descr: select_email_template_by_order() takes 1 positional argument but 2 were given 
+view_func: RequestConsultView (POST) date: 2025-03-23 14:12:07 err_descr: select_email_template_by_order() takes 1 positional argument but 2 were given 
+view_func: RequestConsultView (POST) date: 2025-03-23 14:13:28 err_descr: 'str' object has no attribute 'get' 
+view_func: RequestConsultView (POST) date: 2025-03-23 14:14:48 err_descr: 'str' object has no attribute 'get' 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:21:25 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:22:43 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:23:44 err_descr: local variable 'target_data' referenced before assignment 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:26:12 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:27:19 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:29:03 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:31:45 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:32:38 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:33:04 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:33:33 err_descr: object NoneType can't be used in 'await' expression 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:34:00 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: ContactsRequestView (POST) date: 2025-03-23 17:35:00 err_descr: local variable 'target_data' referenced before assignment 

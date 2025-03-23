@@ -2,7 +2,7 @@
     {
         "id": 1,
         "template_name": "consult_req",
-        "email_subject": "Запрос консультации по услугам контрактного производстваcosmtech.ru",
+        "email_subject": "Запрос консультации по услугам контрактного производства c cosmtech.ru",
         "email_body_description": "Запрос консультации по услугам контрактного производства принят!",
         "organization_contacts": [
             {"name": "Телефон производства:", "value": "+7 (812) 363-06-14", "link": "tel:+78123630614"},

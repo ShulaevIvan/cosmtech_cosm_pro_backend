@@ -9,3 +9,5 @@ order_num:  date: 2025-03-16 15:41:11 send_form: vacancy_req  err_descr: [Errno 
 order_num:  date: 2025-03-17 16:07:48 send_form: callback_req  err_descr: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1007) 
 order_num:  date: 2025-03-19 23:15:30 send_form: specification_req  err_descr: [Errno 2] No such file or directory: '<coroutine object create_file at 0x7d1932eba110>' 
 order_num:  date: 2025-03-19 23:16:40 send_form: specification_req  err_descr: [Errno 2] No such file or directory: '<coroutine object create_file at 0x7d1932e276f0>' 
+order_num: ct_rq_KCLI_1 date: 2025-03-23 14:15:39 send_form: consult_req  err_descr: 'NoneType' object is not iterable 
+order_num: ct_rq_HCGR_1 date: 2025-03-23 14:16:16 send_form: consult_req  err_descr: 'NoneType' object is not iterable 

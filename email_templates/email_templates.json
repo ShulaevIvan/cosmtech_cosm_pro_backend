@@ -436,14 +436,6 @@
         "email_body_description": "",
         "fields": [
             {
-                "name": "order_type",
-                "value": "Тип запроса"
-            },
-            {
-                "name": "order_type_name",
-                "value": "Имя запроса"
-            },
-            {
                 "name": "client_name",
                 "value": "Имя"
             },
@@ -458,6 +450,14 @@
             {
                 "name": "comment",
                 "value": "комментарий"
+            },
+            {
+                "name": "order_type",
+                "value": "Тип запроса"
+            },
+            {
+                "name": "order_type_name",
+                "value": "Имя запроса"
             }
         ],
         "response_title": "",
@@ -469,10 +469,6 @@
         "email_subject": "Запрос на (экскурсия на производство) от клиента с сайта cosmtech.ru",
         "email_body_description": "",
         "fields": [
-            {
-                "name": "order_number",
-                "value": "Номер заказа"
-            },
             {
                 "name": "name",
                 "value": "Имя клиента"
@@ -488,6 +484,10 @@
             {
                 "name": "excursion_time",
                 "value": "Время экскурсии"
+            },
+            {
+                "name": "order_number",
+                "value": "Номер заказа"
             }
         ],
         "response_title": "Спасибо, Ваш запрос на экскурсию принят!",
@@ -512,20 +512,12 @@
                 "value": "email"
             },
             {
-                "name": "client_city",
-                "value": "Город клиента"
-            },
-            {
-                "name": "call_option",
-                "value": "Способ связи"
-            },
-            {
                 "name": "client_comment",
                 "value": "Комментарий клиента"
             },
             {
-                "name": "order_number",
-                "value": "Время заказа"
+                "name": "client_city",
+                "value": "Город клиента"
             },
             {
                 "name": "order_type",
@@ -538,6 +530,14 @@
             {
                 "name": "files",
                 "value": "файлы"
+            },
+            {
+                "name": "call_option",
+                "value": "Способ связи"
+            },
+            {
+                "name": "order_number",
+                "value": "Время заказа"
             }
         ],
         "response_title": "Спасибо! Ваш запрос отправлен!",
