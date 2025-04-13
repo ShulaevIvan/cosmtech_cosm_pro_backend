@@ -2,7 +2,7 @@ import re
 from django.contrib import admin
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, Vacancy, \
-    Supplier, SupplierType, ExcursionProductionRequest, SpecificationOrder
+    Supplier, SupplierType, ExcursionProductionRequest, SpecificationOrder, NewsItem, NewsBanner, NewsUrl, NewsVideo
 
 class AdminClientOrderInline(admin.TabularInline):
     model = ClientOrder
@@ -22,6 +22,18 @@ class CoperationRequestFileInline(admin.TabularInline):
     extra = 0
     fields = ['file_link',]
     readonly_fields = ['file_link',]
+
+class AdminNewsBannerInline(admin.TabularInline):
+    model = NewsBanner
+    extra = 0
+
+class AdminNewsUrlInline(admin.TabularInline):
+    model = NewsUrl
+    extra = 0
+
+class AdminNewsVideoInline(admin.TabularInline):
+    model = NewsVideo
+    extra = 0
 
 @admin.register(CityData)
 class CityDataAdmin(admin.ModelAdmin):
@@ -141,4 +153,9 @@ class AdminSpecificationOrder(admin.ModelAdmin):
         'quantity', 'tz_file_link', 'product_example_file_link'
     ]
     readonly_fields = [ 'order_date', 'order_number','tz_file_path', 'product_example_file', 'tz_file_link', 'product_example_file_link']
-    
+
+@admin.register(NewsItem)
+class AdminNewsItem(admin.ModelAdmin):
+
+    model = NewsItem
+    inlines = [AdminNewsUrlInline, AdminNewsBannerInline, AdminNewsVideoInline]

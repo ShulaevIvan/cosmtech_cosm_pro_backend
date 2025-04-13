@@ -178,6 +178,16 @@ async def create_file(file_obj, path):
 
     return full_name
 
+async def file_to_base64(path):
+    file_path = f'{os.getcwd()}/{path}'
+    async with aiofiles.open(file_path, 'rb') as file:
+        file_str = await file.read()
+        file_data = base64.b64encode(file_str).decode('ascii')
+        
+    
+    return file_data
+
+    
 
 async def find_existing_client(phone='', email=''):
     if phone or email:

@@ -304,3 +304,29 @@ class SpecificationOrder(models.Model):
             return format_html(f"<a href='/api/admin_download/?file_path={self.product_example_file}' target=blank>download file</a>")
         else:
             return "No attachment"
+
+class NewsItem(models.Model):
+    title = models.CharField(max_length=255)
+    date = models.DateField(auto_now_add=True)
+    min_img = models.ImageField(null=True, blank=True)
+    min_img_alt = models.CharField(null=True, blank=True, default='min_alt')
+    short_description = models.TextField()
+
+    text_content = models.TextField()
+
+class NewsUrl(models.Model):
+    news_url = models.URLField()
+    url_text = models.CharField(max_length=255, null=True, blank=True, default='url text')
+    news_id = models.ForeignKey(NewsItem, on_delete=models.CASCADE, related_name='news_url')
+
+class NewsVideo(models.Model):
+    title = models.CharField(max_length=255, null=True, blank=True)
+    file = models.FileField(upload_to=f'upload_files/news_files/videos')
+    mode = models.CharField(null=True, blank=True, default='video')
+    text = models.TextField(null=True, blank=True)
+    news_id = models.ForeignKey(NewsItem, on_delete=models.CASCADE, related_name='news_video')
+
+class NewsBanner(models.Model):
+    news_image = models.FileField(upload_to=f'upload_files/news_files/banners')
+    alt_text = models.CharField(max_length=255, null=True, blank=True, default='alt image')
+    news_id = models.ForeignKey(NewsItem, on_delete=models.CASCADE, related_name='news_image')

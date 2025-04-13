@@ -1,9 +1,9 @@
 import re
 import os
 import json
+import base64
 from datetime import datetime
 import datetime as dt
-from pprint import pprint
 from django.views.generic.base import RedirectView
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -21,11 +21,11 @@ from .utils import validate_email, create_specification_file, create_file, get_r
     generate_order_number, get_time, find_existing_data_by_contact, get_all_data_from_model
 
 from.utils import write_access_view_err_log, select_email_template_by_order, select_client_email_template_by_order, \
-    send_order_to_main_email, send_email_to_client
+    send_order_to_main_email, send_email_to_client, file_to_base64
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
-    Vacancy, Supplier, SupplierType, ExcursionProductionRequest, SpecificationOrder
+    Vacancy, Supplier, SupplierType, ExcursionProductionRequest, SpecificationOrder, NewsItem, NewsBanner, NewsVideo, NewsUrl
 
 def index(request):
     return render(request, 'index.html')
@@ -484,7 +484,7 @@ class CityDataView(APIView):
             # city_name = fr'^{format_city_name}|^{format_city_name}(\w*|.*)(.|\w)(\w+)$'
             target_city = await CityData.objects.aget(name=format_city_name)
 
-            return Response({'cities': model_to_dict(target_city)}, status=status.HTTP_200_OK)
+            return Response({'cities': [model_to_dict(target_city)]}, status=status.HTTP_200_OK)
         
         except Exception as err:
             method = request.method
@@ -1291,6 +1291,51 @@ class SpecForProductionView(APIView):
                     specification_data.get('client_email'),
                     order
                 )
+
+class NewsView(APIView):
+
+    async def get(self, request):
+        try:
+            all_news = []
+            async for news_item in NewsItem.objects.all():
+                news_obj = dict()
+                news_obj['urls'] = []
+                news_obj['videos'] = []
+                news_obj['banners'] = []
+
+                async for url_item in news_item.news_url.all().values():
+                    news_obj['urls'].append(url_item)
+                async for banner_item in news_item.news_image.all().values():
+                    banner_file = await file_to_base64(banner_item['news_image'])
+                    if banner_file:
+                        news_obj['banners'].append({**banner_item, 'banner_file': banner_file})
+                    else:
+                        news_obj['banners'].append({**banner_item, 'banner_file': ''})
+
+                async for video_item in news_item.news_video.all().values():
+                    video_file = await file_to_base64(video_item['file'])
+                    if video_file:
+                        news_obj['banners'].append({**banner_item, 'video_file': video_file})
+                    else:
+                        news_obj['videos'].append({**banner_item, 'video_file': ''})
+
+                
+                news_obj['title'] = news_item.id
+                news_obj['title'] = news_item.title
+                news_obj['date'] = news_item.date
+                # news_obj['min_img'] = news_item.min_img
+                news_obj['min_img_alt'] = news_item.min_img_alt
+                news_obj['short_description'] = news_item.short_description
+                news_obj['text_content'] = news_item.text_content
+
+                all_news.append(news_obj)
+                
+                
+
+            return Response({'status': 'ok', 'news': all_news}, status=status.HTTP_200_OK)
+        except Exception as err:
+            pass
+
 @sync_to_async
 @api_view(['GET'])
 def get_tz_template(request):
