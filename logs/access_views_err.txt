@@ -338,3 +338,5 @@ view_func: ContactsRequestView (POST) date: 2025-03-23 17:33:04 err_descr: 'asyn
 view_func: ContactsRequestView (POST) date: 2025-03-23 17:33:33 err_descr: object NoneType can't be used in 'await' expression 
 view_func: ContactsRequestView (POST) date: 2025-03-23 17:34:00 err_descr: 'async for' requires an object with __aiter__ method, got list 
 view_func: ContactsRequestView (POST) date: 2025-03-23 17:35:00 err_descr: local variable 'target_data' referenced before assignment 
+view_func: SpecForProductionView (GET) date: 2025-04-14 14:55:22 err_descr: string indices must be integers 
+view_func: SpecForProductionView (GET) date: 2025-04-14 15:19:24 err_descr: 'async for' requires an object with __aiter__ method, got list 

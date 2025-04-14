@@ -21,7 +21,7 @@ from .utils import validate_email, create_specification_file, create_file, get_r
     generate_order_number, get_time, find_existing_data_by_contact, get_all_data_from_model
 
 from.utils import write_access_view_err_log, select_email_template_by_order, select_client_email_template_by_order, \
-    send_order_to_main_email, send_email_to_client, file_to_base64
+    send_order_to_main_email, send_email_to_client, file_to_base64, get_paragraphs_from_text
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
@@ -1315,26 +1315,28 @@ class NewsView(APIView):
                 async for video_item in news_item.news_video.all().values():
                     video_file = await file_to_base64(video_item['file'])
                     if video_file:
-                        news_obj['banners'].append({**banner_item, 'video_file': video_file})
+                        news_obj['videos'].append({**banner_item, 'video_file': video_file})
                     else:
                         news_obj['videos'].append({**banner_item, 'video_file': ''})
 
-                
                 news_obj['title'] = news_item.id
                 news_obj['title'] = news_item.title
                 news_obj['date'] = news_item.date
-                # news_obj['min_img'] = news_item.min_img
+                news_obj['min_img'] = await file_to_base64(news_item.min_img)
                 news_obj['min_img_alt'] = news_item.min_img_alt
                 news_obj['short_description'] = news_item.short_description
-                news_obj['text_content'] = news_item.text_content
+                news_obj['text_content'] = await get_paragraphs_from_text(news_item.text_content)
 
                 all_news.append(news_obj)
-                
-                
 
             return Response({'status': 'ok', 'news': all_news}, status=status.HTTP_200_OK)
+        
         except Exception as err:
-            pass
+            method = request.method
+            await write_access_view_err_log(err, method, 'SpecForProductionView')
+            err_description = 'Ошибка доступа к новостям'
+
+            return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
 
 @sync_to_async
 @api_view(['GET'])

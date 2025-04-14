@@ -129,8 +129,6 @@ async def send_email_to_client(email_template, client_name, client_email, order)
         await write_email_err_log(err, email_template.get('template_name'), order_number)
 
 
-    
-
 async def create_specification_file(data):
     specification_info = dict()
     specification_data = dict()
@@ -180,14 +178,38 @@ async def create_file(file_obj, path):
 
 async def file_to_base64(path):
     file_path = f'{os.getcwd()}/{path}'
-    async with aiofiles.open(file_path, 'rb') as file:
-        file_str = await file.read()
-        file_data = base64.b64encode(file_str).decode('ascii')
-        
+    file_format = re.search(r'\.\w+$', file_path)
+    file_data = dict()
     
-    return file_data
+    if not os.path.exists(file_path):
+        return ''
+    
+    if file_format and file_format[0]:
+        file_data['ext'] = file_format[0].replace('.', '')
 
+        async with aiofiles.open(file_path, 'rb') as file:
+            file_str = await file.read()
+            file_data['file'] = base64.b64encode(file_str).decode('ascii')
+
+            return file_data
+    return ''
+
+async def get_paragraphs_from_text(text):
+    text_length = len(text)
+    result_par = []
+    start_index = 0
+    if text_length > 100:
+        find_all_par_indexes = [i.start() for i in re.finditer('\.', text)]
+
+        for p_index in find_all_par_indexes:
+           result_par.append(text[start_index : p_index + 1])
+           start_index = p_index + 1
+        result_par = [p.replace(' ', '') if p.startswith((' ', '\t')) else p for p in result_par]
+
+        return result_par
     
+    return result_par.append(text.replace(r'^\s', ''))
+
 
 async def find_existing_client(phone='', email=''):
     if phone or email:
@@ -247,10 +269,15 @@ def create_upload_folders():
     resume_files = f'{upload_files}/resume_files/'
     log_folder = f'{os.getcwd()}/logs/'
     email_templates = f'{os.getcwd()}/email_templates'
+    news_folder = f'{os.getcwd()}/upload_files/news_files/'
+    news_banners = f'{os.getcwd()}/upload_files/news_files/banners/'
+    news_videos = f'{os.getcwd()}/upload_files/news_files/videos/'
+    
     path_arr = [
         upload_files,order_files,cooperation_files,
         download_files, company_files, resume_files,
-        log_folder, quiz_files
+        log_folder, quiz_files, email_templates,
+        news_folder, news_banners, news_videos
     ]
     for path in path_arr:
         if not os.path.exists(path):
