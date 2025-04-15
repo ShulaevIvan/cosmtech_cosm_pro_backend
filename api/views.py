@@ -1315,11 +1315,11 @@ class NewsView(APIView):
                 async for video_item in news_item.news_video.all().values():
                     video_file = await file_to_base64(video_item['file'])
                     if video_file:
-                        news_obj['videos'].append({**banner_item, 'video_file': video_file})
+                        news_obj['videos'].append({**video_item, 'video_file': video_file})
                     else:
-                        news_obj['videos'].append({**banner_item, 'video_file': ''})
-
-                news_obj['title'] = news_item.id
+                        news_obj['videos'].append({**video_item, 'video_file': ''})
+                        
+                news_obj['id'] = news_item.id
                 news_obj['title'] = news_item.title
                 news_obj['date'] = news_item.date
                 news_obj['min_img'] = await file_to_base64(news_item.min_img)

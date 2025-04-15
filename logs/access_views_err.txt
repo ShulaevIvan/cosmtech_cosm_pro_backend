@@ -340,3 +340,18 @@ view_func: ContactsRequestView (POST) date: 2025-03-23 17:34:00 err_descr: 'asyn
 view_func: ContactsRequestView (POST) date: 2025-03-23 17:35:00 err_descr: local variable 'target_data' referenced before assignment 
 view_func: SpecForProductionView (GET) date: 2025-04-14 14:55:22 err_descr: string indices must be integers 
 view_func: SpecForProductionView (GET) date: 2025-04-14 15:19:24 err_descr: 'async for' requires an object with __aiter__ method, got list 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:15:40 err_descr: 'mime' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:16:22 err_descr: 'mime' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:16:42 err_descr: 'mime' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:17:47 err_descr: 'mime' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:17:55 err_descr: 'mime' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:18:12 err_descr: list index out of range 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:18:23 err_descr: list index out of range 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:18:35 err_descr: list index out of range 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:18:47 err_descr: list index out of range 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:19:24 err_descr: list index out of range 
+view_func: SpecForProductionView (GET) date: 2025-04-15 01:19:29 err_descr: list index out of range 
+view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:04 err_descr: 'NewsItem' object has no attribute '_id' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:04 err_descr: 'NewsItem' object has no attribute '_id' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:09 err_descr: 'NewsItem' object has no attribute '_NewsView__id' 
+view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:09 err_descr: 'NewsItem' object has no attribute '_NewsView__id' 

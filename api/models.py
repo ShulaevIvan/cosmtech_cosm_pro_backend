@@ -308,7 +308,7 @@ class SpecificationOrder(models.Model):
 class NewsItem(models.Model):
     title = models.CharField(max_length=255)
     date = models.DateField(auto_now_add=True)
-    min_img = models.ImageField(null=True, blank=True)
+    min_img = models.ImageField(null=True, blank=True, upload_to='upload_files/news_files/')
     min_img_alt = models.CharField(null=True, blank=True, default='min_alt')
     short_description = models.TextField()
 

@@ -180,16 +180,45 @@ async def file_to_base64(path):
     file_path = f'{os.getcwd()}/{path}'
     file_format = re.search(r'\.\w+$', file_path)
     file_data = dict()
-    
+
+    text_mime_types = [
+        {'ext': 'txt', 'type': 'text/plain'}, 
+        {'ext': 'css', 'type': 'text/css'}, 
+        {'ext': 'js', 'type': 'text/javascript'}, 
+        {'ext': 'xml', 'type': 'application/xml'},
+        {'ext': 'pdf', 'type': 'application/pdf'}
+    ]
+    image_mime_types = [
+        {'ext': 'jpg', 'type': 'image/jpeg'}, 
+        {'ext': 'jpeg', 'type': 'image/jpeg'}, 
+        {'ext': 'png', 'type': 'image/png'}, 
+        {'ext': 'gif', 'type': 'image/gif'},
+        {'ext': 'svg', 'type': 'image/svg+xml'}
+    ]
+    media_mime_types = [
+        {'ext': 'mp3', 'type': 'audio/mpeg'},
+        {'ext': 'mp4', 'type': 'video/mp4'}, 
+    ]
+
     if not os.path.exists(file_path):
         return ''
     
     if file_format and file_format[0]:
         file_data['ext'] = file_format[0].replace('.', '')
+        check_is_media = list(filter(lambda x: x['ext'] == file_data['ext'], media_mime_types))
+        check_is_image = list(filter(lambda x: x['ext'] == file_data['ext'], image_mime_types))
+        check_is_doc = list(filter(lambda x: x['ext'] == file_data['ext'], text_mime_types))
+
 
         async with aiofiles.open(file_path, 'rb') as file:
             file_str = await file.read()
             file_data['file'] = base64.b64encode(file_str).decode('ascii')
+            if check_is_media and len(check_is_media) > 0:
+                file_data['mime'] = check_is_media[0].get('type')
+            elif check_is_image and len(check_is_image) > 0:
+                file_data['mime'] = check_is_image[0].get('type')
+            elif check_is_doc and len(check_is_doc) > 0:
+                file_data['mime'] = check_is_doc[0].get('type')
 
             return file_data
     return ''
@@ -199,10 +228,10 @@ async def get_paragraphs_from_text(text):
     result_par = []
     start_index = 0
     if text_length > 100:
-        find_all_par_indexes = [i.start() for i in re.finditer('\.', text)]
+        find_all_par_indexes = [i.start() for i in re.finditer('\|', text)]
 
         for p_index in find_all_par_indexes:
-           result_par.append(text[start_index : p_index + 1])
+           result_par.append(text[start_index : p_index])
            start_index = p_index + 1
         result_par = [p.replace(' ', '') if p.startswith((' ', '\t')) else p for p in result_par]
 
