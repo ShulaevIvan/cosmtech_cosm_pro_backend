@@ -158,4 +158,5 @@ class AdminSpecificationOrder(admin.ModelAdmin):
 class AdminNewsItem(admin.ModelAdmin):
 
     model = NewsItem
+    list_display = ['title', 'date',]
     inlines = [AdminNewsUrlInline, AdminNewsBannerInline, AdminNewsVideoInline]

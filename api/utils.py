@@ -4,7 +4,12 @@ import re
 import uuid
 import base64
 import random
+import requests
+import xml.etree.ElementTree as XMLET
+from lxml import etree
+from pprint import pprint
 import aiofiles
+import asyncio
 from datetime import datetime
 from django.core.mail import EmailMessage
 from django.conf import settings
@@ -239,6 +244,57 @@ async def get_paragraphs_from_text(text):
     
     return result_par.append(text.replace(r'^\s', ''))
 
+async def get_currency_daily_course(date):
+    try:
+        event_loop = asyncio.get_event_loop()
+        currency_api_url = 'https://cbr.ru/scripts/XML_daily.asp?date_req=16/04.2025'
+        currency_folder = f'{os.getcwd()}/upload_files/news_files/currency'
+        xml_path = f'{currency_folder}/{date}.xml'
+        json_path = f'{currency_folder}/currency.json'
+        prev_date = re.search(r'\d{4}\-\d{2}\-\d{2}', xml_path)
+        json_data = list()
+
+        if prev_date:
+            prev_date = prev_date[0]
+
+        if not (os.path.exists(xml_path) or str(prev_date) != str(prev_date)):
+            if str(prev_date) != str(prev_date):
+                for item in os.scandir(currency_folder):
+                    if item.is_file():
+                        os.remove(item)
+
+            response = await event_loop.run_in_executor(None, requests.get, currency_api_url)
+
+            async with aiofiles.open(f'{xml_path}', 'w+') as file:
+                await file.write(response.text)
+                
+
+        parser = etree.XMLParser(recover=True,encoding='utf-8')
+        xml_file = XMLET.parse(xml_path,parser=parser)
+
+        for currency_item in xml_file.findall('Valute'):
+            json_obj = {
+                'name': currency_item.find('Name').text,
+                'char_code': currency_item.find('CharCode').text,
+                'value': currency_item.find('Value').text,
+            }
+            json_data.append(json_obj)
+
+        result_json = json.dumps(json_data)
+
+        async with aiofiles.open(f'{json_path}', 'w+') as file:
+            await file.write(result_json)
+
+    except Exception as err:
+        async with aiofiles.open(f'{os.getcwd()}/logs/currency_err.txt', 'a+') as file:
+            await file.write(err + '\n')
+
+async def read_json_file_by_parh(path):
+    async with aiofiles.open(path , 'r') as file:
+        file_data = await file.read()
+    
+    return json.loads(file_data)
+
 
 async def find_existing_client(phone='', email=''):
     if phone or email:
@@ -301,12 +357,13 @@ def create_upload_folders():
     news_folder = f'{os.getcwd()}/upload_files/news_files/'
     news_banners = f'{os.getcwd()}/upload_files/news_files/banners/'
     news_videos = f'{os.getcwd()}/upload_files/news_files/videos/'
+    currency_folder = f'{os.getcwd()}/upload_files/news_files/currency/'
     
     path_arr = [
         upload_files,order_files,cooperation_files,
         download_files, company_files, resume_files,
         log_folder, quiz_files, email_templates,
-        news_folder, news_banners, news_videos
+        news_folder, news_banners, news_videos, currency_folder
     ]
     for path in path_arr:
         if not os.path.exists(path):

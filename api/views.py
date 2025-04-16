@@ -1,7 +1,6 @@
 import re
 import os
 import json
-import base64
 from datetime import datetime
 import datetime as dt
 from django.views.generic.base import RedirectView
@@ -18,10 +17,11 @@ from rest_framework.permissions import IsAuthenticated
 from asgiref.sync import sync_to_async
 from adrf.views import APIView
 from .utils import validate_email, create_specification_file, create_file, get_request_name, \
-    generate_order_number, get_time, find_existing_data_by_contact, get_all_data_from_model
+    generate_order_number, get_time, find_existing_data_by_contact, get_all_data_from_model, \
+    read_json_file_by_parh
 
 from.utils import write_access_view_err_log, select_email_template_by_order, select_client_email_template_by_order, \
-    send_order_to_main_email, send_email_to_client, file_to_base64, get_paragraphs_from_text
+    send_order_to_main_email, send_email_to_client, file_to_base64, get_paragraphs_from_text, get_currency_daily_course
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
@@ -1296,6 +1296,8 @@ class NewsView(APIView):
 
     async def get(self, request):
         try:
+            current_date = dt.date.today()
+            await get_currency_daily_course(current_date)
             all_news = []
             async for news_item in NewsItem.objects.all():
                 news_obj = dict()
@@ -1333,10 +1335,25 @@ class NewsView(APIView):
         
         except Exception as err:
             method = request.method
-            await write_access_view_err_log(err, method, 'SpecForProductionView')
+            await write_access_view_err_log(err, method, 'NewsView')
             err_description = 'Ошибка доступа к новостям'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
+        
+class CurrencyCourseView(APIView):
+
+    async def get(self, request):
+        try:
+            json_path = f'{os.getcwd()}/upload_files/news_files/currency/currency.json'
+            if not (os.path.exists(json_path)):
+                return Response({'status': 'ok', 'data': []}, status=status.HTTP_200_OK)
+            
+            result_data = await read_json_file_by_parh(json_path)
+
+            return Response({'status': 'ok', 'data': result_data}, status=status.HTTP_200_OK)
+        except Exception as err:
+            method = request.method
+            await write_access_view_err_log(err, method, 'CurrencyCourseView')
 
 @sync_to_async
 @api_view(['GET'])

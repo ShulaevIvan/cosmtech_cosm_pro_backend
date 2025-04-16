@@ -355,3 +355,35 @@ view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:04 err_descr: 'New
 view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:04 err_descr: 'NewsItem' object has no attribute '_id' 
 view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:09 err_descr: 'NewsItem' object has no attribute '_NewsView__id' 
 view_func: SpecForProductionView (GET) date: 2025-04-15 22:52:09 err_descr: 'NewsItem' object has no attribute '_NewsView__id' 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:31:45 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:31:45 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:31:57 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:31:57 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:32:44 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:32:44 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:32:45 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:32:45 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:08 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:08 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:09 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:10 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:20 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:20 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:21 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:21 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:39 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:40 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:54 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:33:54 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:34:40 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:34:40 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:35:07 err_descr: 'Response' object has no attribute 'data' 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:35:08 err_descr: 'Response' object has no attribute 'data' 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:35:15 err_descr: 'Response' object is not subscriptable 
+view_func: SpecForProductionView (GET) date: 2025-04-16 11:35:15 err_descr: 'Response' object is not subscriptable 
+view_func: SpecForProductionView (GET) date: 2025-04-16 12:42:05 err_descr: unbound method datetime.date() needs an argument 
+view_func: SpecForProductionView (GET) date: 2025-04-16 12:42:05 err_descr: unbound method datetime.date() needs an argument 
+view_func: SpecForProductionView (GET) date: 2025-04-16 12:42:37 err_descr: unbound method datetime.date() needs an argument 
+view_func: SpecForProductionView (GET) date: 2025-04-16 12:42:37 err_descr: unbound method datetime.date() needs an argument 
+view_func: NewsView (GET) date: 2025-04-16 21:17:01 err_descr: name 'all_news' is not defined 
+view_func: NewsView (GET) date: 2025-04-16 21:17:01 err_descr: name 'all_news' is not defined 
