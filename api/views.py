@@ -1,6 +1,7 @@
 import re
 import os
 import json
+from pprint import pprint
 from datetime import datetime
 import datetime as dt
 from django.views.generic.base import RedirectView
@@ -1297,7 +1298,8 @@ class NewsView(APIView):
     async def get(self, request):
         try:
             current_date = dt.date.today()
-            await get_currency_daily_course(current_date)
+            prev_date = dt.date.today()-dt.timedelta(1)
+            await get_currency_daily_course(current_date, prev_date)
             all_news = []
             async for news_item in NewsItem.objects.all():
                 news_obj = dict()
@@ -1344,13 +1346,22 @@ class CurrencyCourseView(APIView):
 
     async def get(self, request):
         try:
+            param = request.GET.get('name')
             json_path = f'{os.getcwd()}/upload_files/news_files/currency/currency.json'
+
             if not (os.path.exists(json_path)):
                 return Response({'status': 'ok', 'data': []}, status=status.HTTP_200_OK)
             
+            
             result_data = await read_json_file_by_parh(json_path)
 
+            if bool(param):
+                result_data = list(filter(lambda x: x['char_code'] == str(param), result_data))
+                return Response({'status': 'ok', 'data': result_data}, status=status.HTTP_200_OK)
+
+
             return Response({'status': 'ok', 'data': result_data}, status=status.HTTP_200_OK)
+        
         except Exception as err:
             method = request.method
             await write_access_view_err_log(err, method, 'CurrencyCourseView')

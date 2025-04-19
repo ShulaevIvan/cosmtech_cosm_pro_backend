@@ -387,3 +387,71 @@ view_func: SpecForProductionView (GET) date: 2025-04-16 12:42:37 err_descr: unbo
 view_func: SpecForProductionView (GET) date: 2025-04-16 12:42:37 err_descr: unbound method datetime.date() needs an argument 
 view_func: NewsView (GET) date: 2025-04-16 21:17:01 err_descr: name 'all_news' is not defined 
 view_func: NewsView (GET) date: 2025-04-16 21:17:01 err_descr: name 'all_news' is not defined 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 12:41:15 err_descr: 'AsyncRequest' object has no attribute 'params' 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 13:54:26 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 14:05:38 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 14:11:34 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 14:24:39 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 15:05:23 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 15:29:52 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 15:29:53 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 15:46:13 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 19:20:20 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-17 19:26:31 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:07:02 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:19:44 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:21:04 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:31:56 err_descr: 'method_descriptor' object has no attribute 'today' 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:31:56 err_descr: 'method_descriptor' object has no attribute 'today' 
+view_func: NewsView (GET) date: 2025-04-18 00:36:09 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:36:09 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:36:45 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:36:47 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:37:46 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:37:54 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:37:54 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:38:13 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:38:13 err_descr: unsupported operand type(s) for +: 'AttributeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:39:20 err_descr: unsupported operand type(s) for +: 'TypeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:39:20 err_descr: unsupported operand type(s) for +: 'TypeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:39:30 err_descr: unsupported operand type(s) for +: 'TypeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:39:30 err_descr: unsupported operand type(s) for +: 'TypeError' and 'str' 
+view_func: NewsView (GET) date: 2025-04-18 00:39:55 err_descr: unsupported operand type(s) for +: 'TypeError' and 'str' 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:49:12 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 00:49:55 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 17:43:43 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 17:56:27 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 18:05:23 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-18 18:06:13 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 11:18:55 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 12:00:17 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 12:02:13 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 12:04:05 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 12:55:02 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 20:31:43 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 20:36:30 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: NewsView (GET) date: 2025-04-19 20:43:06 err_descr: 'min_img' 
+view_func: NewsView (GET) date: 2025-04-19 20:43:06 err_descr: 'min_img' 
+view_func: NewsView (GET) date: 2025-04-19 20:43:53 err_descr: 'ImageFieldFile' object has no attribute 'values' 
+view_func: NewsView (GET) date: 2025-04-19 20:43:53 err_descr: 'ImageFieldFile' object has no attribute 'values' 
+view_func: NewsView (GET) date: 2025-04-19 20:44:01 err_descr: 'ImageFieldFile' object has no attribute 'values' 
+view_func: NewsView (GET) date: 2025-04-19 20:44:01 err_descr: 'ImageFieldFile' object has no attribute 'values' 
+view_func: NewsView (GET) date: 2025-04-19 20:50:11 err_descr: 'ImageFieldFile' object has no attribute 'default' 
+view_func: NewsView (GET) date: 2025-04-19 20:50:11 err_descr: 'ImageFieldFile' object has no attribute 'default' 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 20:50:23 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: NewsView (GET) date: 2025-04-19 20:51:38 err_descr: 'ImageFieldFile' object has no attribute 'image_url' 
+view_func: NewsView (GET) date: 2025-04-19 20:51:38 err_descr: 'ImageFieldFile' object has no attribute 'image_url' 
+view_func: NewsView (GET) date: 2025-04-19 20:51:48 err_descr: 'ImageFieldFile' object has no attribute 'image_url' 
+view_func: NewsView (GET) date: 2025-04-19 20:51:48 err_descr: 'ImageFieldFile' object has no attribute 'image_url' 
+view_func: CurrencyCourseView (GET) date: 2025-04-19 21:12:25 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: NewsView (GET) date: 2025-04-19 21:20:34 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/news_fiels/default.jpg' 
+view_func: NewsView (GET) date: 2025-04-19 21:20:54 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/news_fiels/default.jpg' 
+view_func: NewsView (GET) date: 2025-04-19 21:20:56 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/news_fiels/default.jpg' 
+view_func: NewsView (GET) date: 2025-04-19 21:23:18 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/default.jpg' 
+view_func: NewsView (GET) date: 2025-04-19 21:23:40 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/default.jpg' 
+view_func: NewsView (GET) date: 2025-04-19 21:24:14 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/default.jpg' 
+view_func: NewsView (GET) date: 2025-04-19 21:26:21 err_descr: expected str, bytes or os.PathLike object, not set 
+view_func: NewsView (GET) date: 2025-04-19 21:26:34 err_descr: expected str, bytes or os.PathLike object, not set 
+view_func: NewsView (GET) date: 2025-04-19 21:28:09 err_descr: expected str, bytes or os.PathLike object, not set 
+view_func: NewsView (GET) date: 2025-04-19 21:28:34 err_descr: expected str, bytes or os.PathLike object, not set 
+view_func: NewsView (GET) date: 2025-04-19 21:29:13 err_descr: [Errno 2] No such file or directory: '/home/adminpy/Desktop/cosmtech_backend/upload_files/news_fiels/default.jpg' 

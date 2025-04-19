@@ -1,4 +1,5 @@
 import re
+import os
 from django.db import models
 from django.utils.html import format_html
 # Create your models here.
@@ -308,7 +309,12 @@ class SpecificationOrder(models.Model):
 class NewsItem(models.Model):
     title = models.CharField(max_length=255)
     date = models.DateField()
-    min_img = models.ImageField(null=True, blank=True, upload_to='upload_files/news_files/')
+    min_img = models.ImageField(
+        null=True, 
+        blank=True, 
+        upload_to='upload_files/news_files/', 
+        default=f'upload_files/news_fiels/news_default_img.png'
+    )
     min_img_alt = models.CharField(null=True, blank=True, default='min_alt')
     short_description = models.TextField()
 

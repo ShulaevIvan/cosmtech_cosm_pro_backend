@@ -185,7 +185,7 @@ async def file_to_base64(path):
     file_path = f'{os.getcwd()}/{path}'
     file_format = re.search(r'\.\w+$', file_path)
     file_data = dict()
-
+    
     text_mime_types = [
         {'ext': 'txt', 'type': 'text/plain'}, 
         {'ext': 'css', 'type': 'text/css'}, 
@@ -205,15 +205,14 @@ async def file_to_base64(path):
         {'ext': 'mp4', 'type': 'video/mp4'}, 
     ]
 
-    if not os.path.exists(file_path):
-        return ''
-    
     if file_format and file_format[0]:
         file_data['ext'] = file_format[0].replace('.', '')
         check_is_media = list(filter(lambda x: x['ext'] == file_data['ext'], media_mime_types))
         check_is_image = list(filter(lambda x: x['ext'] == file_data['ext'], image_mime_types))
         check_is_doc = list(filter(lambda x: x['ext'] == file_data['ext'], text_mime_types))
 
+        if not os.path.exists(file_path) and not check_is_media and not check_is_doc:
+            file_path = f'{os.getcwd()}/upload_files/news_files/default.jpg'
 
         async with aiofiles.open(file_path, 'rb') as file:
             file_str = await file.read()
@@ -224,7 +223,6 @@ async def file_to_base64(path):
                 file_data['mime'] = check_is_image[0].get('type')
             elif check_is_doc and len(check_is_doc) > 0:
                 file_data['mime'] = check_is_doc[0].get('type')
-
             return file_data
     return ''
 
@@ -244,21 +242,18 @@ async def get_paragraphs_from_text(text):
     
     return result_par.append(text.replace(r'^\s', ''))
 
-async def get_currency_daily_course(date):
+async def get_currency_daily_course(date, prev_date):
     try:
         event_loop = asyncio.get_event_loop()
-        currency_api_url = 'https://cbr.ru/scripts/XML_daily.asp?date_req=16/04.2025'
+        currency_api_url = 'https://cbr.ru/scripts/XML_daily.asp'
         currency_folder = f'{os.getcwd()}/upload_files/news_files/currency'
         xml_path = f'{currency_folder}/{date}.xml'
+        prev_xml_file = f'{currency_folder}/{prev_date}.xml'
         json_path = f'{currency_folder}/currency.json'
-        prev_date = re.search(r'\d{4}\-\d{2}\-\d{2}', xml_path)
         json_data = list()
 
-        if prev_date:
-            prev_date = prev_date[0]
-
-        if not (os.path.exists(xml_path) or str(prev_date) != str(prev_date)):
-            if str(prev_date) != str(prev_date):
+        if not os.path.exists(xml_path):
+            if os.path.exists(prev_xml_file):
                 for item in os.scandir(currency_folder):
                     if item.is_file():
                         os.remove(item)
