@@ -1292,8 +1292,63 @@ class SpecForProductionView(APIView):
                     specification_data.get('client_email'),
                     order
                 )
+class ArticlesView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    order_type = 'articles'
+
+    async def post(self, request):
+        try:
+            params = dict(request.query_params)
+            send_data = json.loads(json.dumps(request.data))
+            email_data = dict()
+            happy_state_description = dict()
+            
+            is_form = params.get('sendform')
+
+            if is_form and send_data.get('phone') and is_form[0]:
+                self.order_type = 'article_inner_form'
+                email_template = await select_email_template_by_order(self.order_type)
+                order = await generate_order_number('consult', 1)
+                order_time = order.get('order_date')
+
+                contact_types = [
+                    {'name': 'contactPhone', 'value': 'Телефон'},
+                    {'name': 'contactWp', 'value': 'Whatsapp'},
+                    {'name': 'contactTg', 'value': 'Telegram'},
+                ]
+                email_data['client_name'] = send_data.get('name')
+                email_data['client_phone'] = send_data.get('phone')
+                email_data['client_question'] = send_data.get('comment')
+                email_data['contact_type'] = send_data.get('contactType')
+                email_data['article'] = send_data.get('articleName')
+                
+                for contact_type in contact_types:
+                    if contact_type['name'] == email_data.get('contact_type'):
+                        email_data['contact_type'] = contact_type['value']
+
+                tmp_str = f"{email_data.get('client_name')}! Номер обращения: № {order.get('order_number')}"
+                happy_state_description['title'] = f"{email_template.get('response_title')}!"
+                happy_state_description['description'] = f"{email_template.get('response_description')}." + tmp_str
+
+                # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+                
+                return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'ok', 'description': ''}, status=status.HTTP_200_OK)
+        
+        except Exception as err:
+            method = request.method
+            await write_access_view_err_log(err, method, 'ArticlesViewFrom')
+            happy_state_description = {
+                'title': 'Очень жаль, но что-то пошло не так',
+                'description': f"отправьте пожалуйста запрос вручную на pro@cosmtech.ru"
+            }
+
+            return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_200_OK)
+        
 
 class NewsView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    order_type = 'news'
 
     async def get(self, request):
         try:
@@ -1341,6 +1396,43 @@ class NewsView(APIView):
             err_description = 'Ошибка доступа к новостям'
 
             return Response({'status': 'ok', 'description': err_description}, status=status.HTTP_200_OK)
+        
+    async def post(self, request):
+        try:
+            params = dict(request.query_params)
+            send_data = json.loads(json.dumps(request.data))
+            email_data = send_data.get('sendData')
+            is_form = params.get('sendform')
+
+            if is_form and email_data.get('phone') and is_form[0]:
+                self.order_type = 'news_form_req'
+                email_template = await select_email_template_by_order(self.order_type)
+                order = await generate_order_number('consult', 1)
+                order_time = order.get('order_date')
+
+                email_data['client_name'] = email_data.get('name')
+                email_data['client_phone'] = email_data.get('phone')
+                email_data['client_question'] = email_data.get('comment')
+                happy_state_description = {
+                    'title': f"Спасибо за обращение {email_data.get('client_name')}!",
+                    'description': f"{email_template.get('response_description')} №{order.get('order_number')} отправлен"
+                }
+
+                # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+                
+            return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_201_CREATED)
+        
+        except Exception as err:
+            method = request.method
+            await write_access_view_err_log(err, method, 'NewsViewFrom')
+            happy_state_description = {
+                'title': 'Очень жаль, но что-то пошло не так',
+                'description': f"отправьте пожалуйста запрос вручную на pro@cosmtech.ru"
+            }
+
+            return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_200_OK)
+        
+
         
 class CurrencyCourseView(APIView):
 

@@ -624,5 +624,57 @@
         ],
         "response_title": "Спасибо, за обращене {specification_data['client_name']}!",
         "response_description": "Ваше ТЗ № {specification_data['order_number']} отправлено, мы выйдем на связь в ближайшее время."
+    },
+    {
+        "id": 16,
+        "template_name": "news_form_req",
+        "email_subject": "Запрос обратной связи (раздел новости) с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос обратной связи из раздела новостей",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "client_question",
+                "value": "Вопрос клиента"
+            }
+        ],
+        "response_title": "Ваш запрос успешно отправлен",
+        "response_description": "Ваш запрос"
+    },
+    {
+        "id": 17,
+        "template_name": "article_inner_form",
+        "email_subject": "Запрос обратной связи (статьи) с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос обратной из раздела статьи",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "contact_type",
+                "value": "Желаемый тип связи"
+            },
+            {
+                "name": "client_question",
+                "value": "Вопрос клиента"
+            },
+            {
+                "name": "article",
+                "value": "Статья"
+            }
+        ],
+        "response_title": "Ваш запрос успешно отправлен",
+        "response_description": "Спасибо за проявленный интерес"
     }
 ]
