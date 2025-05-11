@@ -7,7 +7,6 @@ import random
 import requests
 import xml.etree.ElementTree as XMLET
 from lxml import etree
-from pprint import pprint
 import aiofiles
 import asyncio
 from datetime import datetime
@@ -44,7 +43,6 @@ async def select_client_email_template_by_order(order_type):
         return target_template[0]
     
     return target_template
-
 
 async def send_order_to_main_email(email_template, email_data, time='', order_number=''):
     try:
@@ -94,8 +92,6 @@ async def write_access_view_err_log(err, method, view_name=''):
 
     async with aiofiles.open(log_file_path, 'a+') as file:
         await file.write(f'{err_description} \n')
-    
-    
     
 async def send_email_to_client(email_template, client_name, client_email, order):
     try:

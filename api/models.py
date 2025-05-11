@@ -320,7 +320,6 @@ class NewsItem(models.Model):
 
     text_content = models.TextField()
 
-
     def __str__(self):
         return f'{self.title} от {self.date}'
 

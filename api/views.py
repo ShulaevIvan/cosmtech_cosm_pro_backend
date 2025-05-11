@@ -1330,7 +1330,7 @@ class ArticlesView(APIView):
                 happy_state_description['title'] = f"{email_template.get('response_title')}!"
                 happy_state_description['description'] = f"{email_template.get('response_description')}." + tmp_str
 
-                # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+                await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
                 
                 return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_201_CREATED)
             return Response({'status': 'ok', 'description': ''}, status=status.HTTP_200_OK)
@@ -1361,7 +1361,7 @@ class NewsView(APIView):
                 news_obj['urls'] = []
                 news_obj['videos'] = []
                 news_obj['banners'] = []
-
+                
                 async for url_item in news_item.news_url.all().values():
                     news_obj['urls'].append(url_item)
                 async for banner_item in news_item.news_image.all().values():
@@ -1431,8 +1431,6 @@ class NewsView(APIView):
             }
 
             return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_200_OK)
-        
-
         
 class CurrencyCourseView(APIView):
 

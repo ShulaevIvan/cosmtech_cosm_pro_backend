@@ -503,3 +503,6 @@ view_func: NewsViewFrom (POST) date: 2025-04-22 15:35:10 err_descr: 'NoneType' o
 view_func: NewsViewFrom (POST) date: 2025-04-22 15:35:23 err_descr: 'NoneType' object does not support item assignment 
 view_func: NewsViewFrom (POST) date: 2025-04-22 15:35:28 err_descr: 'NoneType' object does not support item assignment 
 view_func: CurrencyCourseView (GET) date: 2025-04-22 22:03:19 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: NewsView (GET) date: 2025-04-23 13:55:11 err_descr: unsupported operand type(s) for +: 'FileNotFoundError' and 'str' 
+view_func: CurrencyCourseView (GET) date: 2025-04-23 16:53:25 err_descr: Expecting value: line 1 column 1 (char 0) 
+view_func: CurrencyCourseView (GET) date: 2025-04-23 21:01:18 err_descr: Expecting value: line 1 column 1 (char 0) 
