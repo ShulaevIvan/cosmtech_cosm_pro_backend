@@ -36,9 +36,10 @@ def default(request):
         '/services', '/services/', '/contacts/', 
         '/contacts', '/about', '/about/', 
         '/job', '/job/', '/policy', 
-        '/policy/', '/forclients/', '/forclients'
+        '/policy/', '/forclients/', '/forclients',
+        'robots.txt', 'sitemap.xml'
     ]
-    path_ignore_list = ['/admin/', 'company_files/presentation/',]
+    path_ignore_list = ['/admin/', 'company_files/presentation/', 'robots.txt/', '/robots.txt', '/sitemap.xml', 'sitemap.xml/']
     slash_pattern = re.compile(r'\s*\/$')
     find_slash = re.search(slash_pattern, request.path)
     target_url = list(filter(lambda url: url == request.path, path_list))
@@ -1527,5 +1528,17 @@ def download_admin_file(request):
         write_access_view_err_log(err, method, 'download_admin_file')
 
         return Response({'status': 'err', 'description': err}, status=status.HTTP_400_BAD_REQUEST)
+    
+def robots_txt_file(request):
+    robots_txt_file_path = f'{settings.SEO_FOLDER}/robots.txt'
+    if os.path.exists(robots_txt_file_path):
+        return FileResponse(open(f'{robots_txt_file_path}', 'rb'), content_type='text/plain')
+    return render(request, '404.html', status=404)
+
+def sitemap_xml_file(request):
+    sitemap_xml_file_path = f'{settings.SEO_FOLDER}/sitemap.xml'
+    if os.path.exists(sitemap_xml_file_path):
+        return FileResponse(open(f'{sitemap_xml_file_path}', 'rb'), content_type='application/xml')
+    return render(request, '404.html', status=404)
 
 favicon_view = RedirectView.as_view(url='/static/favicon.ico', permanent=True)

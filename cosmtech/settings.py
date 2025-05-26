@@ -23,6 +23,7 @@ UPLOAD_FILES = f'{os.getcwd()}/upload_files'
 ORDER_FILES = f'{UPLOAD_FILES}/order_files/'
 COOPERATION_FILES = f'{UPLOAD_FILES}/cooperation_files/'
 ORDER_MAIL = 'pro@cosmtech.ru'
+SEO_FOLDER = f'{os.getcwd()}/seo_files/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: *
+
+User-agent: GoogleBot
+Allow: *
+
+User-agent: Yandex
+
+Clean-Param: utm_source&utm_medium&utm_campaign
+Clean-Param: openstat
+
+Sitemap: https://cosmtech.ru/sitemap.xml

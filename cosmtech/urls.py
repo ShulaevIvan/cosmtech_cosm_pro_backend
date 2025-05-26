@@ -25,7 +25,7 @@ ContactsRequestView,  QuizOrderView, QuestionOrderView, TzOrderView, CityDataVie
     VacancyView, SupplierView, SuppliersTypeView, ForClientsRequestView, ExcursionProductionView, \
     DecorativeCosmeticView, SpecForProductionView, ArticlesView, NewsView, CurrencyCourseView, download_admin_file, get_presentation, get_tz_template
 
-from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file
+from api.views import CallbackRequestView, RequestOrderView, RequestConsultView, ContactsRequestView, download_admin_file, robots_txt_file, sitemap_xml_file
 
 
 
@@ -55,6 +55,8 @@ urlpatterns = [
     path('api/currency/', CurrencyCourseView.as_view()),
     path('company_files/presentation/', get_presentation),
     path('company_files/tz/', get_tz_template,),
+    re_path(r'^robots.txt/|^robots.txt', robots_txt_file),
+    re_path(r'^sitemap.xml/|^sitemap.xml', sitemap_xml_file),
     # re_path(r'^favicon\.ico$', favicon_view),
     re_path('.*', default),
 ]+ static(settings.UPLOAD_FILES, document_root=settings.ORDER_FILES)

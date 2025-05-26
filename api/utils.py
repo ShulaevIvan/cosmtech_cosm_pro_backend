@@ -349,12 +349,14 @@ def create_upload_folders():
     news_banners = f'{os.getcwd()}/upload_files/news_files/banners/'
     news_videos = f'{os.getcwd()}/upload_files/news_files/videos/'
     currency_folder = f'{os.getcwd()}/upload_files/news_files/currency/'
+    seo_folder = f'{os.getcwd()}/seo_files/'
     
     path_arr = [
         upload_files,order_files,cooperation_files,
         download_files, company_files, resume_files,
         log_folder, quiz_files, email_templates,
-        news_folder, news_banners, news_videos, currency_folder
+        news_folder, news_banners, news_videos, currency_folder,
+        seo_folder
     ]
     for path in path_arr:
         if not os.path.exists(path):
