@@ -22,7 +22,7 @@ from .utils import validate_email, create_specification_file, create_file, get_r
     read_json_file_by_parh
 
 from.utils import write_access_view_err_log, select_email_template_by_order, select_client_email_template_by_order, \
-    send_order_to_main_email, send_email_to_client, file_to_base64, get_paragraphs_from_text, get_currency_daily_course
+    send_order_to_main_email, send_email_to_client, send_to_design_email, file_to_base64, get_paragraphs_from_text, get_currency_daily_course
 
 from .models import CallbackRequests, Client, Order, ClientOrder, ConsultRequest, ClientOrderFile, \
     CoperationRequest, CoperationRequestFile, CityData, QuizOrder, QuizQuestionOrder, QuizTzOrder, \
@@ -1432,6 +1432,57 @@ class NewsView(APIView):
             }
 
             return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_200_OK)
+        
+class DesignServiceView(APIView):
+
+    order_type = 'design_order'
+    
+    async def post(self, request):
+        try:
+            data = json.loads(request.body)
+            email_data = dict()
+            happy_state_description = dict()
+
+            if data and data['orderType'] == 'order':
+                self.order_type = 'design_order_inner_form'
+                order = await generate_order_number('consult', 1)
+                email_template = await select_email_template_by_order(self.order_type)
+                order_time = order.get('order_date')
+                email_data['client_name'] = data.get('name')
+                email_data['client_phone'] = data.get('phone')
+                email_data['service'] = data.get('service')
+
+                happy_state_description = {
+                    'title': f"Спасибо за обращение {email_data.get('client_name')}!",
+                    'description': f"{email_template.get('response_description')} №{order.get('order_number')} отправлен"
+                }
+
+                # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+                # await send_to_design_email(email_template, email_data, order_time, order.get('order_number'))
+
+                return Response({'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']})
+            elif data and data['orderType'] == 'consult':
+            
+                self.order_type = 'design_consult_page_form'
+                order = await generate_order_number('consult', 1)
+                email_template = await select_email_template_by_order(self.order_type)
+
+                email_data['client_name'] = data.get('name')
+                email_data['client_phone'] = data.get('phone')
+                email_data['comment'] = data.get('comment')
+                order_time = order.get('order_date')
+
+                happy_state_description = {
+                    'title': f"Спасибо за обращение {email_data.get('client_name')}!",
+                    'description': f"{email_template.get('response_description')} №{order.get('order_number')} отправлен"
+                }
+
+                # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+                # await send_to_design_email(email_template, email_data, order_time, order.get('order_number'))
+
+                return Response({'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']})
+        except:
+            pass
         
 class CurrencyCourseView(APIView):
 

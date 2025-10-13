@@ -77,6 +77,39 @@ async def send_order_to_main_email(email_template, email_data, time='', order_nu
         await write_email_err_log(err, email_template.get('template_name'))
 
 
+async def send_to_design_email(email_template, email_data, time='', order_number=''):
+    try:
+        has_multiple_files = email_data.get('files')
+        has_file = email_data.get('file')
+        msg_mail = EmailMessage(
+            f"{email_template.get('email_subject')}", 
+            f"""
+                <h4>Описание:</h4>
+                <p>{email_template.get('email_body_description')}</p>
+
+                <h4>Данные:</h4>
+                <ul>
+                    {''.join(f"<li>{item.get('value')} : {email_data.get(item.get('name'))}</li>" for item in email_template.get('fields'))}
+                </ul>
+
+                <p>№ запроса: <strong>{order_number}</strong></p>
+                <p><strong>{time}</strong></p>
+
+            """,
+            f'{settings.EMAIL_HOST_USER}', [f"shineprint@mail.ru"]
+        )
+        msg_mail.content_subtype = "html"
+        if has_multiple_files:
+            for file_path in email_data.get('files'):
+                msg_mail.attach_file(f'{file_path}')
+        elif has_file:
+            msg_mail.attach_file(f"{email_data.get('file')}")
+        msg_mail.send()
+
+    except Exception as err:
+        await write_email_err_log(err, email_template.get('template_name'))
+
+
 async def write_email_err_log(err, template, order_num=''):
     current_date = datetime.now().replace(microsecond=0)
     err_description = f'order_num: {order_num} date: {current_date} send_form: {template}  err_descr: {err}'

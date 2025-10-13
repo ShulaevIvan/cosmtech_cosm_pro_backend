@@ -676,5 +676,49 @@
         ],
         "response_title": "Ваш запрос успешно отправлен",
         "response_description": "Спасибо за проявленный интерес"
+    },
+    {
+        "id": 18,
+        "template_name": "design_consult_page_form",
+        "email_subject": "Запрос консультации по дизайну (страница) с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос консультации по дизайну",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "comment",
+                "value": "Комментарий клиента"
+            }
+        ],
+        "response_title": "Ваш запрос успешно отправлен",
+        "response_description": "Спасибо за проявленный интерес! Ваш номер запроса №"
+    },
+     {
+        "id": 19,
+        "template_name": "design_order_inner_form",
+        "email_subject": "Запрос на услуги по дизайну (страница) с сайта cosmtech.ru",
+        "email_body_description": "Новый запрос услуги по дизайну",
+        "fields": [
+            {
+                "name": "client_name",
+                "value": "Имя клиента"
+            },
+            {
+                "name": "client_phone",
+                "value": "Телефон клиента"
+            },
+            {
+                "name": "service",
+                "value": "Услуга"
+            }
+        ],
+        "response_title": "Ваш запрос успешно отправлен",
+        "response_description": "Спасибо за проявленный интерес! Ваш номер запроса №"
     }
 ]
