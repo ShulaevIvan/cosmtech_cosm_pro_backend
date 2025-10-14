@@ -1460,7 +1460,10 @@ class DesignServiceView(APIView):
                 # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
                 # await send_to_design_email(email_template, email_data, order_time, order.get('order_number'))
 
-                return Response({'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']})
+                return Response(
+                    {'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']},
+                    status=status.HTTP_200_OK
+                )
             elif data and data['orderType'] == 'consult':
             
                 self.order_type = 'design_consult_page_form'
@@ -1480,9 +1483,19 @@ class DesignServiceView(APIView):
                 # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
                 # await send_to_design_email(email_template, email_data, order_time, order.get('order_number'))
 
-                return Response({'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']})
-        except:
-            pass
+                return Response(
+                    {'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']},
+                    status=status.HTTP_200_OK
+                )
+        except Exception as err:
+            method = request.method
+            await write_access_view_err_log(err, method, 'DesignViewForm')
+            happy_state_description = {
+                'title': 'Очень жаль, но что-то пошло не так',
+                'description': f"отправьте пожалуйста запрос вручную на pro@cosmtech.ru"
+            }
+
+            return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_200_OK)
         
 class CurrencyCourseView(APIView):
 
