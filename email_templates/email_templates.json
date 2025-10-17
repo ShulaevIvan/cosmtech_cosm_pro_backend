@@ -699,7 +699,7 @@
         "response_title": "Ваш запрос успешно отправлен",
         "response_description": "Спасибо за проявленный интерес! Ваш номер запроса №"
     },
-     {
+    {
         "id": 19,
         "template_name": "design_order_inner_form",
         "email_subject": "Запрос на услуги по дизайну (страница) с сайта cosmtech.ru",

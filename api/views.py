@@ -37,6 +37,7 @@ def default(request):
         '/contacts', '/about', '/about/', 
         '/job', '/job/', '/policy', 
         '/policy/', '/forclients/', '/forclients',
+        '/design-cosmetics',
         'robots.txt', 'sitemap.xml'
     ]
     path_ignore_list = ['/admin/', 'company_files/presentation/', 'robots.txt/', '/robots.txt', '/sitemap.xml', 'sitemap.xml/']
@@ -1434,7 +1435,7 @@ class NewsView(APIView):
             return Response({'status': 'ok', 'description': happy_state_description}, status=status.HTTP_200_OK)
         
 class DesignServiceView(APIView):
-
+    permission_classes = [IsAuthenticated, ]
     order_type = 'design_order'
     
     async def post(self, request):
@@ -1480,8 +1481,8 @@ class DesignServiceView(APIView):
                     'description': f"{email_template.get('response_description')} №{order.get('order_number')} отправлен"
                 }
 
-                # await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
-                # await send_to_design_email(email_template, email_data, order_time, order.get('order_number'))
+                await send_order_to_main_email(email_template, email_data, order_time, order.get('order_number'))
+                await send_to_design_email(email_template, email_data, order_time, order.get('order_number'))
 
                 return Response(
                     {'status': 'ok', 'message':  happy_state_description['title'], 'description': happy_state_description['description']},
